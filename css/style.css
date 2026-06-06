@@ -3666,13 +3666,13 @@ body.has-sticky-cta {
   }
 
   .instructor--detail {
-    padding: 24px;
-    gap: 24px;
+    padding: 18px;
+    gap: 16px;
   }
 
   .instructor--detail .instructor__photo {
-    aspect-ratio: 3 / 4;
-    max-width: 260px;
+    aspect-ratio: 1 / 1;
+    max-width: 160px;
     width: 100%;
     margin: 0 auto;
   }
@@ -3680,6 +3680,36 @@ body.has-sticky-cta {
   .instructor--detail .instructor__photo img {
     object-fit: cover;
     object-position: center top;
+  }
+
+  .instructor--detail .instructor__role {
+    font-size: 11px;
+    margin: 0 0 4px;
+    text-align: center;
+  }
+
+  .instructor--detail .instructor__name {
+    font-size: 19px;
+    margin: 0 0 2px;
+    text-align: center;
+  }
+
+  .instructor--detail .instructor__name-en {
+    font-size: 12px;
+    margin: 0 0 12px;
+    text-align: center;
+  }
+
+  .instructor__lesson {
+    padding: 10px 14px;
+    margin: 0;
+    font-size: 13px;
+    line-height: 1.7;
+  }
+
+  .instructor__lesson strong {
+    font-size: 11px;
+    margin-bottom: 2px;
   }
 
   .instructor__stores {
@@ -3715,9 +3745,12 @@ body.has-sticky-cta {
   }
 
   .instructor__profile {
-    grid-template-columns: 96px 1fr;
-    font-size: 13px;
-    column-gap: 12px;
+    grid-template-columns: 88px 1fr;
+    font-size: 12.5px;
+    line-height: 1.6;
+    row-gap: 4px;
+    column-gap: 10px;
+    margin: 0 0 12px;
   }
 
   /* Price table - card layout on mobile */
