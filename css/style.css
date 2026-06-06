@@ -1767,7 +1767,13 @@ button {
   grid-template-columns: 260px 1fr;
   gap: 40px;
   padding: 36px;
-  border: 2px solid var(--color-primary);
+  border: 1px solid var(--color-line);
+}
+
+.instructor--detail:hover {
+  transform: none;
+  border-color: var(--color-line);
+  box-shadow: none;
 }
 
 .instructor__stores {
