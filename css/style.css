@@ -1767,12 +1767,12 @@ button {
   grid-template-columns: 260px 1fr;
   gap: 40px;
   padding: 36px;
-  border: 1px solid var(--color-line);
+  border: 2px solid var(--color-primary);
 }
 
 .instructor--detail:hover {
   transform: none;
-  border-color: var(--color-line);
+  border-color: var(--color-primary);
   box-shadow: none;
 }
 
@@ -1825,6 +1825,7 @@ button {
   margin: 0 0 18px;
   font-size: 14px;
   line-height: 1.7;
+  min-height: 204px;
 }
 
 .instructor__profile dt {
@@ -1846,6 +1847,10 @@ button {
   font-size: 14px;
   line-height: 1.8;
   border-radius: 0 8px 8px 0;
+  min-height: 100px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
 .instructor__lesson strong {
@@ -3714,15 +3719,18 @@ body.has-sticky-cta {
 
   .instructor--detail .instructor__profile {
     margin: 0 0 10px;
+    min-height: 156px;
   }
 
   .instructor--detail .instructor__lesson {
-    padding: 10px 14px;
+    padding: 12px 14px;
     margin: 0;
     font-size: 13px;
     line-height: 1.7;
-    min-height: 0;
-    display: block;
+    min-height: 80px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
   }
 
   .instructor__lesson strong {
