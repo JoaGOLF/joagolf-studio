@@ -2654,10 +2654,11 @@ button {
   color: var(--color-primary);
   font-size: 13px;
   letter-spacing: 0.1em;
-  padding-top: 4px;
   display: flex;
   align-items: center;
   gap: 8px;
+  align-self: start;
+  min-height: calc(15px * 1.9);
 }
 
 .access__info dt[data-icon]::before {
