@@ -4497,3 +4497,48 @@ body.has-sticky-cta {
   .swing-quiz .supervisor__inner { gap: 14px; }
 }
 
+/* =============================================
+   Policy（プライバシーポリシー等の規約系ページ）
+============================================== */
+.policy { line-height: 1.9; color: var(--color-text, #2d3436); }
+.policy__lead {
+  margin: 0 0 40px;
+  font-size: 15px;
+  line-height: 2;
+}
+.policy__article { margin-bottom: 40px; }
+.policy__article:last-child { margin-bottom: 0; }
+.policy__article h2 {
+  font-size: 18px;
+  font-weight: 700;
+  margin: 0 0 16px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid var(--color-primary);
+  color: var(--color-primary);
+  letter-spacing: 0.02em;
+}
+.policy__article h3 {
+  font-size: 15px;
+  font-weight: 700;
+  margin: 20px 0 8px;
+}
+.policy__article p { margin: 0 0 12px; font-size: 14.5px; }
+.policy__article ul,
+.policy__article ol { margin: 8px 0 12px; padding-left: 24px; }
+.policy__article li { margin-bottom: 6px; font-size: 14.5px; line-height: 1.85; }
+.policy__meta {
+  margin-top: 60px;
+  padding-top: 24px;
+  border-top: 1px solid #eee;
+  font-size: 13px;
+  color: #888;
+  text-align: right;
+}
+.policy__meta p { margin: 4px 0; }
+@media (max-width: 767px) {
+  .policy__article h2 { font-size: 16px; }
+  .policy__article h3 { font-size: 14px; }
+  .policy__article p,
+  .policy__article li { font-size: 13.5px; }
+}
+
