@@ -4420,11 +4420,10 @@ body.has-sticky-cta {
 
 .swing-quiz .supervisor {
   margin: 30px auto 0;
-  padding: 22px 24px;
+  padding: 40px 50px;
   background: #fff;
-  border-radius: 16px;
+  border-radius: 20px;
   border: 1px solid #ffeef5;
-  max-width: 460px;
   box-shadow: 0 4px 14px rgba(204, 33, 127, 0.05);
 }
 .swing-quiz .supervisor__label {
