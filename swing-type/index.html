@@ -3,8 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="JoaGOLF STUDIO のスイングタイプ診断。あなたのスイングタイプを知って、最適な上達方法を見つけよう。">
+  <meta name="description" content="JoaGOLF STUDIO のスイングタイプ診断。11問の質問に答えるだけで、あなたの身体特性に合った理想的なスイングタイプを判定します。">
   <title>スイングタイプ診断 | JoaGOLF STUDIO</title>
+
+  <meta property="og:title" content="スイングタイプ診断 | JoaGOLF STUDIO">
+  <meta property="og:description" content="11問の質問に答えるだけで、あなたの身体特性に合った理想的なスイングタイプを判定します。">
+  <meta property="og:type" content="website">
+  <meta property="og:image" content="/images/swing-type/ogp-image.jpeg">
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -55,20 +60,71 @@
       </div>
     </div>
 
-    <section class="section coming-soon">
-      <div class="container container--narrow">
-        <div class="coming-soon__inner">
-          <p class="coming-soon__label">Coming Soon</p>
-          <h2 class="coming-soon__title">準備中です</h2>
-          <p class="coming-soon__desc">
-            スイングタイプ診断ページは現在準備中です。<br>
-            公開までしばらくお待ちください。
-          </p>
-          <div class="coming-soon__actions">
-            <a href="/" class="btn btn--primary">トップページに戻る</a>
-            <a href="/contact/" class="btn btn--ghost">お問い合わせはこちら</a>
+    <section class="swing-quiz">
+      <div class="quiz-inner">
+
+        <section id="intro">
+          <div class="notice-box">
+            <h2 class="main-title">ゴルフスイングタイプ診断</h2>
+            <p class="description">11問の質問に答えて、あなたの身体特性に合った理想的なスイングタイプを判定します！</p>
+            <img src="/images/swing-type/kv.jpeg" alt="ゴルフスイングタイプ診断 メインイメージ" class="intro-image">
+
+            <div class="attention-point" style="margin-bottom: 20px;">
+              <h2>💡 用意するもの</h2>
+              <ul>
+                <li><span>座ったときに足の角度がほぼ直角になる高さの椅子</span></li>
+                <li><span>ペットボトルや蓋付の瓶など</span></li>
+              </ul>
+            </div>
+
+            <div class="attention-point">
+              <h2>⚠️ 答える時の注意点</h2>
+              <p class="sub-notice">回答に迷ったら...</p>
+              <ul>
+                <li><span>「楽にできるのはどちらか？」</span></li>
+                <li><span>「ゴルフを始めた頃はどうだったか？」</span></li>
+                <li><span>「より自然な動きはどちらか？」</span></li>
+              </ul>
+              <p class="priority-text" style="margin-bottom: 15px;">を優先して回答してください！</p>
+
+              <p class="sub-notice">また、</p>
+              <ul>
+                <li><span style="color: #d9534f;">「理想的な動き」</span></li>
+                <li><span style="color: #d9534f;">「カッコいい動き」</span></li>
+                <li><span style="color: #d9534f;">「教わった動き」</span></li>
+              </ul>
+              <p class="priority-text">にとらわれず回答してください！</p>
+            </div>
           </div>
-        </div>
+          <button id="start-btn" class="quiz-btn">診断をスタートする</button>
+        </section>
+
+        <section id="quiz-area" style="display:none;">
+          <div class="progress-container">
+            <span id="progress-text">Q 1 / 11</span>
+            <div class="progress-bar"><div id="progress-core"></div></div>
+          </div>
+
+          <div class="question-card">
+            <h3 id="question-text">読み込み中...</h3>
+            <div class="choice-container">
+              <button class="choice-btn" id="choice-a">
+                <span class="choice-text" id="text-a">選択肢A</span>
+              </button>
+              <button class="choice-btn" id="choice-b">
+                <span class="choice-text" id="text-b">選択肢B</span>
+              </button>
+            </div>
+
+            <div class="quiz-nav">
+              <button id="prev-btn" class="nav-btn" disabled>← 前の質問</button>
+              <button id="next-btn" class="nav-btn" disabled>次の質問 →</button>
+            </div>
+          </div>
+        </section>
+
+        <section id="result-area" style="display:none;"></section>
+
       </div>
     </section>
 
@@ -90,7 +146,6 @@
               <li><a href="/voice/">Voices</a></li>
               <li><a href="/news/">News</a></li>
               <li><a href="/faq/">FAQ</a></li>
-              
             </ul>
           </div>
           <div class="footer__col">
@@ -122,5 +177,6 @@
   </footer>
 
   <script src="/js/script.js"></script>
+  <script src="/js/swing-type.js"></script>
 </body>
 </html>
