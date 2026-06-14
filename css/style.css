@@ -1508,21 +1508,28 @@ button {
 /* Store hero (with image background) */
 .store-hero {
   position: relative;
-  padding: 140px 0 96px;
-  background: var(--color-bg-alt);
-  color: var(--color-text);
+  padding: 200px 0 120px;
+  overflow: hidden;
+  color: #fff;
 }
 
 .store-hero__bg {
-  position: relative;
-  width: 100%;
-  margin: 0 0 48px;
+  position: absolute;
+  inset: 0;
+  z-index: 0;
 }
 
 .store-hero__bg img {
   width: 100%;
-  height: auto;
-  display: block;
+  height: 100%;
+  object-fit: cover;
+}
+
+.store-hero__bg::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.25) 0%, rgba(0, 0, 0, 0.55) 100%);
 }
 
 .store-hero__inner {
@@ -1537,7 +1544,6 @@ button {
   letter-spacing: 0.3em;
   text-transform: uppercase;
   margin: 0 0 12px;
-  color: var(--color-primary);
 }
 
 .store-hero__title {
@@ -1546,14 +1552,13 @@ button {
   font-size: 72px;
   line-height: 1.2;
   margin: 0 0 24px;
-  color: var(--color-text);
 }
 
 .store-hero__addr {
   font-size: 16px;
   line-height: 1.9;
   margin: 0 0 32px;
-  color: var(--color-sub);
+  opacity: 0.95;
 }
 
 .store-hero__meta {
@@ -1561,7 +1566,7 @@ button {
   gap: 32px;
   flex-wrap: wrap;
   padding-top: 24px;
-  border-top: 1px solid var(--color-line);
+  border-top: 1px solid rgba(255, 255, 255, 0.3);
 }
 
 .store-hero__meta-item {
@@ -1575,13 +1580,12 @@ button {
   font-size: 12px;
   letter-spacing: 0.15em;
   text-transform: uppercase;
-  color: var(--color-primary);
+  opacity: 0.8;
 }
 
 .store-hero__meta-value {
   font-size: 15px;
   font-weight: 600;
-  color: var(--color-text);
 }
 
 /* Breadcrumb */
@@ -3256,14 +3260,105 @@ body.has-sticky-cta {
 
   .store-hero {
     padding: 120px 0 80px;
+    overflow: visible;
+    background: var(--color-bg-alt);
+    color: var(--color-text);
   }
 
   .store-hero__bg {
-    margin-bottom: 40px;
+    position: relative;
+    inset: auto;
+    width: 100%;
+    margin: 0 0 40px;
+  }
+
+  .store-hero__bg img {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+
+  .store-hero__bg::after {
+    display: none;
+  }
+
+  .store-hero__en {
+    color: var(--color-primary);
   }
 
   .store-hero__title {
     font-size: 56px;
+    color: var(--color-text);
+  }
+
+  .store-hero__addr {
+    color: var(--color-sub);
+    opacity: 1;
+  }
+
+  .store-hero__meta {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    padding-top: 32px;
+    border-top: 1px solid var(--color-line);
+  }
+
+  .store-hero__meta-item {
+    align-items: center;
+    text-align: center;
+    gap: 8px;
+    background: #fff;
+    border: 1px solid var(--color-line);
+    border-radius: 12px;
+    padding: 24px 20px;
+    box-shadow: 0 2px 12px rgba(204, 33, 127, 0.04);
+    transition: transform var(--transition), box-shadow var(--transition);
+  }
+
+  .store-hero__meta-item:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 24px rgba(204, 33, 127, 0.1);
+  }
+
+  .store-hero__meta-item::before {
+    content: "";
+    display: block;
+    width: 40px;
+    height: 40px;
+    margin-bottom: 4px;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: contain;
+  }
+
+  .store-hero__meta-item[data-icon="access"]::before {
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23cc217f' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'><path d='M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z'/><circle cx='12' cy='10' r='3'/></svg>");
+  }
+
+  .store-hero__meta-item[data-icon="hours"]::before {
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23cc217f' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='12' r='10'/><polyline points='12 6 12 12 16 14'/></svg>");
+  }
+
+  .store-hero__meta-item[data-icon="booths"]::before {
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23cc217f' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'><line x1='6' y1='22' x2='6' y2='3'/><path d='M6 3l12 4-12 4'/></svg>");
+  }
+
+  .store-hero__meta-item[data-icon="parking"]::before {
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23cc217f' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'><rect x='3' y='3' width='18' height='18' rx='2'/><path d='M9 17V7h4a3 3 0 0 1 0 6H9'/></svg>");
+  }
+
+  .store-hero__meta-label {
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    color: var(--color-primary);
+    opacity: 1;
+  }
+
+  .store-hero__meta-value {
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--color-text);
   }
 
   /* Instructor */
