@@ -190,7 +190,7 @@ function showResult() {
                 <div class="supervisor__inner">
                     <img class="supervisor__photo" src="/images/produce.jpg" alt="中村 彩夏">
                     <div class="supervisor__text">
-                        <p class="supervisor__name">中村 彩夏（ナカムラ アヤカ）</p>
+                        <p class="supervisor__name">中村 彩夏</p>
                         <p class="supervisor__name-en">AYAKA NAKAMURA</p>
                     </div>
                 </div>
