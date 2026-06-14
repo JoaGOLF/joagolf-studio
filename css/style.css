@@ -3263,7 +3263,8 @@ body.has-sticky-cta {
   }
 
   .message--detail .message__image {
-    position: static;
+    position: relative;
+    top: auto;
   }
 
   /* Grids → 2 cols on tablet */
@@ -3574,7 +3575,8 @@ body.has-sticky-cta {
 
   .message--detail .message__image {
     aspect-ratio: 4 / 3;
-    position: static;
+    position: relative;
+    top: auto;
   }
 
   /* Profile */
