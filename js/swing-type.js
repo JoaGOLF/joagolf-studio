@@ -192,13 +192,13 @@ function showResult() {
                     <div class="supervisor__text">
                         <p class="supervisor__name">中村 彩夏</p>
                         <p class="supervisor__name-en">AYAKA NAKAMURA</p>
+                        <ul class="supervisor__titles">
+                            <li>JoaGOLF STUDIO インストラクター</li>
+                            <li>4スタンス理論（REASH理論）マスター級トレーナー</li>
+                            <li>LGIA インストラクター育成講師</li>
+                        </ul>
                     </div>
                 </div>
-                <ul class="supervisor__titles">
-                    <li>JoaGOLF STUDIO インストラクター</li>
-                    <li>4スタンス理論（REASH理論）マスター級トレーナー</li>
-                    <li>LGIA インストラクター育成講師</li>
-                </ul>
                 <p class="supervisor__bio">レギュラーツアー出場経験を持つ元ツアープロの父から受け継いだレッスン理論と、4スタンス理論を融合した独自メソッド『AYASTA Method』を考案。</p>
                 <p class="supervisor__bio">一人ひとりの生まれ持った身体特性に合わせた指導を得意とし、「無理なく・楽しく・結果を出せるレッスン」を提供しています。</p>
             </div>
