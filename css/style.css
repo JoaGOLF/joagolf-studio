@@ -2655,6 +2655,36 @@ button {
   font-size: 13px;
   letter-spacing: 0.1em;
   padding-top: 4px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.access__info dt[data-icon]::before {
+  content: "";
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
+  flex-shrink: 0;
+}
+
+.access__info dt[data-icon="address"]::before {
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23cc217f' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'><path d='M3 21h18'/><path d='M5 21V8l7-4 7 4v13'/><path d='M9 9h.01M13 9h.01M9 13h.01M13 13h.01M9 17h.01M13 17h.01'/></svg>");
+}
+
+.access__info dt[data-icon="access"]::before {
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23cc217f' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'><rect x='5' y='3' width='14' height='14' rx='2'/><line x1='5' y1='11' x2='19' y2='11'/><circle cx='9' cy='14' r='1'/><circle cx='15' cy='14' r='1'/><path d='M8 17l-2 4'/><path d='M16 17l2 4'/></svg>");
+}
+
+.access__info dt[data-icon="hours"]::before {
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23cc217f' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='12' r='10'/><polyline points='12 6 12 12 16 14'/></svg>");
+}
+
+.access__info dt[data-icon="parking"]::before {
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23cc217f' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'><rect x='3' y='3' width='18' height='18' rx='2'/><path d='M9 17V7h4a3 3 0 0 1 0 6H9'/></svg>");
 }
 
 .access__info dd {
