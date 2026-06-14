@@ -3167,7 +3167,9 @@ body.has-sticky-cta {
     box-shadow: -8px 0 32px rgba(0, 0, 0, 0.08);
     overflow-y: auto;
   }
-  .nav__cta + .nav__cta { margin-left: 0; margin-top: -10px; }
+  .nav__cta + .nav__cta { margin-left: 0; margin-top: 0; }
+  .nav .nav__cta.btn--primary { order: 1; }
+  .nav .nav__cta.btn--ghost { order: 2; margin-top: -10px; }
 
   .nav.is-open {
     transform: translateX(0);
