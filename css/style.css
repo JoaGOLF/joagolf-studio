@@ -1098,6 +1098,18 @@ button {
   border-radius: 50%;
   object-fit: cover;
 }
+.voice-card__avatar--icon {
+  background: var(--color-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.voice-card__avatar--icon svg {
+  width: 62%;
+  height: 62%;
+  fill: #fff;
+}
 
 .voice-card__name {
   font-size: 17px;
