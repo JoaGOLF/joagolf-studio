@@ -4711,12 +4711,13 @@ body.has-sticky-cta {
 }
 .swing-promo__title {
   font-family: "Outfit", "Noto Sans JP", sans-serif;
-  font-size: 36px;
+  font-size: clamp(22px, 3.4vw, 36px);
   font-weight: 800;
   line-height: 1.35;
   margin: 0 0 28px;
   color: var(--color-text);
   position: relative;
+  white-space: nowrap;
 }
 .swing-promo__lead {
   font-size: 20px;
@@ -4815,7 +4816,7 @@ body.has-sticky-cta {
 @media (max-width: 767px) {
   .swing-promo { padding: 40px 24px; }
   .swing-promo__kv { margin: -40px -24px 24px; }
-  .swing-promo__title { font-size: clamp(22px, 5.5vw, 28px); margin-bottom: 22px; }
+  .swing-promo__title { font-size: clamp(13px, 4.1vw, 22px); margin-bottom: 22px; letter-spacing: -0.01em; }
   .swing-promo__lead { font-size: 17px; margin-bottom: 18px; }
   .swing-promo__body { font-size: 14px; }
   .swing-promo__actions { margin-top: 28px; }
