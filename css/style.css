@@ -289,6 +289,15 @@ button {
   margin-left: -28px;
 }
 
+.nav__cta.btn--primary {
+  border: 2px solid var(--color-primary);
+}
+.nav__cta.btn--primary:hover {
+  background: #fff;
+  color: var(--color-primary);
+  border-color: var(--color-primary);
+}
+
 .nav__home-only {
   display: none;
 }
