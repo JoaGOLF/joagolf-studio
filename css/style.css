@@ -4677,3 +4677,80 @@ body.has-sticky-cta {
   .line-cta__note { font-size: 12px; }
 }
 
+/* =============================================
+   Concept page — Swing Type Promo
+============================================== */
+.swing-promo {
+  background: linear-gradient(135deg, #fff 0%, #fff8fb 100%);
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius);
+  padding: 64px 56px;
+  text-align: center;
+  box-shadow: var(--shadow-sm);
+  position: relative;
+  overflow: hidden;
+}
+.swing-promo::before {
+  content: "";
+  position: absolute;
+  top: -40px;
+  right: -40px;
+  width: 200px;
+  height: 200px;
+  background: radial-gradient(circle, rgba(204, 33, 127, 0.08) 0%, transparent 70%);
+  pointer-events: none;
+}
+.swing-promo__label {
+  font-family: "Outfit", sans-serif;
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 0.2em;
+  color: var(--color-primary);
+  margin: 0 0 16px;
+  position: relative;
+}
+.swing-promo__title {
+  font-family: "Outfit", "Noto Sans JP", sans-serif;
+  font-size: 36px;
+  font-weight: 800;
+  line-height: 1.35;
+  margin: 0 0 28px;
+  color: var(--color-text);
+  position: relative;
+}
+.swing-promo__lead {
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1.7;
+  color: var(--color-primary);
+  margin: 0 0 24px;
+}
+.swing-promo__body {
+  font-size: 15px;
+  line-height: 2;
+  color: var(--color-sub);
+  margin: 0 0 20px;
+}
+.swing-promo__body strong {
+  color: var(--color-primary);
+  font-weight: 700;
+}
+.swing-promo__actions {
+  margin: 36px 0 0;
+}
+.swing-promo__note {
+  font-size: 13px;
+  color: var(--color-sub);
+  margin: 18px 0 0;
+  letter-spacing: 0.04em;
+}
+@media (max-width: 767px) {
+  .swing-promo { padding: 40px 24px; }
+  .swing-promo__title { font-size: clamp(22px, 5.5vw, 28px); margin-bottom: 22px; }
+  .swing-promo__lead { font-size: 17px; margin-bottom: 18px; }
+  .swing-promo__body { font-size: 14px; }
+  .swing-promo__actions { margin-top: 28px; }
+  .swing-promo__actions .btn { width: 100%; }
+  .swing-promo__note { font-size: 12px; }
+}
+
