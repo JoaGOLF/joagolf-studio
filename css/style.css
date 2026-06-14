@@ -4441,11 +4441,12 @@ body.has-sticky-cta {
   justify-content: center;
 }
 .swing-quiz .supervisor__photo {
-  width: 180px;
-  height: 180px;
-  border-radius: 50%;
+  width: 160px;
+  height: 220px;
+  border-radius: 16px;
   object-fit: cover;
-  border: 4px solid #ffeef5;
+  object-position: center top;
+  border: 3px solid #ffeef5;
   flex-shrink: 0;
 }
 .swing-quiz .supervisor__text { text-align: left; }
@@ -4489,7 +4490,7 @@ body.has-sticky-cta {
 
 @media (max-width: 500px) {
   .swing-quiz .supervisor { padding: 24px 20px; max-width: 100%; }
-  .swing-quiz .supervisor__photo { width: 130px; height: 130px; }
+  .swing-quiz .supervisor__photo { width: 120px; height: 165px; }
   .swing-quiz .supervisor__name { font-size: 0.92rem; }
   .swing-quiz .supervisor__titles li { font-size: 0.72rem; }
   .swing-quiz .supervisor__bio { font-size: 0.74rem; line-height: 1.75; }
