@@ -66,6 +66,7 @@ document.getElementById('start-btn').addEventListener('click', () => {
     document.getElementById('intro').style.display = 'none';
     quizSection.style.display = 'block';
     showQuestion();
+    window.scrollTo({ top: 0, behavior: 'auto' });
 });
 
 function showQuestion() {
