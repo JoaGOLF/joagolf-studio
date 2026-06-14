@@ -185,7 +185,17 @@ function showResult() {
                 ${createBlock("■ 注意点", data.notes)}
                 ${createBlock("■ アドバイス", data.advice)}
             </div>
-            <a href="/store/" class="quiz-btn" style="text-decoration: none; background-color:#cc217f; margin-top: 40px; display: block; line-height: 1.4;">
+            <div class="supervisor">
+                <p class="supervisor__label">監修</p>
+                <div class="supervisor__inner">
+                    <img class="supervisor__photo" src="/images/instructors/2nakamuraayaka.webp" alt="中村 彩夏">
+                    <div class="supervisor__text">
+                        <p class="supervisor__name">中村 彩夏</p>
+                        <p class="supervisor__name-en">AYAKA NAKAMURA</p>
+                    </div>
+                </div>
+            </div>
+            <a href="/store/" class="quiz-btn" style="text-decoration: none; background-color:#cc217f; margin-top: 20px; display: block; line-height: 1.4;">
                 タイプ別のスイング指導は<br>JoaGOLF STUDIOへ！
             </a>
 
