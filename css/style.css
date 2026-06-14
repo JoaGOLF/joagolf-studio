@@ -4589,3 +4589,91 @@ body.has-sticky-cta {
   }
 }
 
+/* =============================================
+   Contact 公式LINE CTA
+============================================== */
+:root { --line-green: #06C755; --line-green-dark: #05a948; }
+.line-cta {
+  background: #fff;
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius);
+  padding: 60px 48px;
+  text-align: center;
+  box-shadow: var(--shadow-sm);
+}
+.line-cta__icon {
+  width: 88px;
+  height: 88px;
+  margin: 0 auto 24px;
+  border-radius: 50%;
+  background: var(--line-green);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.line-cta__icon svg {
+  width: 56%;
+  height: 56%;
+  fill: #fff;
+}
+.line-cta__title {
+  font-family: "Outfit", "Noto Sans JP", sans-serif;
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 1.4;
+  margin: 0 0 20px;
+  color: var(--color-text);
+}
+.line-cta__desc {
+  font-size: 15px;
+  line-height: 2;
+  color: var(--color-sub);
+  margin: 0 0 40px;
+}
+.line-cta__btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  background: var(--line-green);
+  color: #fff;
+  font-family: "Outfit", "Noto Sans JP", sans-serif;
+  font-weight: 700;
+  font-size: 17px;
+  padding: 20px 48px;
+  border-radius: 999px;
+  text-decoration: none;
+  transition: transform var(--transition), background var(--transition), box-shadow var(--transition);
+  box-shadow: 0 6px 20px rgba(6, 199, 85, 0.25);
+  min-width: 320px;
+}
+.line-cta__btn svg {
+  width: 26px;
+  height: 26px;
+  fill: #fff;
+}
+.line-cta__btn:hover {
+  background: var(--line-green-dark);
+  transform: translateY(-3px);
+  box-shadow: 0 10px 28px rgba(6, 199, 85, 0.35);
+}
+.line-cta__note {
+  font-size: 13px;
+  color: var(--color-sub);
+  margin: 24px 0 0;
+  line-height: 1.7;
+}
+@media (max-width: 767px) {
+  .line-cta { padding: 44px 24px; }
+  .line-cta__icon { width: 72px; height: 72px; margin-bottom: 18px; }
+  .line-cta__title { font-size: 22px; margin-bottom: 16px; }
+  .line-cta__desc { font-size: 14px; margin-bottom: 28px; }
+  .line-cta__btn {
+    font-size: 16px;
+    padding: 18px 24px;
+    min-width: 0;
+    width: 100%;
+  }
+  .line-cta__note { font-size: 12px; }
+}
+

@@ -36,7 +36,7 @@
         <div class="page-hero__inner">
           <p class="page-hero__sub">Contact</p>
           <h1 class="page-hero__title">お問い合わせ</h1>
-          <p class="page-hero__desc">体験レッスンのご予約・お問い合わせは下記フォームよりお気軽にどうぞ。</p>
+          <p class="page-hero__desc">体験レッスンのご予約・お問い合わせは公式LINEよりお気軽にどうぞ。</p>
         </div>
       </div>
     </section>
@@ -49,83 +49,25 @@
 
     <section class="section">
       <div class="container container--narrow">
-        <form class="form" action="#" method="post" onsubmit="event.preventDefault(); alert('お問い合わせを送信しました（ダミー）');">
-
-          <div class="form__row">
-            <label class="form__label">お問い合わせ種別 <span class="form__required">必須</span></label>
-            <div class="form__radio-group">
-              <label class="form__radio"><input type="radio" name="type" value="trial" checked><span>体験レッスンのご予約</span></label>
-              <label class="form__radio"><input type="radio" name="type" value="member"><span>入会について</span></label>
-              <label class="form__radio"><input type="radio" name="type" value="recruit"><span>採用について</span></label>
-              <label class="form__radio"><input type="radio" name="type" value="other"><span>その他</span></label>
-            </div>
+        <div class="line-cta">
+          <div class="line-cta__icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path d="M19.365 9.863c.349 0 .63.285.63.631 0 .345-.281.63-.63.63H17.61v1.125h1.755c.349 0 .63.283.63.63 0 .344-.281.629-.63.629h-2.386c-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.63-.63h2.386c.346 0 .627.285.627.63 0 .349-.281.63-.63.63H17.61v1.125h1.755zm-3.855 3.016c0 .27-.174.51-.432.596-.064.021-.133.031-.199.031-.211 0-.398-.090-.51-.241l-2.443-3.318v2.926c0 .345-.279.63-.631.63-.346 0-.626-.285-.626-.63V8.108c0-.27.173-.51.43-.594.06-.023.136-.033.194-.033.195 0 .375.105.495.246l2.462 3.33V8.108c0-.345.282-.63.63-.63.345 0 .63.285.63.63v4.771zm-5.741 0c0 .345-.282.63-.631.63-.345 0-.627-.285-.627-.63V8.108c0-.345.282-.63.63-.63.346 0 .628.285.628.63v4.771zm-2.466.629H4.917c-.345 0-.63-.285-.63-.629V8.108c0-.345.285-.63.63-.63.348 0 .63.285.63.63v4.141h1.756c.348 0 .629.283.629.63 0 .344-.282.629-.629.629M24 10.314C24 4.943 18.615.572 12 .572S0 4.943 0 10.314c0 4.811 4.27 8.842 10.035 9.608.391.082.923.258 1.058.59.12.301.079.766.038 1.08l-.164 1.02c-.045.301-.24 1.186 1.049.645 1.291-.539 6.916-4.078 9.436-6.975C23.176 14.393 24 12.458 24 10.314"/>
+            </svg>
           </div>
-
-          <div class="form__row">
-            <label class="form__label" for="store">ご希望店舗 <span class="form__required">必須</span></label>
-            <select class="form__select" id="store" name="store" required>
-              <option value="">店舗を選択してください</option>
-              <option value="kobe">神戸店</option>
-              <option value="minoh">箕面店</option>
-              <option value="kojimachi">麹町店</option>
-              <option value="nishi-shinjuku">西新宿店</option>
-              <option value="sendagaya">千駄ヶ谷店</option>
-              <option value="akasaka">赤坂店</option>
-              <option value="other">未定 / その他</option>
-            </select>
-          </div>
-
-          <div class="form__row">
-            <label class="form__label" for="name">お名前 <span class="form__required">必須</span></label>
-            <input class="form__input" type="text" id="name" name="name" placeholder="山田 太郎" required>
-          </div>
-
-          <div class="form__row">
-            <label class="form__label" for="kana">フリガナ <span class="form__optional">任意</span></label>
-            <input class="form__input" type="text" id="kana" name="kana" placeholder="ヤマダ タロウ">
-          </div>
-
-          <div class="form__row">
-            <label class="form__label" for="email">メールアドレス <span class="form__required">必須</span></label>
-            <input class="form__input" type="email" id="email" name="email" placeholder="example@example.com" required>
-          </div>
-
-          <div class="form__row">
-            <label class="form__label" for="tel">電話番号 <span class="form__required">必須</span></label>
-            <input class="form__input" type="tel" id="tel" name="tel" placeholder="090-XXXX-XXXX" required>
-          </div>
-
-          <div class="form__row">
-            <label class="form__label" for="date">体験ご希望日（体験レッスン予約の方） <span class="form__optional">任意</span></label>
-            <input class="form__input" type="date" id="date" name="date">
-          </div>
-
-          <div class="form__row">
-            <label class="form__label">ゴルフ経験 <span class="form__optional">任意</span></label>
-            <div class="form__radio-group">
-              <label class="form__radio"><input type="radio" name="exp" value="none"><span>未経験</span></label>
-              <label class="form__radio"><input type="radio" name="exp" value="beginner"><span>初心者（1年未満）</span></label>
-              <label class="form__radio"><input type="radio" name="exp" value="intermediate"><span>中級者（1〜5年）</span></label>
-              <label class="form__radio"><input type="radio" name="exp" value="advanced"><span>上級者（5年以上）</span></label>
-            </div>
-          </div>
-
-          <div class="form__row">
-            <label class="form__label" for="message">お問い合わせ内容 <span class="form__optional">任意</span></label>
-            <textarea class="form__textarea" id="message" name="message" placeholder="ご質問・ご要望などございましたらご記入ください。"></textarea>
-          </div>
-
-          <div class="form__row">
-            <label class="form__check">
-              <input type="checkbox" required>
-              <span><a href="#">プライバシーポリシー</a> に同意の上、送信します。</span>
-            </label>
-          </div>
-
-          <div class="form__submit">
-            <button type="submit" class="btn btn--primary btn--lg">この内容で送信する</button>
-          </div>
-        </form>
+          <h2 class="line-cta__title">公式LINEから<br class="sp-only">お問い合わせ</h2>
+          <p class="line-cta__desc">
+            体験レッスンのご予約・料金やレッスン内容のご質問・<br class="pc-only">入会についてのご相談などは、<br>
+            公式LINEからお気軽にお問い合わせください。
+          </p>
+          <a href="#" class="line-cta__btn" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <path d="M19.365 9.863c.349 0 .63.285.63.631 0 .345-.281.63-.63.63H17.61v1.125h1.755c.349 0 .63.283.63.63 0 .344-.281.629-.63.629h-2.386c-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.63-.63h2.386c.346 0 .627.285.627.63 0 .349-.281.63-.63.63H17.61v1.125h1.755zm-3.855 3.016c0 .27-.174.51-.432.596-.064.021-.133.031-.199.031-.211 0-.398-.090-.51-.241l-2.443-3.318v2.926c0 .345-.279.63-.631.63-.346 0-.626-.285-.626-.63V8.108c0-.27.173-.51.43-.594.06-.023.136-.033.194-.033.195 0 .375.105.495.246l2.462 3.33V8.108c0-.345.282-.63.63-.63.345 0 .63.285.63.63v4.771zm-5.741 0c0 .345-.282.63-.631.63-.345 0-.627-.285-.627-.63V8.108c0-.345.282-.63.63-.63.346 0 .628.285.628.63v4.771zm-2.466.629H4.917c-.345 0-.63-.285-.63-.629V8.108c0-.345.285-.63.63-.63.348 0 .63.285.63.63v4.141h1.756c.348 0 .629.283.629.63 0 .344-.282.629-.629.629M24 10.314C24 4.943 18.615.572 12 .572S0 4.943 0 10.314c0 4.811 4.27 8.842 10.035 9.608.391.082.923.258 1.058.59.12.301.079.766.038 1.08l-.164 1.02c-.045.301-.24 1.186 1.049.645 1.291-.539 6.916-4.078 9.436-6.975C23.176 14.393 24 12.458 24 10.314"/>
+            </svg>
+            <span>友だち追加してお問い合わせ</span>
+          </a>
+          <p class="line-cta__note">※ LINEアプリで友だち追加後、トーク画面からメッセージをお送りください。</p>
+        </div>
       </div>
     </section>
 
