@@ -411,6 +411,7 @@ button {
 }
 
 .kv .btn--ghost {
+  background: transparent;
   border-color: #fff;
   color: #fff;
 }
