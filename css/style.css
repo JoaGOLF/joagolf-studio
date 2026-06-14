@@ -4738,19 +4738,92 @@ body.has-sticky-cta {
 .swing-promo__actions {
   margin: 36px 0 0;
 }
-.swing-promo__note {
-  font-size: 13px;
-  color: var(--color-sub);
-  margin: 18px 0 0;
-  letter-spacing: 0.04em;
+
+/* KV image at top of card */
+.swing-promo__kv {
+  margin: -64px -56px 32px;
+  overflow: hidden;
+  border-radius: var(--radius) var(--radius) 0 0;
 }
+.swing-promo__kv img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* Supervisor block inside promo */
+.swing-promo__supervisor {
+  margin: 36px 0 0;
+  padding: 24px 28px;
+  background: #fff;
+  border: 1px solid #ffeef5;
+  border-radius: 14px;
+  text-align: left;
+}
+.swing-promo__supervisor-label {
+  font-family: "Outfit", sans-serif;
+  font-size: 12px;
+  letter-spacing: 0.2em;
+  font-weight: 700;
+  color: var(--color-primary);
+  margin: 0 0 14px;
+  text-align: center;
+}
+.swing-promo__supervisor-inner {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  justify-content: center;
+}
+.swing-promo__supervisor-photo {
+  width: 130px;
+  height: 175px;
+  border-radius: 12px;
+  object-fit: cover;
+  object-position: center top;
+  border: 3px solid #ffeef5;
+  flex-shrink: 0;
+}
+.swing-promo__supervisor-text { flex: 1; min-width: 0; max-width: 300px; }
+.swing-promo__supervisor-name {
+  font-size: 17px;
+  font-weight: 700;
+  margin: 0;
+  color: var(--color-text);
+}
+.swing-promo__supervisor-name-en {
+  font-family: "Outfit", sans-serif;
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  color: var(--color-sub);
+  margin: 2px 0 0;
+}
+.swing-promo__supervisor-titles {
+  list-style: none;
+  padding: 10px 0 0;
+  margin: 10px 0 0;
+  border-top: 1px solid #ffeef5;
+}
+.swing-promo__supervisor-titles li {
+  font-size: 12.5px;
+  line-height: 1.55;
+  color: var(--color-text);
+  margin-bottom: 4px;
+}
+.swing-promo__supervisor-titles li:last-child { margin-bottom: 0; }
+
 @media (max-width: 767px) {
   .swing-promo { padding: 40px 24px; }
+  .swing-promo__kv { margin: -40px -24px 24px; }
   .swing-promo__title { font-size: clamp(22px, 5.5vw, 28px); margin-bottom: 22px; }
   .swing-promo__lead { font-size: 17px; margin-bottom: 18px; }
   .swing-promo__body { font-size: 14px; }
   .swing-promo__actions { margin-top: 28px; }
   .swing-promo__actions .btn { width: 100%; }
-  .swing-promo__note { font-size: 12px; }
+  .swing-promo__supervisor { padding: 18px 16px; margin-top: 28px; }
+  .swing-promo__supervisor-inner { gap: 14px; }
+  .swing-promo__supervisor-photo { width: 100px; height: 138px; }
+  .swing-promo__supervisor-name { font-size: 15px; }
+  .swing-promo__supervisor-titles li { font-size: 11.5px; }
 }
 
