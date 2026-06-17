@@ -156,7 +156,7 @@ function showResult() {
                         大変申し訳ございません。問診のみでの診断が困難な回答のため、再度お試しいただくか、対面でのトレーナーによるタイプチェックをお勧めいたします。
                     </p>
                 </div>
-                <button class="quiz-btn" style="background:#cc217f; margin-top:20px;" onclick="location.reload()">最初からやり直す</button>
+                <button class="quiz-btn" style="background:#cc217f; margin-top:20px;" onclick="location.assign(location.pathname)">最初からやり直す</button>
             </div>
         `;
         window.scrollTo(0, 0);
@@ -245,7 +245,7 @@ function renderResult(key, subNote) {
                 }).join('')}
             </div>
 
-            <button class="quiz-btn" style="background:#cc217f; margin-top:20px;" onclick="location.reload()">最初からやり直す</button>
+            <button class="quiz-btn" style="background:#cc217f; margin-top:20px;" onclick="location.assign(location.pathname)">最初からやり直す</button>
             <div class="share-section" style="margin: 50px 0 20px; padding: 20px; background: #fdfdfd; border-radius: 12px; border: 1px solid #eee;">
                 <p style="font-weight: bold; margin-bottom: 15px; font-size: 0.9rem;">結果を友達に共有する！</p>
                 <div style="display: flex; justify-content: center; gap: 10px; flex-wrap: wrap;">
