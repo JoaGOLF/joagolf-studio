@@ -569,21 +569,6 @@ button {
   z-index: 0;
 }
 
-.concept__image::after {
-  content: "Concept";
-  position: absolute;
-  top: -56px;
-  left: -16px;
-  font-family: "Outfit", sans-serif;
-  font-weight: 800;
-  font-size: 120px;
-  line-height: 1;
-  color: rgba(204, 33, 127, 0.08);
-  letter-spacing: -0.02em;
-  pointer-events: none;
-  z-index: 0;
-}
-
 .concept__image img {
   position: relative;
   width: 100%;
@@ -3546,12 +3531,6 @@ body.has-sticky-cta {
 
   .concept__image::before {
     inset: -16px -16px 16px 16px;
-  }
-
-  .concept__image::after {
-    font-size: 64px;
-    top: -36px;
-    left: -8px;
   }
 
   .concept__lead {
