@@ -163,11 +163,25 @@ function showResult() {
         return;
     }
 
-    const data = results[key];
-    const shareText = encodeURIComponent(`私のゴルフスイングは【${data.name}】でした！\nあなたの身体特性に合った理想的なスイングタイプをチェックしよう！\n#ゴルフスイング診断 #4スタンス理論 #JoaGOLFstudio`);
-    const shareUrl = encodeURIComponent(window.location.href);
+    renderResult(key, subNote);
+}
 
-    const lineText = `私の診断結果は【${data.name}】でした！\n${window.location.href}`;
+function renderResult(key, subNote) {
+    quizSection.style.display = 'none';
+    resultSection.style.display = 'block';
+
+    const data = results[key];
+    if (!data) return;
+
+    const resultUrl = new URL(window.location.href);
+    resultUrl.searchParams.set('type', key);
+    history.replaceState({}, '', resultUrl);
+
+    const shareUrlStr = resultUrl.toString();
+    const shareText = encodeURIComponent(`私のゴルフスイングは【${data.name}】でした！\nあなたの身体特性に合った理想的なスイングタイプをチェックしよう！\n#ゴルフスイング診断 #4スタンス理論 #JoaGOLFstudio`);
+    const shareUrl = encodeURIComponent(shareUrlStr);
+
+    const lineText = `私の診断結果は【${data.name}】でした！\n${shareUrlStr}`;
     const lineUrl = `https://line.me/R/msg/text/?${encodeURIComponent(lineText)}`;
 
     resultSection.innerHTML = `
@@ -250,7 +264,7 @@ function showResult() {
     });
 
     document.getElementById('copy-url-btn').addEventListener('click', () => {
-        const url = window.location.href;
+        const url = shareUrlStr;
         navigator.clipboard.writeText(url).then(() => {
             const toast = document.createElement('div');
             toast.className = 'copy-toast';
@@ -271,3 +285,13 @@ function showResult() {
 function createBlock(title, list) {
     return `<div class="detail-block"><h3>${title}</h3><ul>${list.map(t => `<li>${t}</li>`).join('')}</ul></div>`;
 }
+
+(function initFromUrl() {
+    const sharedType = new URLSearchParams(window.location.search).get('type');
+    if (sharedType && results[sharedType]) {
+        const intro = document.getElementById('intro');
+        if (intro) intro.style.display = 'none';
+        renderResult(sharedType, "");
+        window.scrollTo(0, 0);
+    }
+})();
