@@ -1787,7 +1787,7 @@ button {
   grid-auto-rows: max-content;
   align-content: start;
   gap: 40px;
-  padding: 36px;
+  padding: 36px 36px 56px;
   border: 2px solid var(--color-primary);
 }
 
@@ -3769,7 +3769,7 @@ body.has-sticky-cta {
     grid-auto-rows: max-content;
     align-content: start;
     gap: 12px;
-    padding: 16px;
+    padding: 16px 16px 32px;
   }
 
   .instructor--detail .instructor__photo {
