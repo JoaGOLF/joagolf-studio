@@ -1,0 +1,99 @@
+# =====================================================
+# JoaGOLF STUDIO - Apache .htaccess (Lolipop)
+# =====================================================
+
+# -----------------------------------------------------
+# カスタム 404 ページ
+# -----------------------------------------------------
+ErrorDocument 404 /404.html
+
+# -----------------------------------------------------
+# HTTPS / www 統一リダイレクト
+# (https://joagolfstudio.jp/ に統一)
+# -----------------------------------------------------
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # http → https
+    RewriteCond %{HTTPS} off
+    RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
+
+    # www あり → www なし
+    RewriteCond %{HTTP_HOST} ^www\.joagolfstudio\.jp$ [NC]
+    RewriteRule ^(.*)$ https://joagolfstudio.jp/$1 [R=301,L]
+</IfModule>
+
+# -----------------------------------------------------
+# 静的ファイルのキャッシュ
+# -----------------------------------------------------
+<IfModule mod_expires.c>
+    ExpiresActive On
+
+    # 画像
+    ExpiresByType image/webp                "access plus 1 year"
+    ExpiresByType image/jpeg                "access plus 1 year"
+    ExpiresByType image/png                 "access plus 1 year"
+    ExpiresByType image/gif                 "access plus 1 year"
+    ExpiresByType image/svg+xml             "access plus 1 year"
+    ExpiresByType image/x-icon              "access plus 1 year"
+
+    # フォント
+    ExpiresByType font/woff                 "access plus 1 year"
+    ExpiresByType font/woff2                "access plus 1 year"
+    ExpiresByType application/font-woff     "access plus 1 year"
+    ExpiresByType application/font-woff2    "access plus 1 year"
+
+    # CSS / JS
+    ExpiresByType text/css                  "access plus 1 month"
+    ExpiresByType application/javascript    "access plus 1 month"
+
+    # HTML はキャッシュしない（更新を即時反映）
+    ExpiresByType text/html                 "access plus 0 seconds"
+    ExpiresByType application/xml           "access plus 0 seconds"
+</IfModule>
+
+# -----------------------------------------------------
+# Gzip 圧縮
+# -----------------------------------------------------
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/html
+    AddOutputFilterByType DEFLATE text/css
+    AddOutputFilterByType DEFLATE text/plain
+    AddOutputFilterByType DEFLATE text/xml
+    AddOutputFilterByType DEFLATE application/javascript
+    AddOutputFilterByType DEFLATE application/json
+    AddOutputFilterByType DEFLATE application/xml
+    AddOutputFilterByType DEFLATE application/rss+xml
+    AddOutputFilterByType DEFLATE image/svg+xml
+</IfModule>
+
+# -----------------------------------------------------
+# セキュリティヘッダー
+# -----------------------------------------------------
+<IfModule mod_headers.c>
+    # クリックジャッキング対策
+    Header set X-Frame-Options "SAMEORIGIN"
+    # MIME スニッフィング対策
+    Header set X-Content-Type-Options "nosniff"
+    # リファラ制御
+    Header set Referrer-Policy "strict-origin-when-cross-origin"
+    # HSTS（HTTPS強制を1年間記憶）
+    Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains"
+</IfModule>
+
+# -----------------------------------------------------
+# 文字コード
+# -----------------------------------------------------
+AddDefaultCharset UTF-8
+
+# -----------------------------------------------------
+# ディレクトリ一覧の非表示
+# -----------------------------------------------------
+Options -Indexes
+
+# -----------------------------------------------------
+# .htaccess 自身の保護
+# -----------------------------------------------------
+<Files ".htaccess">
+    Require all denied
+</Files>
