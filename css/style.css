@@ -2095,17 +2095,9 @@ button {
   justify-content: center;
 }
 
+/* LESSON badge removed; the lesson text below remains */
 .instructor__lesson strong {
-  display: inline-flex;
-  align-self: flex-start;
-  font-family: "Outfit", sans-serif;
-  font-size: 10px;
-  letter-spacing: 0.16em;
-  color: #fff;
-  background: var(--color-primary);
-  padding: 3px 11px;
-  border-radius: 999px;
-  margin-bottom: 9px;
+  display: none;
 }
 
 /* =========================================================
@@ -4081,10 +4073,6 @@ body.has-sticky-cta {
     margin-left: 10px;
   }
 
-  .instructor--detail .instructor__lesson strong {
-    align-self: center;
-  }
-
   .instructor--detail .instructor__profile {
     text-align: left;
     margin: 14px 0 10px;
@@ -4104,10 +4092,6 @@ body.has-sticky-cta {
     justify-content: center;
   }
 
-  .instructor__lesson strong {
-    font-size: 11px;
-    margin-bottom: 2px;
-  }
 
   .instructor__stores {
     position: static;
