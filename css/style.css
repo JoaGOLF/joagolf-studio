@@ -902,9 +902,15 @@ button {
   border-radius: 16px;
   box-shadow: 0 8px 32px rgba(204, 33, 127, 0.06);
   display: grid;
-  grid-template-columns: 1fr 2fr;
+  grid-template-columns: 280px 1fr;
   gap: 56px;
   align-items: start;
+}
+
+.profile__main {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
 }
 
 .profile::before {
@@ -929,7 +935,6 @@ button {
   max-width: 280px;
   border-radius: 12px;
   overflow: hidden;
-  margin: 0 0 24px;
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
 }
 
