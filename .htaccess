@@ -14,12 +14,26 @@ ErrorDocument 404 /404.html
 <IfModule mod_rewrite.c>
     RewriteEngine On
 
-    # https + 非www を1回で統一（http または www は https://joagolfstudio.jp へ）
+    # (1) http または www → https://joagolfstudio.jp に統一
     RewriteCond %{HTTPS} off [OR]
     RewriteCond %{HTTP_HOST} ^www\.joagolfstudio\.jp$ [NC]
     RewriteRule ^ https://joagolfstudio.jp%{REQUEST_URI} [R=301,L]
 
-    # /index.html → /（重複URL防止）
+    # (2) 旧トレーナーページ → トップ
+    RewriteRule ^trainer/mizuki-oouchi/?$   / [R=301,L]
+    RewriteRule ^trainer/rio-takatani/?$    / [R=301,L]
+    RewriteRule ^trainer/sakura-tarumoto/?$ / [R=301,L]
+    RewriteRule ^trainer/sayaka-kishi/?$    / [R=301,L]
+    RewriteRule ^trainer/miyu-matsuura/?$   / [R=301,L]
+    RewriteRule ^trainer/ann-hashiguchi/?$  / [R=301,L]
+
+    # (3) 旧サンプル記事 → トップ
+    RewriteRule ^2024/09/16/hello-world/?$  / [R=301,L]
+
+    # (4) 旧カテゴリーページ → トップ
+    RewriteRule ^category(/.*)?$            / [R=301,L]
+
+    # (5) /index.html → /（重複URL防止）
     RewriteRule ^(.*/)?index\.html$ /$1 [R=301,L]
 </IfModule>
 
