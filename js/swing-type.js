@@ -107,6 +107,105 @@ nextBtn.addEventListener('click', () => {
     if (currentStep < questions.length - 1) { currentStep++; showQuestion(); }
 });
 
+function buildSupervisorHtml() {
+    return `
+            <div class="supervisor">
+                <p class="supervisor__label">監修</p>
+                <div class="supervisor__inner">
+                    <img class="supervisor__photo" src="/images/produce.jpg" alt="中村 彩夏">
+                    <div class="supervisor__text">
+                        <p class="supervisor__name">中村 彩夏</p>
+                        <p class="supervisor__name-en">AYAKA NAKAMURA</p>
+                        <ul class="supervisor__titles">
+                            <li>JoaGOLF STUDIO インストラクター</li>
+                            <li>4スタンス理論（REASH理論）マスター級トレーナー</li>
+                            <li>LGIA インストラクター育成講師</li>
+                        </ul>
+                    </div>
+                </div>
+                <p class="supervisor__bio">レギュラーツアー出場経験を持つ元ツアープロの父から受け継いだレッスン理論と、4スタンス理論を融合した独自メソッド『AYASTA Method』を考案。</p>
+                <p class="supervisor__bio">一人ひとりの生まれ持った身体特性に合わせた指導を得意とし、「無理なく・楽しく・結果を出せるレッスン」を提供しています。</p>
+            </div>
+    `;
+}
+
+function buildStoreLinkHtml() {
+    return `
+            <a href="/store/" class="quiz-btn" style="text-decoration: none; background-color:#cc217f; margin-top: 20px; display: block; line-height: 1.4;">
+                タイプ別のスイング指導は<br>JoaGOLF STUDIOへ！
+            </a>
+    `;
+}
+
+function buildAllTypesHtml() {
+    return `
+            <button id="show-all-types" class="quiz-btn" style="background:#cc217f; margin-top:20px;">他のスイングタイプも見る</button>
+
+            <div id="all-types-list" style="display:none; margin-top: 60px; text-align: left;">
+                <hr style="margin: 60px 0; border: 0; border-top: 2px solid #eee;">
+                <h2 style="text-align:center; margin-bottom: 40px;">全タイプ一覧</h2>
+
+                ${Object.keys(results).map(typeKey => {
+                    const item = results[typeKey];
+                    return `
+                        <div class="type-full-card" style="margin-bottom: 80px;">
+                            <div class="type-header">
+                                <img src="/images/swing-type/${item.id}.jpeg" alt="${item.id}" class="type-image">
+                                <h2 class="type-title">${item.name}</h2>
+                            </div>
+                            <div class="result-details">
+                                ${createBlock("■ 特徴", item.features)}
+                                ${createBlock("■ スイング傾向", item.swing)}
+                                ${createBlock("■ 注意点", item.notes)}
+                                ${createBlock("■ アドバイス", item.advice)}
+                            </div>
+                        </div>
+                    `;
+                }).join('')}
+            </div>
+    `;
+}
+
+function buildRestartBtnHtml() {
+    return `<button class="quiz-btn" style="background:#cc217f; margin-top:20px;" onclick="location.assign(location.pathname)">最初からやり直す</button>`;
+}
+
+function buildShareHtml(shareUrlStr, shareText, shareUrl, lineUrl) {
+    return `
+            <div class="share-section" style="margin: 50px 0 20px; padding: 20px; background: #fdfdfd; border-radius: 12px; border: 1px solid #eee;">
+                <p style="font-weight: bold; margin-bottom: 15px; font-size: 0.9rem;">結果を友達に共有する！</p>
+                <div style="display: flex; justify-content: center; gap: 10px; flex-wrap: wrap;">
+                    <button id="copy-url-btn" class="quiz-btn" style="margin:0; flex:1; min-width:100px; background-color:#cc217f; font-size:0.85rem; padding:12px 5px; border:none; color:white;">URLコピー</button>
+                    <a href="${lineUrl}" target="_blank" class="quiz-btn" style="margin:0; flex:1; min-width:100px; background-color:#06C755; font-size:0.85rem; padding:12px 5px; text-decoration:none; color:white;">LINE送る</a>
+                    <a href="https://twitter.com/intent/tweet?text=${shareText}&url=${shareUrl}" target="_blank" class="quiz-btn" style="margin:0; flex:1; min-width:100px; background-color:#000000; font-size:0.85rem; padding:12px 5px; text-decoration:none; color:white;">Xでポスト</a>
+                </div>
+            </div>
+    `;
+}
+
+function bindCommonEvents(shareUrlStr) {
+    document.getElementById('show-all-types').addEventListener('click', function () {
+        document.getElementById('all-types-list').style.display = 'block';
+        this.style.display = 'none';
+        document.getElementById('all-types-list').scrollIntoView({ behavior: 'smooth' });
+    });
+
+    document.getElementById('copy-url-btn').addEventListener('click', () => {
+        navigator.clipboard.writeText(shareUrlStr).then(() => {
+            const toast = document.createElement('div');
+            toast.className = 'copy-toast';
+            toast.innerText = "URLをコピーしました！";
+            document.body.appendChild(toast);
+
+            setTimeout(() => toast.classList.add('show'), 10);
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => toast.remove(), 500);
+            }, 2000);
+        });
+    });
+}
+
 function showResult() {
     quizSection.style.display = 'none';
     resultSection.style.display = 'block';
@@ -147,6 +246,13 @@ function showResult() {
     const forceError = (isCloseAB && isCloseCP && isMismatch);
 
     if (forceError) {
+        const shareUrlStr = `${window.location.origin}${window.location.pathname}`;
+        const neutralText = `ゴルフスイングタイプ診断をやってみよう！\nあなたの身体特性に合った理想的なスイングタイプをチェック！\n#ゴルフスイング診断 #4スタンス理論 #JoaGOLFstudio`;
+        const shareText = encodeURIComponent(neutralText);
+        const shareUrl = encodeURIComponent(shareUrlStr);
+        const lineText = `ゴルフスイングタイプ診断をやってみよう！\n${shareUrlStr}`;
+        const lineUrl = `https://line.me/R/msg/text/?${encodeURIComponent(lineText)}`;
+
         resultSection.innerHTML = `
             <div class="result-container">
                 <div class="type-header">
@@ -156,9 +262,14 @@ function showResult() {
                         大変申し訳ございません。問診のみでの診断が困難な回答のため、再度お試しいただくか、対面でのトレーナーによるタイプチェックをお勧めいたします。
                     </p>
                 </div>
-                <button class="quiz-btn" style="background:#cc217f; margin-top:20px;" onclick="location.assign(location.pathname)">最初からやり直す</button>
+                ${buildSupervisorHtml()}
+                ${buildStoreLinkHtml()}
+                ${buildAllTypesHtml()}
+                ${buildRestartBtnHtml()}
+                ${buildShareHtml(shareUrlStr, shareText, shareUrl, lineUrl)}
             </div>
         `;
+        bindCommonEvents(shareUrlStr);
         window.scrollTo(0, 0);
         return;
     }
@@ -199,85 +310,15 @@ function renderResult(key, subNote) {
                 ${createBlock("■ 注意点", data.notes)}
                 ${createBlock("■ アドバイス", data.advice)}
             </div>
-            <div class="supervisor">
-                <p class="supervisor__label">監修</p>
-                <div class="supervisor__inner">
-                    <img class="supervisor__photo" src="/images/produce.jpg" alt="中村 彩夏">
-                    <div class="supervisor__text">
-                        <p class="supervisor__name">中村 彩夏</p>
-                        <p class="supervisor__name-en">AYAKA NAKAMURA</p>
-                        <ul class="supervisor__titles">
-                            <li>JoaGOLF STUDIO インストラクター</li>
-                            <li>4スタンス理論（REASH理論）マスター級トレーナー</li>
-                            <li>LGIA インストラクター育成講師</li>
-                        </ul>
-                    </div>
-                </div>
-                <p class="supervisor__bio">レギュラーツアー出場経験を持つ元ツアープロの父から受け継いだレッスン理論と、4スタンス理論を融合した独自メソッド『AYASTA Method』を考案。</p>
-                <p class="supervisor__bio">一人ひとりの生まれ持った身体特性に合わせた指導を得意とし、「無理なく・楽しく・結果を出せるレッスン」を提供しています。</p>
-            </div>
-            <a href="/store/" class="quiz-btn" style="text-decoration: none; background-color:#cc217f; margin-top: 20px; display: block; line-height: 1.4;">
-                タイプ別のスイング指導は<br>JoaGOLF STUDIOへ！
-            </a>
-
-            <button id="show-all-types" class="quiz-btn" style="background:#cc217f; margin-top:20px;">他のスイングタイプも見る</button>
-
-            <div id="all-types-list" style="display:none; margin-top: 60px; text-align: left;">
-                <hr style="margin: 60px 0; border: 0; border-top: 2px solid #eee;">
-                <h2 style="text-align:center; margin-bottom: 40px;">全タイプ一覧</h2>
-
-                ${Object.keys(results).map(typeKey => {
-                    const item = results[typeKey];
-                    return `
-                        <div class="type-full-card" style="margin-bottom: 80px;">
-                            <div class="type-header">
-                                <img src="/images/swing-type/${item.id}.jpeg" alt="${item.id}" class="type-image">
-                                <h2 class="type-title">${item.name}</h2>
-                            </div>
-                            <div class="result-details">
-                                ${createBlock("■ 特徴", item.features)}
-                                ${createBlock("■ スイング傾向", item.swing)}
-                                ${createBlock("■ 注意点", item.notes)}
-                                ${createBlock("■ アドバイス", item.advice)}
-                            </div>
-                        </div>
-                    `;
-                }).join('')}
-            </div>
-
-            <button class="quiz-btn" style="background:#cc217f; margin-top:20px;" onclick="location.assign(location.pathname)">最初からやり直す</button>
-            <div class="share-section" style="margin: 50px 0 20px; padding: 20px; background: #fdfdfd; border-radius: 12px; border: 1px solid #eee;">
-                <p style="font-weight: bold; margin-bottom: 15px; font-size: 0.9rem;">結果を友達に共有する！</p>
-                <div style="display: flex; justify-content: center; gap: 10px; flex-wrap: wrap;">
-                    <button id="copy-url-btn" class="quiz-btn" style="margin:0; flex:1; min-width:100px; background-color:#cc217f; font-size:0.85rem; padding:12px 5px; border:none; color:white;">URLコピー</button>
-                    <a href="${lineUrl}" target="_blank" class="quiz-btn" style="margin:0; flex:1; min-width:100px; background-color:#06C755; font-size:0.85rem; padding:12px 5px; text-decoration:none; color:white;">LINE送る</a>
-                    <a href="https://twitter.com/intent/tweet?text=${shareText}&url=${shareUrl}" target="_blank" class="quiz-btn" style="margin:0; flex:1; min-width:100px; background-color:#000000; font-size:0.85rem; padding:12px 5px; text-decoration:none; color:white;">Xでポスト</a>
-                </div>
-            </div>
+            ${buildSupervisorHtml()}
+            ${buildStoreLinkHtml()}
+            ${buildAllTypesHtml()}
+            ${buildRestartBtnHtml()}
+            ${buildShareHtml(shareUrlStr, shareText, shareUrl, lineUrl)}
         </div>
     `;
 
-    document.getElementById('show-all-types').addEventListener('click', function () {
-        document.getElementById('all-types-list').style.display = 'block';
-        this.style.display = 'none';
-        document.getElementById('all-types-list').scrollIntoView({ behavior: 'smooth' });
-    });
-
-    document.getElementById('copy-url-btn').addEventListener('click', () => {
-        const url = shareUrlStr;
-        navigator.clipboard.writeText(url).then(() => {
-            const toast = document.createElement('div');
-            toast.className = 'copy-toast';
-            toast.innerText = "URLをコピーしました！";
-            document.body.appendChild(toast);
-
-            setTimeout(() => toast.classList.add('show'), 10);
-            setTimeout(() => {
-                toast.classList.remove('show');
-                setTimeout(() => toast.remove(), 500);
-            }, 2000);
-        });
-    });
+    bindCommonEvents(shareUrlStr);
 
     window.scrollTo(0, 0);
 }
