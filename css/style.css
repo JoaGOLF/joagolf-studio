@@ -819,6 +819,7 @@ button {
   grid-template-columns: 1fr;
   align-items: start;
   gap: 48px;
+  margin-top: 72px;
 }
 
 .message--detail .message__image {
@@ -898,7 +899,7 @@ button {
 /* ---------- Profile ---------- */
 .profile {
   position: relative;
-  margin-top: 96px;
+  margin-top: 0;
   padding: 56px 56px;
   background: #fff;
   border: 1px solid var(--color-line);
@@ -1923,14 +1924,38 @@ button {
   grid-auto-rows: max-content;
   align-content: start;
   gap: 40px;
-  padding: 36px 36px 56px;
-  border: 2px solid var(--color-primary);
+  padding: 36px 36px 44px;
+  background: linear-gradient(180deg, #fff6fb 0%, #ffffff 220px);
+  border: 1px solid var(--color-line);
+  border-radius: 22px;
+  box-shadow: var(--shadow-sm);
+}
+
+/* thin gradient accent along the top edge of the card */
+.instructor--detail::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 4px;
+  border-radius: 22px 22px 0 0;
+  background: linear-gradient(90deg, var(--color-primary), #f06ab0 60%, var(--color-primary-light));
 }
 
 .instructor--detail:hover {
   transform: none;
-  border-color: var(--color-primary);
-  box-shadow: none;
+  border-color: var(--color-line);
+  box-shadow: var(--shadow-sm);
+}
+
+/* lift only the store-page grid cards on hover */
+.instructors__grid--single .instructor--detail {
+  transition: transform var(--transition), box-shadow var(--transition), border-color var(--transition);
+}
+
+.instructors__grid--single .instructor--detail:hover {
+  transform: translateY(-6px);
+  border-color: var(--color-primary-light);
+  box-shadow: var(--shadow-md);
 }
 
 .instructor__stores {
@@ -1972,23 +1997,86 @@ button {
 
 .instructor--detail .instructor__photo {
   align-self: start;
+  position: relative;
+  border-radius: 16px;
+  box-shadow: 0 12px 28px rgba(204, 33, 127, 0.18);
+}
+
+/* soft gradient + inner hairline over the photo for depth */
+.instructor--detail .instructor__photo::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(180deg, transparent 62%, rgba(163, 24, 100, 0.16) 100%);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.4);
+  pointer-events: none;
+}
+
+/* role label as a soft pill badge */
+.instructor--detail .instructor__role {
+  display: flex;
+  align-items: center;
+  width: fit-content;
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  color: var(--color-primary);
+  background: var(--color-primary-light);
+  padding: 5px 13px;
+  border-radius: 999px;
+  margin: 0 0 12px;
+}
+
+.instructor--detail .instructor__name {
+  font-size: 23px;
+  letter-spacing: 0.02em;
+  margin: 0 0 3px;
+}
+
+/* English name + divider line that separates the header from the profile */
+.instructor--detail .instructor__name-en {
+  position: relative;
+  font-size: 12px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-sub);
+  margin: 0 0 18px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--color-line);
+}
+
+.instructor--detail .instructor__name-en::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -1px;
+  width: 46px;
+  height: 2px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, var(--color-primary), var(--color-primary-light));
 }
 
 .instructor__profile {
   display: grid;
   grid-template-columns: 110px 1fr;
-  row-gap: 10px;
   column-gap: 16px;
-  margin: 0 0 18px;
-  font-size: 14px;
-  line-height: 1.7;
+  margin: 0 0 20px;
+  font-size: 13.5px;
+  line-height: 1.6;
   min-height: 204px;
+}
+
+.instructor__profile dt,
+.instructor__profile dd {
+  padding: 9px 0;
+  border-bottom: 1px dashed var(--color-line);
 }
 
 .instructor__profile dt {
   color: var(--color-primary);
   font-weight: 700;
-  letter-spacing: 0.05em;
+  font-size: 12px;
+  letter-spacing: 0.04em;
 }
 
 .instructor__profile dd {
@@ -1997,13 +2085,15 @@ button {
 }
 
 .instructor__lesson {
-  background: var(--color-bg-alt);
-  border-left: 3px solid var(--color-primary);
-  padding: 14px 18px;
-  margin: 0 0 16px;
-  font-size: 14px;
-  line-height: 1.8;
-  border-radius: 0 8px 8px 0;
+  position: relative;
+  background: linear-gradient(135deg, #fff5fa 0%, #fde9f2 100%);
+  border: 1px solid var(--color-primary-light);
+  padding: 16px 18px;
+  margin: 0;
+  font-size: 13.5px;
+  line-height: 1.85;
+  color: var(--color-text);
+  border-radius: 14px;
   min-height: 100px;
   display: flex;
   flex-direction: column;
@@ -2011,11 +2101,16 @@ button {
 }
 
 .instructor__lesson strong {
-  display: block;
-  font-size: 12px;
-  letter-spacing: 0.1em;
-  color: var(--color-primary);
-  margin-bottom: 4px;
+  display: inline-flex;
+  align-self: flex-start;
+  font-family: "Outfit", sans-serif;
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  color: #fff;
+  background: var(--color-primary);
+  padding: 3px 11px;
+  border-radius: 999px;
+  margin-bottom: 9px;
 }
 
 /* =========================================================
@@ -3747,7 +3842,7 @@ body.has-sticky-cta {
   .profile {
     grid-template-columns: 1fr;
     gap: 24px;
-    margin-top: 64px;
+    margin-top: 0;
     padding: 40px 24px 32px;
   }
 
@@ -3976,9 +4071,8 @@ body.has-sticky-cta {
 
   .instructor--detail .instructor__role {
     font-size: 11px;
-    letter-spacing: 0.2em;
-    margin: 0;
-    text-align: center;
+    letter-spacing: 0.18em;
+    margin: 0 auto 8px;
   }
 
   .instructor--detail .instructor__name {
@@ -3991,8 +4085,18 @@ body.has-sticky-cta {
   .instructor--detail .instructor__name-en {
     font-size: 12px;
     letter-spacing: 0.08em;
-    margin: 2px 0 10px;
+    margin: 2px 0 14px;
+    padding-bottom: 14px;
     text-align: center;
+  }
+
+  .instructor--detail .instructor__name-en::after {
+    left: 50%;
+    transform: translateX(-50%);
+  }
+
+  .instructor--detail .instructor__lesson strong {
+    align-self: center;
   }
 
   .instructor--detail .instructor__profile {
