@@ -14,13 +14,13 @@ ErrorDocument 404 /404.html
 <IfModule mod_rewrite.c>
     RewriteEngine On
 
-    # http → https
-    RewriteCond %{HTTPS} off
-    RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
-
-    # www あり → www なし
+    # https + 非www を1回で統一（http または www は https://joagolfstudio.jp へ）
+    RewriteCond %{HTTPS} off [OR]
     RewriteCond %{HTTP_HOST} ^www\.joagolfstudio\.jp$ [NC]
-    RewriteRule ^(.*)$ https://joagolfstudio.jp/$1 [R=301,L]
+    RewriteRule ^ https://joagolfstudio.jp%{REQUEST_URI} [R=301,L]
+
+    # /index.html → /（重複URL防止）
+    RewriteRule ^(.*/)?index\.html$ /$1 [R=301,L]
 </IfModule>
 
 # -----------------------------------------------------
