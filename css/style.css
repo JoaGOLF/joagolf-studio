@@ -357,7 +357,7 @@ button {
   content: "";
   position: absolute;
   inset: 0;
-  background: transparent;
+  background: rgba(0, 0, 0, 0.35);
 }
 
 .kv__bg img {
