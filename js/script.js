@@ -22,6 +22,7 @@
     hamburger.classList.remove('is-open');
     nav.classList.remove('is-open');
     hamburger.setAttribute('aria-expanded', 'false');
+    hamburger.setAttribute('aria-label', 'メニューを開く');
     document.body.style.overflow = '';
   };
 
@@ -29,6 +30,7 @@
     hamburger.classList.add('is-open');
     nav.classList.add('is-open');
     hamburger.setAttribute('aria-expanded', 'true');
+    hamburger.setAttribute('aria-label', 'メニューを閉じる');
     document.body.style.overflow = 'hidden';
   };
 
