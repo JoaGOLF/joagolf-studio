@@ -3044,155 +3044,6 @@ body.has-sticky-cta {
 }
 
 /* =========================================================
-   Form
-   ========================================================= */
-.form {
-  background: #fff;
-  border-radius: var(--radius);
-  padding: 56px 64px;
-  box-shadow: var(--shadow-sm);
-}
-
-.form__row {
-  margin-bottom: 28px;
-}
-
-.form__row:last-of-type {
-  margin-bottom: 0;
-}
-
-.form__label {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 12px;
-  font-size: 15px;
-  font-weight: 700;
-}
-
-.form__required {
-  font-family: "Outfit", sans-serif;
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  padding: 3px 10px;
-  border-radius: 4px;
-  background: var(--color-primary);
-  color: #fff;
-}
-
-.form__optional {
-  font-family: "Outfit", sans-serif;
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  padding: 3px 10px;
-  border-radius: 4px;
-  background: var(--color-line);
-  color: var(--color-sub);
-}
-
-.form__input,
-.form__select,
-.form__textarea {
-  width: 100%;
-  padding: 14px 18px;
-  border: 1px solid var(--color-line);
-  border-radius: 10px;
-  font-family: inherit;
-  font-size: 15px;
-  background: #fff;
-  color: var(--color-text);
-  transition: border-color var(--transition), box-shadow var(--transition);
-}
-
-.form__input:focus,
-.form__select:focus,
-.form__textarea:focus {
-  outline: none;
-  border-color: var(--color-primary);
-  box-shadow: 0 0 0 4px rgba(204, 33, 127, 0.1);
-}
-
-.form__textarea {
-  min-height: 180px;
-  resize: vertical;
-  line-height: 1.7;
-}
-
-.form__radio-group {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
-}
-
-.form__radio {
-  position: relative;
-  cursor: pointer;
-}
-
-.form__radio input {
-  position: absolute;
-  opacity: 0;
-  pointer-events: none;
-}
-
-.form__radio span {
-  display: inline-block;
-  padding: 12px 24px;
-  border: 1px solid var(--color-line);
-  border-radius: 999px;
-  font-size: 14px;
-  transition: all var(--transition);
-}
-
-.form__radio input:checked + span {
-  background: var(--color-primary);
-  border-color: var(--color-primary);
-  color: #fff;
-}
-
-.form__radio:hover span {
-  border-color: var(--color-primary);
-  color: var(--color-primary);
-}
-
-.form__radio input:checked + span:hover {
-  color: #fff;
-}
-
-.form__check {
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
-  font-size: 14px;
-  cursor: pointer;
-}
-
-.form__check input {
-  margin-top: 4px;
-  width: 18px;
-  height: 18px;
-  accent-color: var(--color-primary);
-}
-
-.form__check a {
-  color: var(--color-primary);
-  text-decoration: underline;
-}
-
-.form__submit {
-  text-align: center;
-  margin-top: 40px;
-}
-
-.form__submit .btn {
-  min-width: 280px;
-}
-
-/* =========================================================
    Article (news detail)
    ========================================================= */
 .article {
@@ -3274,80 +3125,6 @@ body.has-sticky-cta {
 
 .article__nav .article__nav-back {
   color: var(--color-primary);
-}
-
-/* =========================================================
-   Recruit / Job items
-   ========================================================= */
-.job {
-  background: #fff;
-  border: 1px solid var(--color-line);
-  border-radius: var(--radius);
-  padding: 40px;
-  margin-bottom: 24px;
-  transition: border-color var(--transition), box-shadow var(--transition), transform var(--transition);
-}
-
-.job:hover {
-  border-color: var(--color-primary);
-  box-shadow: var(--shadow-md);
-  transform: translateY(-4px);
-}
-
-.job__head {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  margin-bottom: 20px;
-  flex-wrap: wrap;
-}
-
-.job__tag {
-  font-family: "Outfit", "Noto Sans JP", sans-serif;
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: 0.1em;
-  padding: 4px 12px;
-  border-radius: 999px;
-  background: var(--color-primary-light);
-  color: var(--color-primary);
-}
-
-.job__title {
-  font-size: 24px;
-  font-weight: 700;
-  margin: 0;
-}
-
-.job__desc {
-  color: var(--color-sub);
-  margin: 0 0 24px;
-  line-height: 1.9;
-}
-
-.job__details {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 16px 32px;
-  padding: 20px 24px;
-  background: var(--color-bg-alt);
-  border-radius: 12px;
-  margin-bottom: 24px;
-}
-
-.job__detail-label {
-  font-family: "Outfit", sans-serif;
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.15em;
-  text-transform: uppercase;
-  color: var(--color-primary);
-  margin: 0 0 4px;
-}
-
-.job__detail-value {
-  font-size: 14px;
-  margin: 0;
 }
 
 /* =========================================================
@@ -3576,10 +3353,6 @@ body.has-sticky-cta {
     gap: 32px;
   }
 
-  /* Form */
-  .form {
-    padding: 40px 32px;
-  }
 }
 
 /* =========================================================
@@ -4225,16 +3998,6 @@ body.has-sticky-cta {
     font-size: 14px;
   }
 
-  /* Form */
-  .form {
-    padding: 28px 20px;
-  }
-
-  .form__submit .btn {
-    width: 100%;
-    min-width: 0;
-  }
-
   /* Article */
   .article__title {
     font-size: 24px;
@@ -4256,20 +4019,6 @@ body.has-sticky-cta {
     text-align: center;
   }
 
-  /* Recruit job */
-  .job {
-    padding: 28px 24px;
-  }
-
-  .job__title {
-    font-size: 20px;
-  }
-
-  .job__details {
-    grid-template-columns: 1fr;
-    gap: 16px;
-    padding: 16px 20px;
-  }
 }
 
 /* =========================================================
