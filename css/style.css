@@ -828,15 +828,99 @@ button {
   top: 100px;
 }
 
+.message__lead {
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1.8;
+  color: var(--color-text);
+  letter-spacing: 0.02em;
+  margin: 0 0 40px;
+  padding-bottom: 28px;
+  border-bottom: 1px solid var(--color-line);
+}
+
+.message__quote {
+  position: relative;
+  margin: 40px 0;
+  padding: 32px 36px 32px 48px;
+  background: linear-gradient(135deg, #fff5fa 0%, #fff 100%);
+  border-left: 4px solid var(--color-primary);
+  border-radius: 0 12px 12px 0;
+}
+
+.message__quote::before {
+  content: "“";
+  position: absolute;
+  top: 0;
+  left: 14px;
+  font-family: "Outfit", serif;
+  font-size: 80px;
+  line-height: 1;
+  color: var(--color-primary);
+  opacity: 0.22;
+  pointer-events: none;
+}
+
+.message__quote p {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1.7;
+  color: var(--color-text);
+  letter-spacing: 0.02em;
+}
+
+.message__quote em {
+  font-style: normal;
+  color: var(--color-primary);
+  position: relative;
+  padding: 0 2px;
+}
+
+.message__closing {
+  font-size: 17px;
+  font-weight: 600;
+  line-height: 2;
+  color: var(--color-text);
+  margin: 36px 0 24px;
+}
+
+.message__sign {
+  margin: 48px 0 0;
+  padding-top: 28px;
+  border-top: 1px solid var(--color-line);
+  text-align: right;
+}
+
 /* ---------- Profile ---------- */
 .profile {
-  margin-top: 80px;
-  padding-top: 56px;
-  border-top: 1px solid var(--color-line);
+  position: relative;
+  margin-top: 96px;
+  padding: 56px 56px;
+  background: #fff;
+  border: 1px solid var(--color-line);
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(204, 33, 127, 0.06);
   display: grid;
   grid-template-columns: 1fr 2fr;
   gap: 56px;
   align-items: start;
+}
+
+.profile::before {
+  content: "Profile";
+  position: absolute;
+  top: -14px;
+  left: 40px;
+  padding: 4px 16px;
+  background: var(--color-primary);
+  color: #fff;
+  font-family: "Outfit", sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  border-radius: 999px;
+  text-transform: uppercase;
 }
 
 .profile__photo {
@@ -846,6 +930,7 @@ button {
   border-radius: 12px;
   overflow: hidden;
   margin: 0 0 24px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
 }
 
 .profile__photo img {
@@ -856,32 +941,43 @@ button {
 }
 
 .profile__label {
-  font-family: 'Outfit', sans-serif;
-  font-size: 13px;
-  letter-spacing: 0.16em;
-  color: var(--color-primary);
-  text-transform: uppercase;
-  margin: 0 0 12px;
+  display: none;
 }
 
 .profile__name {
   font-size: 28px;
   font-weight: 700;
   letter-spacing: 0.04em;
-  margin: 0 0 16px;
+  margin: 0 0 4px;
+}
+
+.profile__name-en {
+  font-family: "Outfit", sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  color: var(--color-primary);
+  margin: 0 0 18px;
 }
 
 .profile__roles {
   list-style: none;
-  padding: 0;
+  padding: 14px 16px;
   margin: 0;
+  background: #fafafa;
+  border-radius: 8px;
+  border-left: 3px solid var(--color-primary);
 }
 
 .profile__roles li {
-  font-size: 14px;
-  color: var(--color-sub);
+  font-size: 13px;
+  color: var(--color-text);
   line-height: 1.7;
   margin-bottom: 4px;
+}
+
+.profile__roles li:last-child {
+  margin-bottom: 0;
 }
 
 .profile__body p {
@@ -889,6 +985,18 @@ button {
   color: var(--color-sub);
   line-height: 2;
   margin: 0 0 20px;
+  position: relative;
+  padding-left: 18px;
+}
+
+.profile__body p::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 14px;
+  width: 8px;
+  height: 1px;
+  background: var(--color-primary);
 }
 
 .profile__body p:last-child {
@@ -3576,12 +3684,48 @@ body.has-sticky-cta {
     top: auto;
   }
 
+  .message__lead {
+    font-size: 18px;
+    margin: 0 0 28px;
+    padding-bottom: 20px;
+  }
+
+  .message__quote {
+    margin: 28px 0;
+    padding: 24px 22px 24px 32px;
+  }
+
+  .message__quote::before {
+    font-size: 60px;
+    left: 8px;
+  }
+
+  .message__quote p {
+    font-size: 17px;
+    line-height: 1.7;
+  }
+
+  .message__closing {
+    font-size: 15px;
+    margin: 28px 0 20px;
+  }
+
+  .message__sign {
+    margin-top: 36px;
+    padding-top: 20px;
+  }
+
   /* Profile */
   .profile {
     grid-template-columns: 1fr;
     gap: 24px;
-    margin-top: 56px;
-    padding-top: 40px;
+    margin-top: 64px;
+    padding: 40px 24px 32px;
+  }
+
+  .profile::before {
+    left: 50%;
+    transform: translateX(-50%);
   }
 
   .profile__photo {
@@ -3589,8 +3733,26 @@ body.has-sticky-cta {
     margin: 0 auto 16px;
   }
 
+  .profile__head {
+    text-align: center;
+  }
+
   .profile__name {
     font-size: 24px;
+  }
+
+  .profile__name-en {
+    font-size: 12px;
+  }
+
+  .profile__roles {
+    text-align: left;
+    padding: 12px 14px;
+  }
+
+  .profile__body p {
+    font-size: 14px;
+    padding-left: 14px;
   }
 
   .concept__lead {
