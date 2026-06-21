@@ -2013,57 +2013,52 @@ button {
   pointer-events: none;
 }
 
-/* role label as a soft pill badge */
+/* role pill removed from the card */
 .instructor--detail .instructor__role {
-  display: flex;
-  align-items: center;
-  width: fit-content;
-  font-size: 11px;
-  letter-spacing: 0.18em;
-  color: var(--color-primary);
-  background: var(--color-primary-light);
-  padding: 5px 13px;
-  border-radius: 999px;
-  margin: 0 0 12px;
+  display: none;
 }
 
+/* name + english name sit together on one baseline-aligned line */
 .instructor--detail .instructor__name {
+  display: inline;
   font-size: 23px;
   letter-spacing: 0.02em;
-  margin: 0 0 3px;
+  margin: 0;
 }
 
-/* English name + divider line that separates the header from the profile */
 .instructor--detail .instructor__name-en {
-  position: relative;
+  display: inline;
+  margin-left: 12px;
   font-size: 12px;
   letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--color-sub);
-  margin: 0 0 18px;
-  padding-bottom: 16px;
-  border-bottom: 1px solid var(--color-line);
+  white-space: nowrap;
 }
 
-.instructor--detail .instructor__name-en::after {
+/* divider + accent now sits at the top of the profile, separating it from the header */
+.instructor__profile {
+  position: relative;
+  display: grid;
+  grid-template-columns: 110px 1fr;
+  column-gap: 16px;
+  margin: 18px 0 20px;
+  padding-top: 18px;
+  border-top: 1px solid var(--color-line);
+  font-size: 13.5px;
+  line-height: 1.6;
+  min-height: 204px;
+}
+
+.instructor__profile::before {
   content: "";
   position: absolute;
+  top: -1px;
   left: 0;
-  bottom: -1px;
   width: 46px;
   height: 2px;
   border-radius: 2px;
   background: linear-gradient(90deg, var(--color-primary), var(--color-primary-light));
-}
-
-.instructor__profile {
-  display: grid;
-  grid-template-columns: 110px 1fr;
-  column-gap: 16px;
-  margin: 0 0 20px;
-  font-size: 13.5px;
-  line-height: 1.6;
-  min-height: 204px;
 }
 
 .instructor__profile dt,
@@ -4069,30 +4064,21 @@ body.has-sticky-cta {
     object-position: center top;
   }
 
-  .instructor--detail .instructor__role {
-    font-size: 11px;
-    letter-spacing: 0.18em;
-    margin: 0 auto 8px;
+  /* center the name line; profile / lesson text stay left-aligned below */
+  .instructor--detail > div:last-of-type {
+    text-align: center;
   }
 
   .instructor--detail .instructor__name {
     font-size: 19px;
-    margin: 2px 0 0;
     line-height: 1.3;
-    text-align: center;
+    margin: 0;
   }
 
   .instructor--detail .instructor__name-en {
-    font-size: 12px;
+    font-size: 11px;
     letter-spacing: 0.08em;
-    margin: 2px 0 14px;
-    padding-bottom: 14px;
-    text-align: center;
-  }
-
-  .instructor--detail .instructor__name-en::after {
-    left: 50%;
-    transform: translateX(-50%);
+    margin-left: 10px;
   }
 
   .instructor--detail .instructor__lesson strong {
@@ -4100,11 +4086,14 @@ body.has-sticky-cta {
   }
 
   .instructor--detail .instructor__profile {
-    margin: 0 0 10px;
+    text-align: left;
+    margin: 14px 0 10px;
+    padding-top: 14px;
     min-height: 156px;
   }
 
   .instructor--detail .instructor__lesson {
+    text-align: left;
     padding: 12px 14px;
     margin: 0;
     font-size: 13px;
