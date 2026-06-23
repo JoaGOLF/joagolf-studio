@@ -1973,6 +1973,35 @@ button {
 .instructors__nav--prev { left: -22px; }
 .instructors__nav--next { right: -22px; }
 
+/* Current-card indicator (dots) */
+.instructors__dots {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 28px;
+}
+
+.instructors__dot {
+  width: 9px;
+  height: 9px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: var(--color-line);
+  cursor: pointer;
+  transition: background var(--transition), transform var(--transition);
+}
+
+.instructors__dot:hover {
+  background: var(--color-primary);
+}
+
+.instructors__dot.is-active {
+  background: var(--color-primary);
+  transform: scale(1.3);
+}
+
 @media (max-width: 1024px) {
   .instructors__nav--prev { left: 8px; }
   .instructors__nav--next { right: 8px; }
@@ -1983,9 +2012,9 @@ button {
     width: 36px;
     height: 36px;
     font-size: 18px;
-    /* On mobile the card stacks vertically, so a 50% center lands on the
-       profile text. Anchor the arrows over the photo instead (higher up). */
-    top: 190px;
+    /* Mobile card stacks vertically (photo ≈283px tall, then the name line).
+       Anchor the arrows at the name's height so they flank the name. */
+    top: 322px;
   }
 }
 

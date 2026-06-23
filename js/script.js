@@ -109,6 +109,28 @@
     let timer = null;
     let isAnimating = false;
 
+    // Current-card indicator (dots)
+    const dotsWrap = document.createElement('div');
+    dotsWrap.className = 'instructors__dots';
+    dotsWrap.setAttribute('aria-label', 'インストラクター切り替え');
+    const dots = realSlides.map((_, i) => {
+      const dot = document.createElement('button');
+      dot.type = 'button';
+      dot.className = 'instructors__dot';
+      dot.setAttribute('aria-label', `${i + 1}人目を表示`);
+      dotsWrap.appendChild(dot);
+      return dot;
+    });
+    carousel.appendChild(dotsWrap);
+    const updateDots = (i) => {
+      dots.forEach((d, di) => {
+        const active = di === i;
+        d.classList.toggle('is-active', active);
+        d.setAttribute('aria-current', active ? 'true' : 'false');
+      });
+    };
+    updateDots(0);
+
     const setPos = (visualIdx, animate) => {
       track.style.transition = animate ? '' : 'none';
       track.style.transform = `translateX(-${visualIdx * 100}%)`;
@@ -125,6 +147,7 @@
       if (isAnimating) return;
       isAnimating = true;
       index += delta;
+      updateDots(((index % total) + total) % total);
 
       if (delta > 0 && index === total) {
         // Past the last → animate into the first-clone, then snap to real first.
@@ -147,6 +170,16 @@
         setTimeout(() => { isAnimating = false; }, DUR + 20);
       }
     };
+
+    const goTo = (target) => {
+      if (isAnimating || target === index) return;
+      isAnimating = true;
+      index = target;
+      setPos(index + 1, true);
+      updateDots(index);
+      setTimeout(() => { isAnimating = false; }, DUR + 20);
+    };
+    dots.forEach((dot, i) => dot.addEventListener('click', () => { goTo(i); start(); }));
 
     const stop = () => {
       if (timer) { clearInterval(timer); timer = null; }
