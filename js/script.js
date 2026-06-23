@@ -199,6 +199,23 @@
       if (document.hidden) stop(); else start();
     });
 
+    // Anchor the prev/next arrows to the name's vertical centre (used on mobile).
+    const positionNav = () => {
+      const name = track.querySelector('.instructor__name');
+      if (!name) return;
+      const top = name.getBoundingClientRect().top
+        - carousel.getBoundingClientRect().top
+        + name.offsetHeight / 2;
+      if (top > 0) carousel.style.setProperty('--nav-top', `${Math.round(top)}px`);
+    };
+    positionNav();
+    window.addEventListener('load', positionNav);
+    let navTimer;
+    window.addEventListener('resize', () => {
+      clearTimeout(navTimer);
+      navTimer = setTimeout(positionNav, 150);
+    });
+
     start();
   }
 
