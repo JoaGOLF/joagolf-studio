@@ -191,6 +191,28 @@
 
     prev.addEventListener('click', () => { go(-1); start(); });
     next.addEventListener('click', () => { go(1); start(); });
+
+    // Swipe to switch cards (tablet / mobile)
+    const viewport = carousel.querySelector('.instructors__viewport');
+    let swipeX = 0, swipeY = 0, swiping = false;
+    viewport.addEventListener('touchstart', (e) => {
+      if (e.touches.length !== 1) return;
+      swipeX = e.touches[0].clientX;
+      swipeY = e.touches[0].clientY;
+      swiping = true;
+      stop();
+    }, { passive: true });
+    viewport.addEventListener('touchend', (e) => {
+      if (!swiping) return;
+      swiping = false;
+      const dx = e.changedTouches[0].clientX - swipeX;
+      const dy = e.changedTouches[0].clientY - swipeY;
+      if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy)) {
+        if (dx < 0) go(1); else go(-1);
+      }
+      start();
+    }, { passive: true });
+
     carousel.addEventListener('mouseenter', stop);
     carousel.addEventListener('mouseleave', start);
     carousel.addEventListener('focusin', stop);

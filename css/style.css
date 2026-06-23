@@ -2016,6 +2016,12 @@ button {
        Fallback covers the store-tag row + photo height when JS is unavailable. */
     top: var(--nav-top, 352px);
   }
+
+  /* Reserve space on both sides of the name so the arrows never overlap it */
+  .instructors__carousel .instructor--detail > div:last-of-type {
+    padding-left: 48px;
+    padding-right: 48px;
+  }
 }
 
 .instructor--detail {
