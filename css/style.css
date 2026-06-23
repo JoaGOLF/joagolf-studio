@@ -871,6 +871,13 @@ button {
   letter-spacing: 0.04em;
 }
 
+/* Homepage message: separate the speaker (role / name) from the message body */
+.message:not(.message--detail) .message__sign {
+  margin: 0 0 28px;
+  padding-bottom: 22px;
+  border-bottom: 1px solid var(--color-line);
+}
+
 .message__more {
   margin: 32px 0 0;
 }
