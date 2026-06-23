@@ -209,6 +209,7 @@ function bindCommonEvents(shareUrlStr) {
 function showResult() {
     quizSection.style.display = 'none';
     resultSection.style.display = 'block';
+    document.body.classList.add('is-result');
 
     let scoreAB = { A: 0, B: 0 };
     let scoreCP = { Cross: 0, Parallel: 0 };
@@ -280,6 +281,7 @@ function showResult() {
 function renderResult(key, subNote) {
     quizSection.style.display = 'none';
     resultSection.style.display = 'block';
+    document.body.classList.add('is-result');
 
     const data = results[key];
     if (!data) return;

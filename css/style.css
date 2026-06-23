@@ -3145,6 +3145,19 @@ body.has-sticky-cta {
   padding-bottom: 0;
 }
 
+/* Sticky CTA shown on tablet/smartphone only (hidden on PC) */
+@media (min-width: 1025px) {
+  .sticky-cta--mobile-only {
+    display: none;
+  }
+}
+
+/* Result-gated CTA (swing-type): stay hidden until the diagnosis result is shown,
+   even after the scroll trigger adds .is-visible */
+body:not(.is-result) .sticky-cta--result-only.is-visible {
+  transform: translateY(100%);
+}
+
 /* =========================================================
    Article (news detail)
    ========================================================= */
