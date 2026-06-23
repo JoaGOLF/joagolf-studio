@@ -454,6 +454,60 @@ button {
   50% { transform: scaleY(1); transform-origin: top; }
 }
 
+/* ---------- Entrance / scroll animations ---------- */
+@media (prefers-reduced-motion: no-preference) {
+  /* KV: slow ken-burns zoom on the background */
+  .kv__bg img {
+    animation: kvZoom 18s ease-out forwards;
+  }
+
+  /* KV: staggered fade-up of the copy */
+  .kv__sub,
+  .kv__title span,
+  .kv__desc,
+  .kv__actions {
+    opacity: 0;
+    animation: kvUp 0.9s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  }
+  .kv__sub { animation-delay: 0.15s; }
+  .kv__title span:nth-child(1) { animation-delay: 0.32s; }
+  .kv__title span:nth-child(2) { animation-delay: 0.46s; }
+  .kv__desc { animation-delay: 0.62s; }
+  .kv__actions { animation-delay: 0.78s; }
+  .kv__scroll {
+    opacity: 0;
+    animation: kvFade 1s ease forwards;
+    animation-delay: 1.15s;
+  }
+
+  /* Scroll reveal — the .reveal class is added by JS (progressive enhancement) */
+  .reveal {
+    opacity: 0;
+    transform: translateY(32px);
+    transition: opacity 0.7s ease, transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+    transition-delay: var(--reveal-delay, 0s);
+    will-change: opacity, transform;
+  }
+  .reveal.is-visible {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes kvUp {
+  from { opacity: 0; transform: translateY(28px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes kvFade {
+  to { opacity: 1; }
+}
+
+@keyframes kvZoom {
+  from { transform: scale(1.12); }
+  to { transform: scale(1); }
+}
+
 /* ---------- Concept ---------- */
 .concept .section__head {
   text-align: left;
@@ -896,7 +950,7 @@ button {
   margin: 36px 0 24px;
 }
 
-.message__sign {
+.message--detail .message__sign {
   margin: 48px 0 0;
   padding-top: 28px;
   border-top: 1px solid var(--color-line);
@@ -1922,6 +1976,9 @@ button {
     width: 36px;
     height: 36px;
     font-size: 18px;
+    /* On mobile the card stacks vertically, so a 50% center lands on the
+       profile text. Anchor the arrows over the photo instead (higher up). */
+    top: 190px;
   }
 }
 
@@ -3600,7 +3657,7 @@ body.has-sticky-cta {
     margin: 28px 0 20px;
   }
 
-  .message__sign {
+  .message--detail .message__sign {
     margin-top: 36px;
     padding-top: 20px;
   }

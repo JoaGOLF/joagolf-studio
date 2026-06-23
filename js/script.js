@@ -169,6 +169,52 @@
     start();
   }
 
+  // ---------- Scroll reveal (fade-up as sections enter the viewport) ----------
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (!reduceMotion && 'IntersectionObserver' in window) {
+    const revealSelector = [
+      '.section__head',
+      '.concept__text', '.concept__image',
+      '.feature',
+      '.message__image', '.message__text',
+      '.store-card',
+      '.instructors__carousel',
+      '.voice-card',
+      '.news-item',
+      '.faq-item',
+      '.price-card', '.access-card',
+    ].join(',');
+
+    const items = Array.from(document.querySelectorAll(revealSelector));
+    items.forEach((el) => el.classList.add('reveal'));
+
+    // Stagger siblings that share a parent (e.g. feature / store-card grids).
+    const groups = new Map();
+    items.forEach((el) => {
+      const parent = el.parentElement;
+      if (!groups.has(parent)) groups.set(parent, []);
+      groups.get(parent).push(el);
+    });
+    groups.forEach((els) => {
+      if (els.length > 1) {
+        els.forEach((el, i) => {
+          el.style.setProperty('--reveal-delay', `${Math.min(i, 6) * 0.08}s`);
+        });
+      }
+    });
+
+    const io = new IntersectionObserver((entries, obs) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('is-visible');
+          obs.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.12, rootMargin: '0px 0px -8% 0px' });
+
+    items.forEach((el) => io.observe(el));
+  }
+
   // ---------- Sticky CTA (show after scrolling past KV) ----------
   const stickyCta = document.querySelector('.sticky-cta');
   if (stickyCta) {
