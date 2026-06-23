@@ -491,6 +491,9 @@ button {
   .reveal.is-visible {
     opacity: 1;
     transform: none;
+    /* Drop the compositing layer once revealed (lingering will-change can
+       cause absolutely-positioned siblings to mis-paint on mobile). */
+    will-change: auto;
   }
 }
 
@@ -1943,7 +1946,9 @@ button {
 .instructors__nav {
   position: absolute;
   top: 50%;
-  transform: translateY(-50%);
+  transform: translate3d(0, -50%, 0);
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
   width: 44px;
   height: 44px;
   border-radius: 50%;
@@ -1967,7 +1972,7 @@ button {
   background: var(--color-primary);
   color: #fff;
   box-shadow: var(--shadow-md);
-  transform: translateY(-50%) scale(1.06);
+  transform: translate3d(0, -50%, 0) scale(1.06);
 }
 
 .instructors__nav--prev { left: -22px; }
