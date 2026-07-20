@@ -3234,6 +3234,7 @@ body:not(.is-result) .sticky-cta--result-only.is-visible {
   margin: 24px 0;
 }
 .article__body img.article__img--tall {
+  width: 100%;
   max-width: 600px;
   margin-left: auto;
   margin-right: auto;
