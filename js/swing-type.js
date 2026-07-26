@@ -139,7 +139,7 @@ function buildStoreLinkHtml() {
 
 function buildAllTypesHtml() {
     return `
-            <button id="show-all-types" class="quiz-btn" style="background:#cc217f; margin-top:20px;">他のスイングタイプも見る</button>
+            <button id="show-all-types" class="quiz-btn quiz-btn--ghost" style="margin-top:20px;">他のスイングタイプも見る</button>
 
             <div id="all-types-list" style="display:none; margin-top: 60px; text-align: left;">
                 <hr style="margin: 60px 0; border: 0; border-top: 2px solid #eee;">
@@ -167,7 +167,7 @@ function buildAllTypesHtml() {
 }
 
 function buildRestartBtnHtml() {
-    return `<button class="quiz-btn" style="background:#cc217f; margin-top:20px;" onclick="location.assign(location.pathname)">最初からやり直す</button>`;
+    return `<button class="quiz-btn quiz-btn--ghost" style="margin-top:20px;" onclick="location.assign(location.pathname)">最初からやり直す</button>`;
 }
 
 function buildShareHtml(shareUrlStr, shareText, shareUrl, lineUrl) {

@@ -4626,6 +4626,16 @@ body:not(.is-result) .sticky-cta--result-only.is-visible {
   background-color: var(--sq-primary-hover);
   transform: translateY(-3px);
 }
+.swing-quiz .quiz-btn--ghost {
+  background-color: #fff;
+  color: var(--sq-primary);
+  border: 2px solid var(--sq-primary);
+  box-shadow: none;
+}
+.swing-quiz .quiz-btn--ghost:hover {
+  background-color: var(--sq-primary);
+  color: #fff;
+}
 
 .swing-quiz .type-full-card {
   background: #fff;
