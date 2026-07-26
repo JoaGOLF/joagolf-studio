@@ -131,7 +131,7 @@ function buildSupervisorHtml() {
 
 function buildStoreLinkHtml() {
     return `
-            <a href="/store/" class="quiz-btn" style="text-decoration: none; background-color:#cc217f; margin-top: 20px; display: block; line-height: 1.4;">
+            <a href="/store/" class="quiz-btn quiz-btn--cta" style="text-decoration: none; margin-top: 20px; display: block; line-height: 1.4;">
                 タイプ別のスイング指導は<br>JoaGOLF STUDIOへ！
             </a>
     `;

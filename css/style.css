@@ -4636,6 +4636,13 @@ body:not(.is-result) .sticky-cta--result-only.is-visible {
   background-color: var(--sq-primary);
   color: #fff;
 }
+.swing-quiz .quiz-btn--cta {
+  border: 2px solid var(--sq-primary);
+}
+.swing-quiz .quiz-btn--cta:hover {
+  background-color: #fff;
+  color: var(--sq-primary);
+}
 
 .swing-quiz .type-full-card {
   background: #fff;
