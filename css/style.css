@@ -3281,7 +3281,7 @@ body:not(.is-result) .sticky-cta--result-only.is-visible {
   color: #fff;
 }
 .article__body p.article__cta {
-  margin: 24px 0 8px;
+  margin: 24px 0;
 }
 .article__cta .btn,
 .article__cta .btn:hover {
