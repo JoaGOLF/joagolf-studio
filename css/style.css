@@ -3280,8 +3280,8 @@ body:not(.is-result) .sticky-cta--result-only.is-visible {
   background: var(--color-primary);
   color: #fff;
 }
-.article__cta {
-  margin: 20px 0 8px;
+.article__body p.article__cta {
+  margin: 36px 0 8px;
 }
 .article__cta .btn,
 .article__cta .btn:hover {
