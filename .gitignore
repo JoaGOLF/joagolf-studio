@@ -50,3 +50,6 @@ build/
 *.tmp
 *.bak
 *.zip
+.deploy-state.json
+.DS_Store
+_*.html
