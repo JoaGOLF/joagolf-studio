@@ -5138,3 +5138,177 @@ body:not(.is-result) .sticky-cta--result-only.is-visible {
   .swing-promo__supervisor-titles li { font-size: 11.5px; }
 }
 
+
+/* =========================================================
+   Campaign Banner（特設LP誘導バナー）
+   ========================================================= */
+.camp-banner {
+  padding: 64px 0;
+}
+
+.camp-banner__card {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  border-radius: var(--radius);
+  background: #0B1220;
+  border: 1px solid rgba(216, 194, 154, 0.5);
+  box-shadow: 0 12px 32px rgba(11, 18, 32, 0.18);
+  transition: transform var(--transition), box-shadow var(--transition);
+}
+
+.camp-banner__card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 20px 44px rgba(11, 18, 32, 0.28);
+}
+
+.camp-banner__bg {
+  position: absolute;
+  inset: 0;
+}
+
+.camp-banner__bg img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.38;
+}
+
+.camp-banner__bg::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, rgba(11, 18, 32, 0.85) 0%, rgba(11, 18, 32, 0.55) 100%);
+}
+
+.camp-banner__inner {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  padding: clamp(36px, 5vw, 52px) 24px;
+  color: #fff;
+}
+
+.camp-banner__label {
+  font-family: "Outfit", sans-serif;
+  font-weight: 500;
+  font-size: 11px;
+  letter-spacing: 0.4em;
+  text-transform: uppercase;
+  color: #D8C29A;
+  margin: 0 0 14px;
+}
+
+.camp-banner__title {
+  font-weight: 700;
+  font-size: clamp(23px, 3.6vw, 32px);
+  line-height: 1.5;
+  letter-spacing: 0.05em;
+  margin: 0 0 10px;
+}
+
+.camp-banner__title em {
+  font-style: normal;
+  color: #D8C29A;
+}
+
+.camp-banner__sub {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.78);
+  letter-spacing: 0.06em;
+  margin: 0 0 22px;
+}
+
+.camp-banner__btn {
+  display: inline-block;
+  border: 1px solid #D8C29A;
+  color: #D8C29A;
+  font-weight: 600;
+  font-size: 14px;
+  letter-spacing: 0.08em;
+  padding: 13px 40px;
+  border-radius: 999px;
+  transition: background var(--transition), color var(--transition);
+}
+
+.camp-banner__card:hover .camp-banner__btn {
+  background: #D8C29A;
+  color: #0B1220;
+}
+
+@media (max-width: 767px) {
+  .camp-banner {
+    padding: 48px 0;
+  }
+  .camp-banner__sub {
+    font-size: 11.5px;
+  }
+}
+
+/* 店舗一覧に並べるキャンペーンカード（特設LP誘導） */
+.store-card--campaign {
+  background: #0B1220;
+  border-color: rgba(216, 194, 154, 0.55);
+}
+
+.store-card--campaign > a {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.store-card--campaign .store-card__image {
+  position: relative;
+}
+
+.store-card--campaign .store-card__image::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(11, 18, 32, 0.12) 0%, rgba(11, 18, 32, 0.6) 100%);
+}
+
+.store-card--campaign__badge {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  z-index: 2;
+  background: #B08D4F;
+  color: #0B1220;
+  font-family: "Outfit", sans-serif;
+  font-weight: 700;
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  padding: 6px 14px;
+  border-radius: 4px;
+}
+
+.store-card--campaign .store-card__en {
+  color: #D8C29A;
+}
+
+.store-card--campaign .store-card__name {
+  color: #fff;
+}
+
+.store-card--campaign .store-card__name em {
+  font-style: normal;
+  color: #D8C29A;
+}
+
+.store-card--campaign .store-card__addr {
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.store-card--campaign__btn {
+  width: 100%;
+  border: 1px solid #D8C29A;
+  color: #D8C29A;
+  background: transparent;
+}
+
+.store-card--campaign:hover .store-card--campaign__btn {
+  background: #D8C29A;
+  color: #0B1220;
+  transform: translateY(-3px);
+}
