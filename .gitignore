@@ -53,3 +53,4 @@ build/
 .deploy-state.json
 .DS_Store
 _*.html
+_reports/
