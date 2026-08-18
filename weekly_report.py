@@ -370,13 +370,16 @@ def render(d, start, end):
     a("\n## ⑥ 検索での見え方（Search Console）\n")
     if d["sc_tot"]:
         t = d["sc_tot"][0]
-        a(f"- 表示回数 **{int(t.get('impressions',0)):,}** ／ クリック **{int(t.get('clicks',0)):,}** "
+        imp_, clk_ = int(t.get('impressions', 0)), int(t.get('clicks', 0))
+        ctr_ = clk_ / imp_ * 100 if imp_ else 0
+        a(f"- 表示回数 **{imp_:,}** ／ クリック **{clk_:,}**（クリック率 **{ctr_:.1f}%**）"
           f"／ 平均掲載順位 **{t.get('position',0):.1f}位**")
     if d["sc_q"]:
-        a("\n| 検索キーワード | 表示 | クリック | 順位 |")
-        a("|---|---:|---:|---:|")
+        a("\n| 検索キーワード | 表示 | クリック | クリック率 | 順位 |")
+        a("|---|---:|---:|---:|---:|")
         for r in d["sc_q"]:
-            a(f"| {r['keys'][0]} | {int(r['impressions']):,} | {int(r['clicks']):,} | {r['position']:.1f} |")
+            c_ = f"{r['clicks']/r['impressions']*100:.1f}%" if r['impressions'] else "—"
+            a(f"| {r['keys'][0]} | {int(r['impressions']):,} | {int(r['clicks']):,} | {c_} | {r['position']:.1f} |")
     else:
         a("（データ取得なし）")
 
@@ -386,10 +389,11 @@ def render(d, start, end):
         tk = [r for r in aq if any(w in r["keys"][0] for w in tk_words)]
         a("\n### 地域キーワードの順位（MEO・ローカルSEOの指標）\n")
         a(f"- 地域を含む検索: **{len(aq)}種** ／ うち**東京エリア: {len(tk)}種**")
-        a("\n| 地域キーワード | 表示 | クリック | 順位 |")
-        a("|---|---:|---:|---:|")
+        a("\n| 地域キーワード | 表示 | クリック | クリック率 | 順位 |")
+        a("|---|---:|---:|---:|---:|")
         for r in aq[:10]:
-            a(f"| {r['keys'][0]} | {int(r['impressions']):,} | {int(r['clicks']):,} | {r['position']:.1f} |")
+            c_ = f"{r['clicks']/r['impressions']*100:.1f}%" if r['impressions'] else "—"
+            a(f"| {r['keys'][0]} | {int(r['impressions']):,} | {int(r['clicks']):,} | {c_} | {r['position']:.1f} |")
         if not tk:
             a("\n⚠️ **東京エリアの地域キーワードが1件も拾えていません。**"
               "東京4店舗のローカルSEO/MEOが機能していない可能性があります。")

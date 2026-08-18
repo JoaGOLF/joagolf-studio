@@ -311,6 +311,7 @@ const METRICS = {
   lp:{label:"キャンペーンLP閲覧", color:COLORS.blue, f:w=>w.lp},
   sc_imp:{label:"検索表示回数", color:COLORS.teal, f:w=>w.sc_imp},
   sc_clicks:{label:"検索クリック", color:COLORS.orange, f:w=>w.sc_clicks},
+  sc_ctr:{label:"検索クリック率(%)", color:COLORS.pink, f:w=>w.sc_imp?+(w.sc_clicks/w.sc_imp*100).toFixed(1):0},
 };
 const TABS = [["overview","概要"],["stores","店舗"],["traffic","集客チャネル"],
   ["search","検索"],["lp","キャンペーンLP"],["table","データ表"]];
@@ -463,10 +464,11 @@ function vTraffic(){
 function vSearch(){
   const ws=slice();
   const tkCount=D.areaQueries.filter(q=>q.tokyo).length;
+  const ctr=(c,i)=>i?(c/i*100).toFixed(1)+"%":"—";
   const qtable=(rows,warn)=>rows.length?`<div class="scroll"><table><thead><tr>
-    <th>検索キーワード</th><th>表示</th><th>クリック</th><th>平均順位</th></tr></thead><tbody>
+    <th>検索キーワード</th><th>表示</th><th>クリック</th><th>クリック率</th><th>平均順位</th></tr></thead><tbody>
     ${rows.map(r=>`<tr class="${warn&&r.tokyo?"warn":""}"><td>${r.q}${r.tokyo?" 🗼":""}</td>
-    <td>${fmt(r.imp)}</td><td>${fmt(r.clicks)}</td><td>${r.pos}</td></tr>`).join("")}
+    <td>${fmt(r.imp)}</td><td>${fmt(r.clicks)}</td><td>${ctr(r.clicks,r.imp)}</td><td>${r.pos}</td></tr>`).join("")}
     </tbody></table></div>`:'<p class="empty">データなし</p>';
   return `
   <div class="card"><h3>検索での表示回数・クリックの推移</h3>
@@ -475,7 +477,11 @@ function vSearch(){
     <div class="scroll">${lineChart(ws.map(w=>w.week),[
       {label:"表示回数",vals:ws.map(w=>w.sc_imp),color:COLORS.teal},
       {label:"クリック",vals:ws.map(w=>w.sc_clicks),color:COLORS.orange}])}</div></div>
-  <div class="card"><h3>平均掲載順位の推移（下がるほど良い）</h3>
+  <div class="card"><h3>クリック率（CTR）の推移</h3>
+    <p class="note">表示されたうち、実際にクリックされた割合。順位が上がるとここが伸びます</p>
+    <div class="scroll">${lineChart(ws.map(w=>w.week),[
+      {label:"クリック率",vals:ws.map(w=>w.sc_imp?+(w.sc_clicks/w.sc_imp*100).toFixed(1):0),color:COLORS.pink}],{h:170,unit:"%"})}</div></div>
+  <div class="card"><h3>平均掲載順位の推移（下がるほど良い＝検索結果の何番目に出たか）</h3>
     <div class="scroll">${lineChart(ws.map(w=>w.week),[
       {label:"平均順位",vals:ws.map(w=>w.sc_pos),color:COLORS.navy}],{h:170,unit:"位"})}</div></div>
   <div class="two">
@@ -510,8 +516,9 @@ function vLp(){
 function vTable(){
   const cols=[["week","週"],["users","訪問者"],["sessions","セッション"],["reserve","予約クリック"],
     ["cvr","CVR%"],["line","LINE"],["tokyo","東京"],["kansai","関西"],["lp","LP閲覧"],
-    ["sc_imp","検索表示"],["sc_clicks","検索クリック"],["sc_pos","平均順位"]];
-  const rows=W.map(w=>({...w,cvr:w.sessions?+(w.reserve/w.sessions*100).toFixed(1):0}));
+    ["sc_imp","検索表示"],["sc_clicks","検索クリック"],["sc_ctr","検索CTR%"],["sc_pos","平均順位"]];
+  const rows=W.map(w=>({...w,cvr:w.sessions?+(w.reserve/w.sessions*100).toFixed(1):0,
+    sc_ctr:w.sc_imp?+(w.sc_clicks/w.sc_imp*100).toFixed(1):0}));
   rows.sort((a,b)=>{const k=S.sort.key,d=S.sort.dir;
     return (a[k]>b[k]?1:a[k]<b[k]?-1:0)*d;});
   return `
@@ -541,8 +548,9 @@ document.addEventListener("click",e=>{
     S.sort=S.sort.key===k?{key:k,dir:-S.sort.dir}:{key:k,dir:-1};render();}
   else if(t.id==="csv"){
     const cols=["week","users","sessions","reserve","line","tokyo","kansai","lp","sc_imp","sc_clicks","sc_pos"];
-    const head="週,訪問者,セッション,予約クリック,LINE追加,東京,関西,LP閲覧,検索表示,検索クリック,平均順位";
-    const csv=[head,...W.map(w=>cols.map(k=>w[k]).join(","))].join("\n");
+    const head="週,訪問者,セッション,予約クリック,LINE追加,東京,関西,LP閲覧,検索表示,検索クリック,検索CTR%,平均順位";
+    const csv=[head,...W.map(w=>[...cols.slice(0,-1),"ctr","sc_pos"].map(k=>
+      k==="ctr"?(w.sc_imp?(w.sc_clicks/w.sc_imp*100).toFixed(1):0):w[k]).join(","))].join("\n");
     const a=document.createElement("a");
     a.href=URL.createObjectURL(new Blob(["﻿"+csv],{type:"text/csv"}));
     a.download="joagolf_web_weekly.csv";a.click();}
