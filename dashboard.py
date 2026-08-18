@@ -263,6 +263,8 @@ def render(W):
 <html lang="ja"><head><meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>JoaGOLF STUDIO Web ダッシュボード</title>
+<meta name="robots" content="noindex, nofollow, noarchive">
+<meta name="referrer" content="no-referrer">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
@@ -273,6 +275,8 @@ body{{font-family:"Outfit","Noto Sans JP",sans-serif;background:#f6f6f8;color:#1
 .wrap{{max-width:1180px;margin:0 auto;padding:28px 20px 60px}}
 header{{margin-bottom:26px}}
 h1{{font-size:23px;font-weight:700;letter-spacing:.02em}}
+.confidential{{display:inline-block;background:#fdeef4;color:var(--pink);font-size:11px;
+ font-weight:700;letter-spacing:.1em;padding:3px 10px;border-radius:4px;margin-bottom:6px}}
 .meta{{font-size:13px;color:var(--sub);margin-top:4px}}
 h2{{font-size:16px;font-weight:700;margin:34px 0 12px;padding-left:11px;
  border-left:4px solid var(--pink)}}
@@ -307,6 +311,7 @@ th{{background:#fafafb;font-weight:600;color:var(--sub);font-size:11.5px;positio
 td:first-child,th:first-child{{text-align:left;font-weight:600}}
 </style></head><body><div class="wrap">
 <header>
+  <p class="confidential">社外秘 ／ 関係者限定</p>
   <h1>JoaGOLF STUDIO ／ Web週次ダッシュボード</h1>
   <p class="meta">対象期間 2026-06-21（公開日）〜 {ks[-1]}週　｜　全{len(ks)}週　｜　更新 {date.today()}<br>
   <span style="font-size:12px">※ 集計が終わった週のみ表示（進行中の週は含みません）。最初の週は公開日6/21の1日分です。</span></p>
@@ -390,6 +395,13 @@ def main():
     with open(path, "w", encoding="utf-8") as f:
         f.write(html)
     print(f"出力: {path}（{len(W)}週分）")
+
+    # 社内共有用（Basic認証をかけたフォルダにアップロードされる）
+    pub_dir = os.path.join(BASE, "dashboard")
+    if os.path.isdir(pub_dir):
+        with open(os.path.join(pub_dir, "index.html"), "w", encoding="utf-8") as f:
+            f.write(html)
+        print(f"社内共有用も更新: {pub_dir}/index.html")
 
 
 if __name__ == "__main__":
