@@ -70,12 +70,11 @@ $payload = json_encode([
     'contents' => $contents,
     'generationConfig' => [
         'temperature' => 0.4,
-        'maxOutputTokens' => 2048,
-        'thinkingConfig' => ['thinkingBudget' => 0],
+        'maxOutputTokens' => 4096,
     ],
 ], JSON_UNESCAPED_UNICODE);
 
-$ch = curl_init('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent');
+$ch = curl_init('https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent');
 curl_setopt_array($ch, [
     CURLOPT_POST => true,
     CURLOPT_HTTPHEADER => ['Content-Type: application/json', 'x-goog-api-key: ' . $GEMINI_API_KEY],
