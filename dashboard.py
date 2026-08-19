@@ -775,10 +775,27 @@ $("#ai-fab").onclick=()=>{
     aiAdd("model","こんにちは！このダッシュボードの数字について、なんでも聞いてください。");
     aiSugs();
   }
-  $("#ai-in").focus();
+  if(!matchMedia("(max-width:767px)").matches)$("#ai-in").focus();
+  aiFit();
 };
 $("#ai-close").onclick=()=>{$("#ai-panel").classList.remove("open");$("#ai-fab").style.display="";
-  document.body.style.overflow="";};
+  document.body.style.overflow="";
+  $("#ai-panel").style.height="";$("#ai-panel").style.top="";};
+function aiFit(){
+  if(!window.visualViewport)return;
+  const p=$("#ai-panel");
+  if(!p.classList.contains("open")||!matchMedia("(max-width:767px)").matches){
+    p.style.height="";p.style.top="";return;
+  }
+  const vv=window.visualViewport;
+  p.style.top=vv.offsetTop+"px";
+  p.style.height=vv.height+"px";
+  $("#ai-msgs").scrollTop=$("#ai-msgs").scrollHeight;
+}
+if(window.visualViewport){
+  window.visualViewport.addEventListener("resize",aiFit);
+  window.visualViewport.addEventListener("scroll",aiFit);
+}
 $("#ai-form").addEventListener("submit",e=>{
   e.preventDefault();
   const q=$("#ai-in").value; $("#ai-in").value="";
