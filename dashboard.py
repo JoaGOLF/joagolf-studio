@@ -247,6 +247,10 @@ h1{font-size:22px;font-weight:700}
 .kpi-v small{font-size:12px;color:var(--sub);font-weight:500;margin-left:2px}
 .kpi-d{font-size:11.5px;color:var(--sub)}
 .up{color:#12855b;font-weight:700}.down{color:#c8324f;font-weight:700}.flat{color:var(--sub)}
+.period-bar{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin:2px 0 10px}
+.period-bar b{font-size:14.5px;font-weight:700}
+.period-bar span{font-size:12px;color:#fff;background:var(--navy);border-radius:6px;padding:3px 10px;font-weight:600}
+.period-bar small{font-size:11.5px;color:var(--sub)}
 .card{background:#fff;border:1px solid var(--line);border-radius:12px;
  padding:16px 18px 12px;margin-bottom:12px}
 .card h3{font-size:14px;font-weight:700;margin-bottom:2px}
@@ -316,6 +320,8 @@ td:first-child,th:first-child{text-align:left;font-weight:600}
 #ai-send{background:var(--navy);color:#fff;border:none;border-radius:10px;padding:9px 16px;
  font-size:13px;font-weight:700;cursor:pointer;font-family:inherit}
 #ai-send:disabled{opacity:.4;cursor:default}
+.ai-review-box{background:#f7f3fb;border:1px solid #e8dff2;border-radius:10px;padding:11px 14px;
+ font-size:12.5px;line-height:1.85;white-space:pre-wrap;word-break:break-word;margin-top:8px}
 /* 自動診断 */
 .diag-list{list-style:none;display:flex;flex-direction:column;gap:7px;margin:4px 0 6px}
 .diag-list li{display:flex;gap:9px;font-size:12.5px;line-height:1.7;padding:9px 12px;border-radius:10px;background:#fafafb}
@@ -399,6 +405,13 @@ let S = {tab:"overview", metric:"users", period:"all", store:"全店",
 const $ = s => document.querySelector(s);
 const fmt = n => (typeof n==="number") ? n.toLocaleString("ja-JP") : n;
 const short = k => k.slice(5).replace("-","/");
+const jdate = d => `${d.getMonth()+1}/${d.getDate()}(${"日月火水木金土"[d.getDay()]})`;
+const escT = s => s.replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const aiReviewKey = () => "aiReview:" + W[W.length-1].week;
+function weekRange(mon){
+  const a=new Date(mon+"T00:00:00"), b=new Date(a); b.setDate(b.getDate()+6);
+  return `${jdate(a)}〜${jdate(b)}`;
+}
 function slice(){
   if(S.period==="all") return W;
   return W.slice(-parseInt(S.period));
@@ -457,11 +470,17 @@ function vOverview(){
       <p class="kpi-d">前週比 ${delta(v,pv)}</p></div>`;};
   const m=METRICS[S.metric];
   return `
+  <div class="period-bar"><b>直近1週間の数値</b><span>集計期間：${weekRange(last.week)}</span>
+    <small>前週比は ${weekRange(prev.week||last.week)} との比較</small></div>
   <div class="kpis">${Object.keys(METRICS).map(kpi).join("")}</div>
-  <p class="hint">↑ カードをクリックするとグラフが切り替わります（直近週: ${last.week}〜）</p>
+  <p class="hint">↑ カードをクリックするとグラフが切り替わります</p>
   <div class="card"><h3>今週の自動診断</h3>
     <p class="note">データから機械的に判定した要注意ポイントと好調ポイント（毎週自動更新）</p>
     <ul class="diag-list">${diagItems().map(d=>`<li class="${d.lv}"><i>${{warn:"⚠️",good:"✅",info:"💡"}[d.lv]}</i><span>${d.t}</span></li>`).join("")}</ul>
+    ${(c=>c?`<div class="ai-review-box">🤖 <b>AI分析（Gemini 3.6 Flash）</b>\n${escT(c)}</div>
+      <p class="hint">この分析は今週分として保存済み。データが更新される来週また生成できます</p>`
+      :`<p style="margin-top:8px"><span class="btn" id="ai-review-btn">🤖 AIの週次分析を生成する</span></p>
+      <p class="hint">押すとAI（Gemini 3.6 Flash）が今週のデータを総評します（無料枠を1回分使用）</p>`)(localStorage.getItem(aiReviewKey()))}
     <p class="hint">深掘りしたいときは右下の「💬 AIに相談」でこのデータについて質問できます</p>
   </div>
   <div class="card">
@@ -656,8 +675,18 @@ function render(){
   $("#view").innerHTML=VIEWS[S.tab]();
 }
 document.addEventListener("click",e=>{
-  const t=e.target.closest("[data-tab],[data-metric],[data-period],[data-store],[data-sort],#csv,tr[data-store]");
+  const t=e.target.closest("[data-tab],[data-metric],[data-period],[data-store],[data-sort],#csv,#ai-review-btn,tr[data-store]");
   if(!t)return;
+  if(t.id==="ai-review-btn"){
+    t.textContent="🤖 分析中…（10秒ほどお待ちください）"; t.style.pointerEvents="none";
+    fetch("api.php",{method:"POST",headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({question:"直近週のデータを総評してください。①今週の総評（2〜3行） ②良かった点 ③悪かった点 ④来週の最優先の打ち手（1つに絞る）を、必ず具体的な数字を根拠に、全体で400字以内でまとめてください。",history:[]})})
+    .then(r=>r.json()).then(j=>{
+      if(j.answer){localStorage.setItem(aiReviewKey(),j.answer);render();}
+      else{t.textContent="エラー: "+(j.error||"取得に失敗しました");t.style.pointerEvents="";}
+    }).catch(()=>{t.textContent="接続できません（本番の /dashboard/ でご利用ください）";t.style.pointerEvents="";});
+    return;
+  }
   if(t.dataset.tab){S.tab=t.dataset.tab;render();window.scrollTo({top:0});}
   else if(t.dataset.metric){S.metric=t.dataset.metric;S.tab="overview";render();}
   else if(t.dataset.period){S.period=t.dataset.period;render();}
