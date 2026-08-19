@@ -435,7 +435,7 @@ function delta(cur, prev){
 function lineChart(labels, series, opts={}){
   const n=labels.length; if(n<2) return '<p class="empty">データが2週分たまると表示されます</p>';
   const MB=matchMedia("(max-width:767px)").matches;
-  const H=opts.h||220, P=MB?30:36, Wd=MB?344:Math.max(560,n*64);
+  const H=opts.h||220, P=MB?30:36, Wd=MB?344:720;
   const mx=Math.max(1,...series.flatMap(s=>s.vals));
   const x=i=>P+i*(Wd-P*2)/(n-1), y=v=>H-P-(v/mx)*(H-P*2);
   let o=`<svg viewBox="0 0 ${Wd} ${H}" class="chart">`;
@@ -448,7 +448,7 @@ function lineChart(labels, series, opts={}){
         stroke-linejoin="round" stroke-linecap="round"/>`;
     s.vals.forEach((v,i)=>{o+=`<circle cx="${x(i)}" cy="${y(v)}" r="${MB?3.5:4.5}" fill="${s.color}"
       data-tip="${s.label}｜${labels[i]}の週: ${fmt(v)}${opts.unit||""}"/>`;});}
-  const step=MB?Math.max(1,Math.ceil(n/6)):(n<=13?1:2);
+  const step=Math.max(1,Math.ceil(n/(MB?6:12)));
   labels.forEach((l,i)=>{if(i%step===0||i===n-1)o+=`<text x="${x(i)}" y="${H-9}" class="xlab">${short(l)}</text>`;});
   return o+"</svg>";
 }
