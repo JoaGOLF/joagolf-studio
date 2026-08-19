@@ -261,6 +261,7 @@ h1{font-size:22px;font-weight:700}
 .chip:hover{border-color:var(--pink);color:var(--pink)}
 .chip.on{background:var(--pink);border-color:var(--pink);color:#fff}
 .two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.two>*{min-width:0}
 @media(max-width:860px){.two{grid-template-columns:1fr}}
 .scroll{overflow-x:auto}
 svg.chart{width:100%;height:auto;display:block}
@@ -343,7 +344,7 @@ td:first-child,th:first-child{text-align:left;font-weight:600}
   .meta{font-size:10.5px}
   .confidential{font-size:10px}
   .tabs{gap:5px;margin:12px 0 12px;padding-top:4px}
-  .tab{padding:8px 14px;font-size:12.5px}
+  .tab{padding:8px 12px;font-size:12px}
   .kpis{grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:12px}
   .kpi{padding:10px 12px;border-radius:10px}
   .kpi:hover{transform:none}
