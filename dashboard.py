@@ -474,6 +474,12 @@ function vOverview(){
     <small>前週比は ${weekRange(prev.week||last.week)} との比較</small></div>
   <div class="kpis">${Object.keys(METRICS).map(kpi).join("")}</div>
   <p class="hint">↑ カードをクリックするとグラフが切り替わります</p>
+
+  <div class="card" id="metric-chart">
+    <h3>${m.label} の推移</h3>${periodChips()}
+    <div class="scroll">${lineChart(ws.map(w=>w.week),[{label:m.label,vals:ws.map(m.f),color:m.color}],
+      {unit:S.metric==="cvr"?"%":""})}</div>
+  </div>
   <div class="card"><h3>今週の自動診断</h3>
     <p class="note">データから機械的に判定した要注意ポイントと好調ポイント（毎週自動更新）</p>
     <ul class="diag-list">${diagItems().map(d=>`<li class="${d.lv}"><i>${{warn:"⚠️",good:"✅",info:"💡"}[d.lv]}</i><span>${d.t}</span></li>`).join("")}</ul>
@@ -482,11 +488,6 @@ function vOverview(){
       :`<p style="margin-top:8px"><span class="btn" id="ai-review-btn">🤖 AIの週次分析を生成する</span></p>
       <p class="hint">押すとAI（Gemini 3.6 Flash）が今週のデータを総評します（無料枠を1回分使用）</p>`)(localStorage.getItem(aiReviewKey()))}
     <p class="hint">深掘りしたいときは右下の「💬 AIに相談」でこのデータについて質問できます</p>
-  </div>
-  <div class="card">
-    <h3>${m.label} の推移</h3>${periodChips()}
-    <div class="scroll">${lineChart(ws.map(w=>w.week),[{label:m.label,vals:ws.map(m.f),color:m.color}],
-      {unit:S.metric==="cvr"?"%":""})}</div>
   </div>
   <div class="two">
     <div class="card"><h3>東京 vs 関西（セッション）</h3>
@@ -688,7 +689,10 @@ document.addEventListener("click",e=>{
     return;
   }
   if(t.dataset.tab){S.tab=t.dataset.tab;render();window.scrollTo({top:0});}
-  else if(t.dataset.metric){S.metric=t.dataset.metric;S.tab="overview";render();}
+  else if(t.dataset.metric){S.metric=t.dataset.metric;S.tab="overview";render();
+    const c=document.querySelector("#metric-chart");
+    if(c){const r=c.getBoundingClientRect();
+      if(r.top<0||r.bottom>window.innerHeight)c.scrollIntoView({behavior:"smooth",block:"nearest"});}}
   else if(t.dataset.period){S.period=t.dataset.period;render();}
   else if(t.dataset.store!==undefined&&t.dataset.store){S.store=t.dataset.store;S.tab="stores";render();}
   else if(t.dataset.sort){const k=t.dataset.sort;
