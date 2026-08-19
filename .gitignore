@@ -54,3 +54,5 @@ build/
 .DS_Store
 _*.html
 _reports/
+dashboard/config.php
+dashboard/data.json

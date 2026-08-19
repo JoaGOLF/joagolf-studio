@@ -287,6 +287,41 @@ td:first-child,th:first-child{text-align:left;font-weight:600}
  white-space:nowrap;box-shadow:0 6px 20px rgba(0,0,0,.25)}
 .empty{color:var(--sub);font-size:13px;padding:8px 0}
 .hint{font-size:11.5px;color:var(--sub);margin:6px 0 2px}
+/* AIチャット */
+#ai-fab{position:fixed;right:18px;bottom:18px;z-index:90;background:var(--pink);color:#fff;
+ border:none;border-radius:99px;padding:13px 20px;font-size:14px;font-weight:700;cursor:pointer;
+ font-family:inherit;box-shadow:0 8px 24px rgba(204,33,127,.35);transition:.15s}
+#ai-fab:hover{transform:translateY(-2px)}
+#ai-panel{position:fixed;right:18px;bottom:18px;z-index:95;width:min(380px,calc(100vw - 24px));
+ height:min(560px,calc(100vh - 40px));background:#fff;border:1px solid var(--line);border-radius:16px;
+ box-shadow:0 20px 60px rgba(0,0,0,.22);display:none;flex-direction:column;overflow:hidden}
+#ai-panel.open{display:flex}
+#ai-head{background:var(--navy);color:#fff;padding:12px 16px;font-size:13.5px;font-weight:700;
+ display:flex;justify-content:space-between;align-items:center;flex:none}
+#ai-head small{font-weight:400;opacity:.7;font-size:10.5px;margin-left:8px}
+#ai-close{cursor:pointer;font-size:20px;line-height:1;opacity:.8;padding:0 2px}
+#ai-close:hover{opacity:1}
+#ai-msgs{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:9px}
+.ai-m{max-width:88%;padding:9px 13px;border-radius:14px;font-size:13px;line-height:1.7;white-space:pre-wrap;word-break:break-word}
+.ai-m.user{align-self:flex-end;background:var(--pink);color:#fff;border-bottom-right-radius:4px}
+.ai-m.model{align-self:flex-start;background:#f2f2f5;border-bottom-left-radius:4px}
+.ai-m.err{align-self:flex-start;background:#fdeef2;color:#c8324f}
+.ai-sug{align-self:flex-start;border:1px solid var(--pink);color:var(--pink);border-radius:99px;
+ padding:6px 13px;font-size:12px;font-weight:600;cursor:pointer;background:#fff}
+.ai-sug:hover{background:#fdeef4}
+#ai-form{display:flex;gap:8px;padding:10px;border-top:1px solid var(--line);flex:none}
+#ai-in{flex:1;border:1px solid var(--line);border-radius:10px;padding:9px 12px;font-size:13px;
+ font-family:inherit;outline:none}
+#ai-in:focus{border-color:var(--pink)}
+#ai-send{background:var(--navy);color:#fff;border:none;border-radius:10px;padding:9px 16px;
+ font-size:13px;font-weight:700;cursor:pointer;font-family:inherit}
+#ai-send:disabled{opacity:.4;cursor:default}
+/* 自動診断 */
+.diag-list{list-style:none;display:flex;flex-direction:column;gap:7px;margin:4px 0 6px}
+.diag-list li{display:flex;gap:9px;font-size:12.5px;line-height:1.7;padding:9px 12px;border-radius:10px;background:#fafafb}
+.diag-list li.warn{background:#fdf3f6}
+.diag-list li.good{background:#eef8f2}
+.diag-list li i{font-style:normal;flex:none}
 .scroll{-webkit-overflow-scrolling:touch}
 .tabs{scrollbar-width:none}
 .tabs::-webkit-scrollbar{display:none}
@@ -321,6 +356,8 @@ td:first-child,th:first-child{text-align:left;font-weight:600}
   .hint{font-size:10.5px}
   .btn{padding:8px 14px}
   #tip{font-size:11px;white-space:normal;max-width:220px}
+  #ai-panel{right:8px;bottom:8px;width:calc(100vw - 16px);height:min(560px,calc(100vh - 24px))}
+  #ai-fab{right:12px;bottom:12px;padding:12px 18px;font-size:13px}
 }
 </style></head><body>
 <div class="wrap">
@@ -331,6 +368,12 @@ td:first-child,th:first-child{text-align:left;font-weight:600}
   <div id="view"></div>
 </div>
 <div id="tip"></div>
+<button id="ai-fab">💬 AIに相談</button>
+<div id="ai-panel">
+  <div id="ai-head"><span>データAI相談<small>Gemini</small></span><span id="ai-close">×</span></div>
+  <div id="ai-msgs"></div>
+  <form id="ai-form"><input id="ai-in" placeholder="数字について質問してみる…" maxlength="1000" autocomplete="off"><button id="ai-send" type="submit">送信</button></form>
+</div>
 <script>
 const D = __DATA__;
 const W = D.weeks;
@@ -416,6 +459,11 @@ function vOverview(){
   return `
   <div class="kpis">${Object.keys(METRICS).map(kpi).join("")}</div>
   <p class="hint">↑ カードをクリックするとグラフが切り替わります（直近週: ${last.week}〜）</p>
+  <div class="card"><h3>今週の自動診断</h3>
+    <p class="note">データから機械的に判定した要注意ポイントと好調ポイント（毎週自動更新）</p>
+    <ul class="diag-list">${diagItems().map(d=>`<li class="${d.lv}"><i>${{warn:"⚠️",good:"✅",info:"💡"}[d.lv]}</i><span>${d.t}</span></li>`).join("")}</ul>
+    <p class="hint">深掘りしたいときは右下の「💬 AIに相談」でこのデータについて質問できます</p>
+  </div>
   <div class="card">
     <h3>${m.label} の推移</h3>${periodChips()}
     <div class="scroll">${lineChart(ws.map(w=>w.week),[{label:m.label,vals:ws.map(m.f),color:m.color}],
@@ -567,6 +615,41 @@ function vTable(){
     </tbody></table></div></div>`;
 }
 
+/* ---------- 自動診断 ---------- */
+function diagItems(){
+  const out=[], lw=W[W.length-1], pw=W[W.length-2];
+  const agg={}; D.storeNames.forEach(nm=>agg[nm]={v:0,c:0});
+  for(const w of W){
+    for(const k in w.storeViews) if(agg[k]) agg[k].v+=w.storeViews[k];
+    for(const k in w.stores) if(agg[k]) agg[k].c+=w.stores[k];
+  }
+  const rated=Object.entries(agg).filter(([,a])=>a.v>=30&&a.c>0).sort((x,y)=>y[1].c/y[1].v-x[1].c/x[1].v);
+  const best=rated[0];
+  for(const [nm,a] of Object.entries(agg)){
+    if(a.v>=30&&(a.c===0||(best&&a.c/a.v<best[1].c/best[1].v*0.4)))
+      out.push({lv:"warn",t:`${nm}：ページ閲覧${a.v}に対し予約クリック${a.c}（転換率${(a.c/a.v*100).toFixed(1)}%）。`+
+        (best?`${best[0]}の${(best[1].c/best[1].v*100).toFixed(1)}%と比べ低く、ページ内容や予約導線の見直しが優先課題`:"予約導線の見直しが優先課題")});
+  }
+  const tkV=D.tokyoStores.reduce((s,nm)=>s+agg[nm].v,0);
+  const knV=Object.entries(agg).reduce((s,[nm,a])=>s+(D.tokyoStores.includes(nm)?0:a.v),0);
+  if(knV>0&&tkV<knV*0.5)
+    out.push({lv:"warn",t:`東京4店舗の店舗ページ閲覧は累計${fmt(tkV)}で、関西3店舗（${fmt(knV)}）の半分未満。キャンペーン中の東京こそ店舗ページへの導線強化が必要`});
+  const tkq=D.areaQueries.filter(q=>q.tokyo).length;
+  if(tkq<5) out.push({lv:"warn",t:`検索に表示される地域キーワードのうち東京系は${tkq}種のみ（関西系が大半）。東京エリアの検索露出（SEO/MEO）が課題`});
+  if(pw){
+    if(lw.reserve<pw.reserve*0.8) out.push({lv:"warn",t:`体験予約クリックが${pw.reserve}→${lw.reserve}に減少（${((lw.reserve-pw.reserve)/pw.reserve*100).toFixed(0)}%）。要因の確認を`});
+    else if(lw.reserve>pw.reserve*1.2) out.push({lv:"good",t:`体験予約クリックが${pw.reserve}→${lw.reserve}に増加。この調子`});
+    if(lw.sc_clicks>pw.sc_clicks&&lw.sc_imp>pw.sc_imp)
+      out.push({lv:"good",t:`検索は表示${fmt(pw.sc_imp)}→${fmt(lw.sc_imp)}・クリック${pw.sc_clicks}→${lw.sc_clicks}と伸びており、検索経由の集客は好調`});
+  }
+  const lpT=W.reduce((a,w)=>a+w.lp,0), lnT=W.reduce((a,w)=>a+w.line,0);
+  if(lpT>0) out.push({lv:"info",t:`キャンペーンLPは閲覧${fmt(lpT)}・LINE追加${lnT}${lnT===0?"。まずはLPへの流入を増やす段階（SNS・店頭・バナーでの告知）":`（転換率${(lnT/lpT*100).toFixed(1)}%）`}`});
+  const mob=Object.entries(W.reduce((m,w)=>{for(const k in w.devices)m[k]=(m[k]||0)+w.devices[k];return m},{}));
+  const mt=mob.reduce((s,[,v])=>s+v,0), mv=mob.find(([k])=>k==="mobile");
+  if(mv&&mv[1]/mt>0.8) out.push({lv:"info",t:`閲覧の${(mv[1]/mt*100).toFixed(0)}%がスマホ。施策や新ページは常にスマホ表示を最優先で確認を`});
+  out.sort((a,b)=>({warn:0,good:1,info:2}[a.lv]-{warn:0,good:1,info:2}[b.lv]));
+  return out.slice(0,6);
+}
 const VIEWS={overview:vOverview,stores:vStores,traffic:vTraffic,search:vSearch,lp:vLp,table:vTable};
 function render(){
   $("#tabs").innerHTML=TABS.map(([k,l])=>`<span class="tab ${S.tab===k?"on":""}" data-tab="${k}">${l}</span>`).join("");
@@ -600,6 +683,63 @@ document.addEventListener("mousemove",e=>{
     tip.style.left=Math.min(e.clientX+14,window.innerWidth-tip.offsetWidth-8)+"px";
     tip.style.top=(e.clientY-36)+"px";}});
 render();
+
+/* ---------- AIチャット ---------- */
+const AI_SUGS=["今、一番緊急で取り組むべきことは？","先週の結果を3行で要約して","東京の集客を伸ばすには？","検索対策は次に何をすべき？"];
+const aiHist=[];
+let aiBusy=false;
+const esc=s=>s.replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+function aiAdd(cls,text){
+  const d=document.createElement("div");
+  d.className="ai-m "+cls; d.innerHTML=esc(text);
+  $("#ai-msgs").appendChild(d);
+  $("#ai-msgs").scrollTop=$("#ai-msgs").scrollHeight;
+  return d;
+}
+function aiSugs(){
+  for(const q of AI_SUGS){
+    const b=document.createElement("button");
+    b.type="button"; b.className="ai-sug"; b.textContent=q;
+    b.onclick=()=>aiSend(q);
+    $("#ai-msgs").appendChild(b);
+  }
+}
+async function aiSend(q){
+  if(aiBusy||!q.trim())return;
+  aiBusy=true; $("#ai-send").disabled=true;
+  document.querySelectorAll(".ai-sug").forEach(x=>x.remove());
+  aiAdd("user",q);
+  const wait=aiAdd("model","考え中…");
+  try{
+    const r=await fetch("api.php",{method:"POST",headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({question:q,history:aiHist})});
+    const j=await r.json();
+    wait.remove();
+    if(j.answer){
+      aiAdd("model",j.answer);
+      aiHist.push({role:"user",text:q},{role:"model",text:j.answer});
+      while(aiHist.length>8)aiHist.shift();
+    }else aiAdd("err",j.error||"エラーが発生しました");
+  }catch(e){
+    wait.remove();
+    aiAdd("err","AIサーバーに接続できません。社内ダッシュボード（joagolfstudio.jp/dashboard/）上でご利用ください。");
+  }
+  aiBusy=false; $("#ai-send").disabled=false;
+}
+$("#ai-fab").onclick=()=>{
+  $("#ai-panel").classList.add("open"); $("#ai-fab").style.display="none";
+  if(!$("#ai-msgs").children.length){
+    aiAdd("model","こんにちは！このダッシュボードの数字について、なんでも聞いてください。");
+    aiSugs();
+  }
+  $("#ai-in").focus();
+};
+$("#ai-close").onclick=()=>{$("#ai-panel").classList.remove("open");$("#ai-fab").style.display="";};
+$("#ai-form").addEventListener("submit",e=>{
+  e.preventDefault();
+  const q=$("#ai-in").value; $("#ai-in").value="";
+  aiSend(q);
+});
 </script></body></html>"""
 
 
@@ -623,7 +763,9 @@ def main():
     if os.path.isdir(pub_dir):
         with open(os.path.join(pub_dir, "index.html"), "w", encoding="utf-8") as f:
             f.write(html)
-        print(f"社内共有用も更新: {pub_dir}/index.html")
+        with open(os.path.join(pub_dir, "data.json"), "w", encoding="utf-8") as f:
+            json.dump(data, f, ensure_ascii=False)
+        print(f"社内共有用も更新: {pub_dir}/index.html ＋ data.json（AIチャット用）")
 
 
 if __name__ == "__main__":
