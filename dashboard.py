@@ -287,6 +287,41 @@ td:first-child,th:first-child{text-align:left;font-weight:600}
  white-space:nowrap;box-shadow:0 6px 20px rgba(0,0,0,.25)}
 .empty{color:var(--sub);font-size:13px;padding:8px 0}
 .hint{font-size:11.5px;color:var(--sub);margin:6px 0 2px}
+.scroll{-webkit-overflow-scrolling:touch}
+.tabs{scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+/* タブレット */
+@media(max-width:1024px){
+  .wrap{padding:18px 16px 60px}
+  .kpis{grid-template-columns:repeat(4,1fr)}
+}
+/* スマホ */
+@media(max-width:767px){
+  .wrap{padding:14px 12px 50px}
+  h1{font-size:17px}
+  .meta{font-size:10.5px}
+  .confidential{font-size:10px}
+  .tabs{gap:5px;margin:12px 0 12px;padding-top:4px}
+  .tab{padding:8px 14px;font-size:12.5px}
+  .kpis{grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:12px}
+  .kpi{padding:10px 12px;border-radius:10px}
+  .kpi:hover{transform:none}
+  .kpi-t{font-size:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .kpi-v{font-size:20px;line-height:1.35}
+  .kpi-d{font-size:10.5px}
+  .card{padding:13px 13px 10px;margin-bottom:10px;border-radius:10px}
+  .card h3{font-size:13px}
+  .card .note{font-size:10.5px}
+  .chips{gap:5px}
+  .chip{padding:5px 11px;font-size:11.5px}
+  .legend{font-size:11px;gap:10px}
+  .scroll svg.chart{min-width:540px}
+  th,td{padding:6px 7px;font-size:11.5px}
+  .bar-row{grid-template-columns:minmax(76px,110px) 1fr 46px;font-size:11.5px;gap:7px}
+  .hint{font-size:10.5px}
+  .btn{padding:8px 14px}
+  #tip{font-size:11px;white-space:normal;max-width:220px}
+}
 </style></head><body>
 <div class="wrap">
   <span class="confidential">社外秘 ／ 関係者限定</span>
