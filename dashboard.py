@@ -323,6 +323,12 @@ td:first-child,th:first-child{text-align:left;font-weight:600}
 #ai-send:disabled{opacity:.4;cursor:default}
 .ai-review-box{background:#f7f3fb;border:1px solid #e8dff2;border-radius:10px;padding:11px 14px;
  font-size:12.5px;line-height:1.85;white-space:pre-wrap;word-break:break-word;margin-top:8px}
+.ai-typing{display:inline-flex;gap:4px;align-items:center;margin-left:6px;vertical-align:middle}
+.ai-typing i{width:7px;height:7px;border-radius:50%;background:#9a9aa5;font-style:normal;
+ animation:aidot 1.2s infinite ease-in-out}
+.ai-typing i:nth-child(2){animation-delay:.15s}
+.ai-typing i:nth-child(3){animation-delay:.3s}
+@keyframes aidot{0%,60%,100%{transform:translateY(0);opacity:.35}30%{transform:translateY(-5px);opacity:1}}
 /* 自動診断 */
 .diag-list{list-style:none;display:flex;flex-direction:column;gap:7px;margin:4px 0 6px}
 .diag-list li{display:flex;gap:9px;font-size:12.5px;line-height:1.7;padding:9px 12px;border-radius:10px;background:#fafafb}
@@ -689,7 +695,8 @@ document.addEventListener("click",e=>{
   const t=e.target.closest("[data-tab],[data-metric],[data-period],[data-store],[data-sort],#csv,#ai-review-btn,tr[data-store]");
   if(!t)return;
   if(t.id==="ai-review-btn"){
-    t.textContent="🤖 分析中…（10秒ほどお待ちください）"; t.style.pointerEvents="none";
+    t.innerHTML='🤖 分析中（10秒ほどお待ちください）<span class="ai-typing"><i></i><i></i><i></i></span>';
+    t.style.pointerEvents="none";
     fetch("api.php",{method:"POST",headers:{"Content-Type":"application/json"},
       body:JSON.stringify({question:"直近週のデータを総評してください。①今週の総評（2〜3行） ②良かった点 ③悪かった点 ④来週の最優先の打ち手（1つに絞る）を、必ず具体的な数字を根拠に、全体で400字以内でまとめてください。",history:[]})})
     .then(r=>r.json()).then(j=>{
@@ -752,7 +759,8 @@ async function aiSend(q){
   aiBusy=true; $("#ai-send").disabled=true;
   document.querySelectorAll(".ai-sug").forEach(x=>x.remove());
   aiAdd("user",q);
-  const wait=aiAdd("model","考え中…");
+  const wait=aiAdd("model","");
+  wait.innerHTML='考え中<span class="ai-typing"><i></i><i></i><i></i></span>';
   try{
     const r=await fetch("api.php",{method:"POST",headers:{"Content-Type":"application/json"},
       body:JSON.stringify({question:q,history:aiHist})});
