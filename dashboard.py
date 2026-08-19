@@ -271,7 +271,7 @@ svg.chart{width:100%;height:auto;display:block}
 .legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;margin:2px 0 4px}
 .legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:4px;vertical-align:-1px}
 .bars{margin-top:4px}
-.bar-row{display:grid;grid-template-columns:minmax(90px,150px) 1fr 54px;align-items:center;
+.bar-row{display:grid;grid-template-columns:minmax(100px,230px) 1fr 54px;align-items:center;
  gap:9px;margin-bottom:6px;font-size:12.5px}
 .bar-name{font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .bar-track{background:#f0f0f3;border-radius:99px;height:9px;overflow:hidden}
@@ -364,7 +364,7 @@ td:first-child,th:first-child{text-align:left;font-weight:600}
   .chip{padding:5px 11px;font-size:11.5px}
   .legend{font-size:11px;gap:10px}
   th,td{padding:6px 7px;font-size:11.5px}
-  .bar-row{grid-template-columns:minmax(76px,110px) 1fr 46px;font-size:11.5px;gap:7px}
+  .bar-row{grid-template-columns:minmax(90px,150px) 1fr 46px;font-size:11.5px;gap:7px}
   .hint{font-size:10.5px}
   .btn{padding:8px 14px}
   #tip{font-size:11px;white-space:normal;max-width:220px}
@@ -554,8 +554,8 @@ function vStores(){
   </div>`;
 }
 
-const CH_JP={"Organic Search":"検索から（無料）","Paid Search":"検索広告","Direct":"直接アクセス",
-  "Referral":"他サイトのリンク","Organic Social":"SNSから","Paid Social":"SNS広告","Email":"メール",
+const CH_JP={"Organic Search":"無料の検索から","Paid Search":"検索広告","Direct":"直接アクセス",
+  "Referral":"他サイトのリンク","Organic Social":"SNS投稿から","Paid Social":"SNS広告","Email":"メール",
   "Display":"バナー広告","Organic Video":"動画から","Unassigned":"分類不能","Cross-network":"複合広告",
   "Affiliates":"アフィリエイト","Organic Shopping":"ショッピング","AI Assistant":"AI経由"};
 const CH_DESC={"Organic Search":"GoogleやYahoo!で検索して、広告ではなく検索結果からたどり着いた訪問。SEO(検索対策)の成果がここに出ます",
@@ -569,7 +569,7 @@ const CH_DESC={"Organic Search":"GoogleやYahoo!で検索して、広告では�
   "Organic Video":"YouTubeなど動画サイトから来た訪問",
   "Display":"Webサイト上のバナー広告から来た訪問",
   "AI Assistant":"ChatGPTなどのAIチャットが紹介したリンクから来た訪問。最近増えている新しい経路"};
-const chJp=c=>CH_JP[c]||c;
+const chJp=c=>CH_JP[c]?`${c}（${CH_JP[c]}）`:c;
 function vTraffic(){
   const ws=slice();
   const chTot=sum(W,w=>w.channels), top=chTot.slice(0,5).map(x=>x[0]);
@@ -599,7 +599,7 @@ function vTraffic(){
   <div class="card"><h3>用語の解説（流入チャネルとは）</h3>
     <p class="note">Google Analyticsが「訪問者がどこから来たか」を自動分類したもの。このサイトで実際に発生している分類だけを載せています</p>
     <ul class="diag-list">${chTot.filter(([k])=>CH_DESC[k]).map(([k,v])=>
-      `<li><i>🔎</i><span><b>${chJp(k)}</b>（${k}）｜累計${fmt(v)}セッション\n${CH_DESC[k]}</span></li>`).join("")}</ul>
+      `<li><i>🔎</i><span><b>${chJp(k)}</b>｜累計${fmt(v)}セッション\n${CH_DESC[k]}</span></li>`).join("")}</ul>
   </div>`;
 }
 
