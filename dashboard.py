@@ -288,9 +288,9 @@ td:first-child,th:first-child{text-align:left;font-weight:600}
 .empty{color:var(--sub);font-size:13px;padding:8px 0}
 .hint{font-size:11.5px;color:var(--sub);margin:6px 0 2px}
 /* AIチャット */
-#ai-fab{position:fixed;right:18px;bottom:18px;z-index:90;background:var(--pink);color:#fff;
- border:none;border-radius:99px;padding:13px 20px;font-size:14px;font-weight:700;cursor:pointer;
- font-family:inherit;box-shadow:0 8px 24px rgba(204,33,127,.35);transition:.15s}
+#ai-fab{position:fixed;right:20px;bottom:20px;z-index:90;background:var(--pink);color:#fff;
+ border:none;border-radius:99px;padding:17px 28px;font-size:16.5px;font-weight:700;cursor:pointer;
+ font-family:inherit;box-shadow:0 10px 28px rgba(204,33,127,.4);transition:.15s}
 #ai-fab:hover{transform:translateY(-2px)}
 #ai-panel{position:fixed;right:18px;bottom:18px;z-index:95;width:min(380px,calc(100vw - 24px));
  height:min(560px,calc(100vh - 40px));background:#fff;border:1px solid var(--line);border-radius:16px;
@@ -357,7 +357,7 @@ td:first-child,th:first-child{text-align:left;font-weight:600}
   .btn{padding:8px 14px}
   #tip{font-size:11px;white-space:normal;max-width:220px}
   #ai-panel{right:8px;bottom:8px;width:calc(100vw - 16px);height:min(560px,calc(100vh - 24px))}
-  #ai-fab{right:12px;bottom:12px;padding:12px 18px;font-size:13px}
+  #ai-fab{right:14px;bottom:14px;padding:15px 24px;font-size:15px}
 }
 </style></head><body>
 <div class="wrap">
@@ -370,7 +370,7 @@ td:first-child,th:first-child{text-align:left;font-weight:600}
 <div id="tip"></div>
 <button id="ai-fab">💬 AIに相談</button>
 <div id="ai-panel">
-  <div id="ai-head"><span>データAI相談<small>Gemini</small></span><span id="ai-close">×</span></div>
+  <div id="ai-head"><span>データAI相談<small>Gemini 3.6 Flash で回答</small></span><span id="ai-close">×</span></div>
   <div id="ai-msgs"></div>
   <form id="ai-form"><input id="ai-in" placeholder="数字について質問してみる…" maxlength="1000" autocomplete="off"><button id="ai-send" type="submit">送信</button></form>
 </div>
