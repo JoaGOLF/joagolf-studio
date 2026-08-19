@@ -554,21 +554,39 @@ function vStores(){
   </div>`;
 }
 
+const CH_JP={"Organic Search":"検索から（無料）","Paid Search":"検索広告","Direct":"直接アクセス",
+  "Referral":"他サイトのリンク","Organic Social":"SNSから","Paid Social":"SNS広告","Email":"メール",
+  "Display":"バナー広告","Organic Video":"動画から","Unassigned":"分類不能","Cross-network":"複合広告",
+  "Affiliates":"アフィリエイト","Organic Shopping":"ショッピング","AI Assistant":"AI経由"};
+const CH_DESC={"Organic Search":"GoogleやYahoo!で検索して、広告ではなく検索結果からたどり着いた訪問。SEO(検索対策)の成果がここに出ます",
+  "Direct":"URLを直接入力・ブックマーク・QRコード・LINEのトークなどから。店名を知っている人やリピーターが中心",
+  "Organic Social":"InstagramなどSNSの通常投稿(広告ではない)から来た訪問",
+  "Paid Social":"InstagramなどのSNS広告から来た訪問",
+  "Paid Search":"Google広告など、検索結果の広告枠から来た訪問",
+  "Referral":"ほかのWebサイトに貼られたリンクから来た訪問(例:ポータルサイト・ブログ)",
+  "Email":"メールの中のリンクから来た訪問",
+  "Unassigned":"出どころをGoogleが判別できなかった訪問(アプリ内ブラウザ経由などで起きがち)",
+  "Organic Video":"YouTubeなど動画サイトから来た訪問",
+  "Display":"Webサイト上のバナー広告から来た訪問",
+  "AI Assistant":"ChatGPTなどのAIチャットが紹介したリンクから来た訪問。最近増えている新しい経路"};
+const chJp=c=>CH_JP[c]||c;
 function vTraffic(){
   const ws=slice();
   const chTot=sum(W,w=>w.channels), top=chTot.slice(0,5).map(x=>x[0]);
-  const series=top.map((c,i)=>({label:c,vals:ws.map(w=>w.channels[c]||0),color:CH_COLORS[i%CH_COLORS.length]}));
+  const series=top.map((c,i)=>({label:chJp(c),vals:ws.map(w=>w.channels[c]||0),color:CH_COLORS[i%CH_COLORS.length]}));
   const devTot=sum(W,w=>w.devices);
   const devJp={mobile:"スマホ",desktop:"PC",tablet:"タブレット"};
   const lw=W[W.length-1];
   return `
   <div class="card"><h3>流入チャネルの推移</h3>
-    <div class="legend">${top.map((c,i)=>`<span><i style="background:${CH_COLORS[i%CH_COLORS.length]}"></i>${c}</span>`).join("")}</div>
+    <p class="note">「どこから来たか」の分類別のセッション数。各分類の意味は下の用語解説へ</p>
+    <div class="legend">${top.map((c,i)=>`<span><i style="background:${CH_COLORS[i%CH_COLORS.length]}"></i>${chJp(c)}</span>`).join("")}</div>
     ${periodChips()}
     <div class="scroll">${lineChart(ws.map(w=>w.week),series)}</div></div>
   <div class="two">
-    <div class="card"><h3>チャネル別 累計</h3>${hbars(chTot.slice(0,7),COLORS.navy)}</div>
-    <div class="card"><h3>参照元 累計（上位）</h3>${hbars(sum(W,w=>w.sources).slice(0,8),COLORS.pink)}</div>
+    <div class="card"><h3>チャネル別 累計</h3>${hbars(chTot.slice(0,7).map(([k,v])=>[chJp(k),v]),COLORS.navy)}</div>
+    <div class="card"><h3>参照元 累計（上位）</h3>
+      <p class="note">具体的にどのサイト・サービスから来たか</p>${hbars(sum(W,w=>w.sources).slice(0,8),COLORS.pink)}</div>
   </div>
   <div class="two">
     <div class="card"><h3>端末（累計）</h3>${hbars(devTot.map(([k,v])=>[devJp[k]||k,v]),COLORS.gold)}
@@ -577,7 +595,12 @@ function vTraffic(){
         return t?Math.round((lw.devices.mobile||0)/t*100):0})()}%</p></div>
     <div class="card"><h3>最初に着地したページ（累計）</h3>${hbars(sum(W,w=>w.landings).slice(0,8),COLORS.teal)}</div>
   </div>
-  <div class="card"><h3>よく見られたページ（累計）</h3>${hbars(sum(W,w=>w.pages).slice(0,10),COLORS.purple)}</div>`;
+  <div class="card"><h3>よく見られたページ（累計）</h3>${hbars(sum(W,w=>w.pages).slice(0,10),COLORS.purple)}</div>
+  <div class="card"><h3>用語の解説（流入チャネルとは）</h3>
+    <p class="note">Google Analyticsが「訪問者がどこから来たか」を自動分類したもの。このサイトで実際に発生している分類だけを載せています</p>
+    <ul class="diag-list">${chTot.filter(([k])=>CH_DESC[k]).map(([k,v])=>
+      `<li><i>🔎</i><span><b>${chJp(k)}</b>（${k}）｜累計${fmt(v)}セッション\n${CH_DESC[k]}</span></li>`).join("")}</ul>
+  </div>`;
 }
 
 function vSearch(){
