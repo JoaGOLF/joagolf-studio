@@ -357,7 +357,6 @@ td:first-child,th:first-child{text-align:left;font-weight:600}
   .chips{gap:5px}
   .chip{padding:5px 11px;font-size:11.5px}
   .legend{font-size:11px;gap:10px}
-  .scroll svg.chart{min-width:540px}
   th,td{padding:6px 7px;font-size:11.5px}
   .bar-row{grid-template-columns:minmax(76px,110px) 1fr 46px;font-size:11.5px;gap:7px}
   .hint{font-size:10.5px}
@@ -435,7 +434,8 @@ function delta(cur, prev){
 /* ---------- チャート ---------- */
 function lineChart(labels, series, opts={}){
   const n=labels.length; if(n<2) return '<p class="empty">データが2週分たまると表示されます</p>';
-  const H=opts.h||220, P=36, Wd=Math.max(560,n*64);
+  const MB=matchMedia("(max-width:767px)").matches;
+  const H=opts.h||220, P=MB?30:36, Wd=MB?344:Math.max(560,n*64);
   const mx=Math.max(1,...series.flatMap(s=>s.vals));
   const x=i=>P+i*(Wd-P*2)/(n-1), y=v=>H-P-(v/mx)*(H-P*2);
   let o=`<svg viewBox="0 0 ${Wd} ${H}" class="chart">`;
@@ -446,9 +446,10 @@ function lineChart(labels, series, opts={}){
     const pts=s.vals.map((v,i)=>`${x(i)},${y(v)}`).join(" ");
     o+=`<polyline points="${pts}" fill="none" stroke="${s.color}" stroke-width="2.5"
         stroke-linejoin="round" stroke-linecap="round"/>`;
-    s.vals.forEach((v,i)=>{o+=`<circle cx="${x(i)}" cy="${y(v)}" r="4.5" fill="${s.color}"
+    s.vals.forEach((v,i)=>{o+=`<circle cx="${x(i)}" cy="${y(v)}" r="${MB?3.5:4.5}" fill="${s.color}"
       data-tip="${s.label}｜${labels[i]}の週: ${fmt(v)}${opts.unit||""}"/>`;});}
-  labels.forEach((l,i)=>{if(n<=13||i%2===0)o+=`<text x="${x(i)}" y="${H-9}" class="xlab">${short(l)}</text>`;});
+  const step=MB?Math.max(1,Math.ceil(n/6)):(n<=13?1:2);
+  labels.forEach((l,i)=>{if(i%step===0||i===n-1)o+=`<text x="${x(i)}" y="${H-9}" class="xlab">${short(l)}</text>`;});
   return o+"</svg>";
 }
 function hbars(items, color){
