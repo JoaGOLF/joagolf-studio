@@ -363,7 +363,15 @@ td:first-child,th:first-child{text-align:left;font-weight:600}
   .hint{font-size:10.5px}
   .btn{padding:8px 14px}
   #tip{font-size:11px;white-space:normal;max-width:220px}
-  #ai-panel{right:8px;bottom:8px;width:calc(100vw - 16px);height:min(560px,calc(100vh - 24px))}
+  #ai-panel{left:0;right:0;top:0;bottom:0;width:100vw;height:100vh;height:100dvh;
+    border-radius:0;border:none}
+  #ai-head{padding:14px 16px;font-size:15px}
+  #ai-close{font-size:26px;padding:0 6px}
+  .ai-m{font-size:14px;max-width:92%}
+  .ai-sug{font-size:13px;padding:8px 15px}
+  #ai-in{font-size:16px;padding:11px 13px}
+  #ai-send{padding:11px 18px;font-size:14px}
+  #ai-form{padding:10px;padding-bottom:calc(10px + env(safe-area-inset-bottom))}
   #ai-fab{right:14px;bottom:14px;padding:15px 24px;font-size:15px}
 }
 </style></head><body>
@@ -762,13 +770,15 @@ async function aiSend(q){
 }
 $("#ai-fab").onclick=()=>{
   $("#ai-panel").classList.add("open"); $("#ai-fab").style.display="none";
+  if(matchMedia("(max-width:767px)").matches)document.body.style.overflow="hidden";
   if(!$("#ai-msgs").children.length){
     aiAdd("model","こんにちは！このダッシュボードの数字について、なんでも聞いてください。");
     aiSugs();
   }
   $("#ai-in").focus();
 };
-$("#ai-close").onclick=()=>{$("#ai-panel").classList.remove("open");$("#ai-fab").style.display="";};
+$("#ai-close").onclick=()=>{$("#ai-panel").classList.remove("open");$("#ai-fab").style.display="";
+  document.body.style.overflow="";};
 $("#ai-form").addEventListener("submit",e=>{
   e.preventDefault();
   const q=$("#ai-in").value; $("#ai-in").value="";
