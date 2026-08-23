@@ -1,122 +1,623 @@
 <!DOCTYPE html>
 <html lang="ja"><head><meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>JoaGOLF STUDIO Web ダッシュボード</title>
 <meta name="robots" content="noindex, nofollow, noarchive">
 <meta name="referrer" content="no-referrer">
+<title>JoaGOLF STUDIO Web ダッシュボード</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
-:root{--pink:#cc217f;--navy:#0F182B;--gold:#B08D4F;--line:#e6e6ea;--sub:#6b6b76}
+:root{--pink:#cc217f;--navy:#0F182B;--gold:#B08D4F;--green:#06c755;--blue:#4a9fd8;
+ --line:#e6e6ea;--sub:#6b6b76;--bg:#f6f6f8}
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:"Outfit","Noto Sans JP",sans-serif;background:#f6f6f8;color:#1a1a1a;
- line-height:1.8;font-feature-settings:"palt";-webkit-font-smoothing:antialiased}
-.wrap{max-width:1180px;margin:0 auto;padding:28px 20px 60px}
-header{margin-bottom:26px}
-h1{font-size:23px;font-weight:700;letter-spacing:.02em}
+body{font-family:"Outfit","Noto Sans JP",sans-serif;background:var(--bg);color:#1a1a1a;
+ line-height:1.75;font-feature-settings:"palt";-webkit-font-smoothing:antialiased}
+.wrap{max-width:1180px;margin:0 auto;padding:24px 18px 70px}
 .confidential{display:inline-block;background:#fdeef4;color:var(--pink);font-size:11px;
  font-weight:700;letter-spacing:.1em;padding:3px 10px;border-radius:4px;margin-bottom:6px}
-.meta{font-size:13px;color:var(--sub);margin-top:4px}
-h2{font-size:16px;font-weight:700;margin:34px 0 12px;padding-left:11px;
- border-left:4px solid var(--pink)}
-.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(158px,1fr));gap:12px}
-.kpi{background:#fff;border:1px solid var(--line);border-radius:12px;padding:16px 18px}
-.kpi-t{font-size:12px;color:var(--sub);font-weight:500}
-.kpi-v{font-size:27px;font-weight:700;line-height:1.25;letter-spacing:-.01em}
-.kpi-v small{font-size:13px;font-weight:500;color:var(--sub);margin-left:2px}
-.kpi-d{font-size:12px;color:var(--sub)}
-.up{color:#12855b;font-weight:700} .down{color:#c8324f;font-weight:700} .flat{color:var(--sub)}
-.card{background:#fff;border:1px solid var(--line);border-radius:12px;padding:18px 20px 12px;margin-bottom:14px}
-.card h3{font-size:14px;font-weight:700;margin-bottom:4px}
-.card p.note{font-size:12px;color:var(--sub);margin-bottom:8px}
-.legend{display:flex;gap:16px;flex-wrap:wrap;font-size:12px;margin-bottom:6px}
-.legend i{display:inline-block;width:11px;height:11px;border-radius:3px;margin-right:5px;vertical-align:-1px}
+h1{font-size:22px;font-weight:700}
+.meta{font-size:12.5px;color:var(--sub);margin-top:2px}
+.tabs{display:flex;gap:6px;margin:20px 0 16px;overflow-x:auto;padding-bottom:4px;
+ position:sticky;top:0;background:var(--bg);z-index:20;padding-top:6px}
+.tab{flex:none;border:1px solid var(--line);background:#fff;border-radius:99px;
+ padding:9px 20px;font-size:13.5px;font-weight:600;cursor:pointer;color:var(--sub);
+ transition:.15s}
+.tab:hover{border-color:var(--pink);color:var(--pink)}
+.tab.on{background:var(--navy);border-color:var(--navy);color:#fff}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:16px}
+.kpi{background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px 16px;
+ cursor:pointer;transition:.15s;position:relative}
+.kpi:hover{border-color:var(--pink);transform:translateY(-2px)}
+.kpi.on{border-color:var(--pink);box-shadow:0 0 0 2px #f9d4e6}
+.kpi-t{font-size:11.5px;color:var(--sub);font-weight:500}
+.kpi-v{font-size:25px;font-weight:700;line-height:1.3}
+.kpi-v small{font-size:12px;color:var(--sub);font-weight:500;margin-left:2px}
+.kpi-d{font-size:11.5px;color:var(--sub)}
+.up{color:#12855b;font-weight:700}.down{color:#c8324f;font-weight:700}.flat{color:var(--sub)}
+.period-bar{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin:2px 0 10px}
+.period-bar b{font-size:14.5px;font-weight:700}
+.period-bar span{font-size:12px;color:#fff;background:var(--navy);border-radius:6px;padding:3px 10px;font-weight:600}
+.period-bar small{font-size:11.5px;color:var(--sub)}
+.card{background:#fff;border:1px solid var(--line);border-radius:12px;
+ padding:16px 18px 12px;margin-bottom:12px}
+.card h3{font-size:14px;font-weight:700;margin-bottom:2px}
+.card .note{font-size:11.5px;color:var(--sub);margin-bottom:8px}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0 10px}
+.chip{border:1px solid var(--line);background:#fff;border-radius:99px;padding:5px 14px;
+ font-size:12px;font-weight:600;cursor:pointer;color:var(--sub);transition:.15s}
+.chip:hover{border-color:var(--pink);color:var(--pink)}
+.chip.on{background:var(--pink);border-color:var(--pink);color:#fff}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.two>*{min-width:0}
+@media(max-width:860px){.two{grid-template-columns:1fr}}
 .scroll{overflow-x:auto}
-.chart{width:100%;height:auto;display:block}
-.grid{stroke:#ececed;stroke-width:1}
+svg.chart{width:100%;height:auto;display:block}
+.grid-l{stroke:#ececed;stroke-width:1}
 .ylab{font-size:9px;fill:#9a9aa2;text-anchor:end}
 .xlab{font-size:9.5px;fill:#8a8a94;text-anchor:middle}
-.two{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-@media(max-width:860px){.two{grid-template-columns:1fr}}
-.bars{margin-top:6px}
-.bar-row{display:grid;grid-template-columns:112px 1fr 52px;align-items:center;gap:10px;margin-bottom:7px;font-size:13px}
-.bar-name{font-weight:500}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;margin:2px 0 4px}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:4px;vertical-align:-1px}
+.bars{margin-top:4px}
+.bar-row{display:grid;grid-template-columns:minmax(100px,230px) 1fr 54px;align-items:center;
+ gap:9px;margin-bottom:6px;font-size:12.5px}
+.bar-name{font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .bar-track{background:#f0f0f3;border-radius:99px;height:9px;overflow:hidden}
-.bar-fill{display:block;height:100%;border-radius:99px}
-.bar-val{text-align:right;font-weight:700;font-size:12.5px}
+.bar-fill{display:block;height:100%;border-radius:99px;transition:width .4s}
+.bar-val{text-align:right;font-weight:700;font-size:12px}
 table{width:100%;border-collapse:collapse;font-size:12.5px;background:#fff}
-th,td{padding:8px 9px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}
-th{background:#fafafb;font-weight:600;color:var(--sub);font-size:11.5px;position:sticky;top:0}
+th,td{padding:7px 9px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}
+th{background:#fafafb;font-weight:600;color:var(--sub);font-size:11px;cursor:pointer;
+ user-select:none;position:sticky;top:0}
+th:hover{color:var(--pink)}
 td:first-child,th:first-child{text-align:left;font-weight:600}
-</style></head><body><div class="wrap">
-<header>
-  <p class="confidential">社外秘 ／ 関係者限定</p>
-  <h1>JoaGOLF STUDIO ／ Web週次ダッシュボード</h1>
-  <p class="meta">対象期間 2026-06-21（公開日）〜 2026-08-10週　｜　全9週　｜　更新 2026-08-18<br>
-  <span style="font-size:12px">※ 集計が終わった週のみ表示（進行中の週は含みません）。最初の週は公開日6/21の1日分です。</span></p>
-</header>
-
-<h2>直近週のサマリー（2026-08-10 の週）</h2>
-<div class="kpis">
-  <div class="kpi"><p class="kpi-t">訪問者数</p><p class="kpi-v">486<small></small></p><p class="kpi-d">前週比 <span class="up">+24%</span></p></div>
-  <div class="kpi"><p class="kpi-t">セッション</p><p class="kpi-v">651<small></small></p><p class="kpi-d">前週比 <span class="up">+11%</span></p></div>
-  <div class="kpi"><p class="kpi-t">体験予約クリック</p><p class="kpi-v">39<small></small></p><p class="kpi-d">前週比 <span class="down">-22%</span></p></div>
-  <div class="kpi"><p class="kpi-t">LINE友だち追加</p><p class="kpi-v">0<small></small></p><p class="kpi-d">前週比 <span class="flat">—</span></p></div>
-  <div class="kpi"><p class="kpi-t">東京エリア</p><p class="kpi-v">108<small></small></p><p class="kpi-d">前週比 <span class="down">-7%</span></p></div>
-  <div class="kpi"><p class="kpi-t">関西エリア</p><p class="kpi-v">171<small></small></p><p class="kpi-d">前週比 <span class="up">+6%</span></p></div>
+.warn{background:#fdf3f6}
+.btn{display:inline-block;border:1px solid var(--line);background:#fff;border-radius:8px;
+ padding:7px 16px;font-size:12.5px;font-weight:600;cursor:pointer;color:var(--sub)}
+.btn:hover{border-color:var(--pink);color:var(--pink)}
+#tip{position:fixed;pointer-events:none;background:var(--navy);color:#fff;font-size:12px;
+ padding:6px 10px;border-radius:8px;opacity:0;transition:opacity .12s;z-index:99;
+ white-space:nowrap;box-shadow:0 6px 20px rgba(0,0,0,.25)}
+.empty{color:var(--sub);font-size:13px;padding:8px 0}
+.hint{font-size:11.5px;color:var(--sub);margin:6px 0 2px}
+/* AIチャット */
+#ai-fab{position:fixed;right:20px;bottom:20px;z-index:90;background:var(--pink);color:#fff;
+ border:none;border-radius:99px;padding:17px 28px;font-size:16.5px;font-weight:700;cursor:pointer;
+ font-family:inherit;box-shadow:0 10px 28px rgba(204,33,127,.4);transition:.15s}
+#ai-fab:hover{transform:translateY(-2px)}
+#ai-panel{position:fixed;right:18px;bottom:18px;z-index:95;width:min(380px,calc(100vw - 24px));
+ height:min(560px,calc(100vh - 40px));background:#fff;border:1px solid var(--line);border-radius:16px;
+ box-shadow:0 20px 60px rgba(0,0,0,.22);display:none;flex-direction:column;overflow:hidden}
+#ai-panel.open{display:flex}
+#ai-head{background:var(--navy);color:#fff;padding:12px 16px;font-size:13.5px;font-weight:700;
+ display:flex;justify-content:space-between;align-items:center;flex:none}
+#ai-head small{font-weight:400;opacity:.7;font-size:10.5px;margin-left:8px}
+#ai-close{cursor:pointer;font-size:20px;line-height:1;opacity:.8;padding:0 2px}
+#ai-close:hover{opacity:1}
+#ai-msgs{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:9px}
+.ai-m{max-width:88%;padding:9px 13px;border-radius:14px;font-size:13px;line-height:1.7;white-space:pre-wrap;word-break:break-word}
+.ai-m.user{align-self:flex-end;background:var(--pink);color:#fff;border-bottom-right-radius:4px}
+.ai-m.model{align-self:flex-start;background:#f2f2f5;border-bottom-left-radius:4px}
+.ai-m.err{align-self:flex-start;background:#fdeef2;color:#c8324f}
+.ai-sug{align-self:flex-start;border:1px solid var(--pink);color:var(--pink);border-radius:99px;
+ padding:6px 13px;font-size:12px;font-weight:600;cursor:pointer;background:#fff}
+.ai-sug:hover{background:#fdeef4}
+#ai-form{display:flex;gap:8px;padding:10px;border-top:1px solid var(--line);flex:none}
+#ai-in{flex:1;border:1px solid var(--line);border-radius:10px;padding:9px 12px;font-size:13px;
+ font-family:inherit;outline:none}
+#ai-in:focus{border-color:var(--pink)}
+#ai-send{background:var(--navy);color:#fff;border:none;border-radius:10px;padding:9px 16px;
+ font-size:13px;font-weight:700;cursor:pointer;font-family:inherit}
+#ai-send:disabled{opacity:.4;cursor:default}
+.ai-review-box{background:#f7f3fb;border:1px solid #e8dff2;border-radius:10px;padding:11px 14px;
+ font-size:12.5px;line-height:1.85;white-space:pre-wrap;word-break:break-word;margin-top:8px}
+.ai-typing{display:inline-flex;gap:4px;align-items:center;margin-left:6px;vertical-align:middle}
+.ai-typing i{width:7px;height:7px;border-radius:50%;background:#9a9aa5;font-style:normal;
+ animation:aidot 1.2s infinite ease-in-out}
+.ai-typing i:nth-child(2){animation-delay:.15s}
+.ai-typing i:nth-child(3){animation-delay:.3s}
+@keyframes aidot{0%,60%,100%{transform:translateY(0);opacity:.35}30%{transform:translateY(-5px);opacity:1}}
+/* 自動診断 */
+.diag-list{list-style:none;display:flex;flex-direction:column;gap:7px;margin:4px 0 6px}
+.diag-list li{display:flex;gap:9px;font-size:12.5px;line-height:1.7;padding:9px 12px;border-radius:10px;background:#fafafb}
+.diag-list li.warn{background:#fdf3f6}
+.diag-list li.good{background:#eef8f2}
+.diag-list li i{font-style:normal;flex:none}
+.scroll{-webkit-overflow-scrolling:touch}
+.tabs{scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+/* タブレット */
+@media(max-width:1024px){
+  .wrap{padding:18px 16px 60px}
+  .kpis{grid-template-columns:repeat(4,1fr)}
+}
+/* スマホ */
+@media(max-width:767px){
+  .wrap{padding:14px 12px 50px}
+  h1{font-size:17px}
+  .meta{font-size:10.5px}
+  .confidential{font-size:10px}
+  .tabs{gap:5px;margin:12px 0 12px;padding-top:4px}
+  .tab{padding:8px 12px;font-size:12px}
+  .kpis{grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:12px}
+  .kpi{padding:10px 12px;border-radius:10px}
+  .kpi:hover{transform:none}
+  .kpi-t{font-size:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .kpi-v{font-size:20px;line-height:1.35}
+  .kpi-d{font-size:10.5px}
+  .card{padding:13px 13px 10px;margin-bottom:10px;border-radius:10px}
+  .card h3{font-size:13px}
+  .card .note{font-size:10.5px}
+  .chips{gap:5px}
+  .chip{padding:5px 11px;font-size:11.5px}
+  .legend{font-size:11px;gap:10px}
+  th,td{padding:6px 7px;font-size:11.5px}
+  .bar-row{grid-template-columns:minmax(90px,150px) 1fr 46px;font-size:11.5px;gap:7px}
+  .hint{font-size:10.5px}
+  .btn{padding:8px 14px}
+  #tip{font-size:11px;white-space:normal;max-width:220px}
+  #ai-panel{left:0;right:0;top:0;bottom:0;width:100vw;height:100vh;height:100dvh;
+    border-radius:0;border:none}
+  #ai-head{padding:14px 16px;font-size:15px}
+  #ai-close{font-size:26px;padding:0 6px}
+  .ai-m{font-size:14px;max-width:92%}
+  .ai-sug{font-size:13px;padding:8px 15px}
+  #ai-in{font-size:16px;padding:11px 13px}
+  #ai-send{padding:11px 18px;font-size:14px}
+  #ai-form{padding:10px;padding-bottom:calc(10px + env(safe-area-inset-bottom))}
+  #ai-fab{right:14px;bottom:14px;padding:15px 24px;font-size:15px}
+}
+</style></head><body>
+<div class="wrap">
+  <span class="confidential">社外秘 ／ 関係者限定</span>
+  <h1>JoaGOLF STUDIO ／ Web ダッシュボード</h1>
+  <p class="meta">公開日 2026-06-21 〜 ｜ 全9週 ｜ 更新 2026-08-23 ｜ 毎週月曜朝に自動更新</p>
+  <div class="tabs" id="tabs"></div>
+  <div id="view"></div>
 </div>
-
-<h2>アクセスの推移</h2>
-<div class="card">
-  <div class="legend"><span><i style="background:#cc217f"></i>訪問者</span><span><i style="background:#0F182B"></i>セッション</span></div>
-  <div class="scroll"><svg viewBox="0 0 594 210" class="chart" preserveAspectRatio="xMidYMid meet"><line x1="34" y1="34.0" x2="560" y2="34.0" class="grid"/><text x="28" y="38.0" class="ylab">1,963</text><line x1="34" y1="69.5" x2="560" y2="69.5" class="grid"/><text x="28" y="73.5" class="ylab">1,472</text><line x1="34" y1="105.0" x2="560" y2="105.0" class="grid"/><text x="28" y="109.0" class="ylab">982</text><line x1="34" y1="140.5" x2="560" y2="140.5" class="grid"/><text x="28" y="144.5" class="ylab">491</text><line x1="34" y1="176.0" x2="560" y2="176.0" class="grid"/><text x="28" y="180.0" class="ylab">0</text><polyline points="34.0,175.1 99.8,60.0 165.5,141.4 231.2,146.9 297.0,156.6 362.8,149.7 428.5,151.4 494.2,147.6 560.0,140.8" fill="none" stroke="#cc217f" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/><circle cx="34.0" cy="175.1" r="3.5" fill="#cc217f"><title>訪問者 2026-06-15: 13</title></circle><circle cx="99.8" cy="60.0" r="3.5" fill="#cc217f"><title>訪問者 2026-06-22: 1,603</title></circle><circle cx="165.5" cy="141.4" r="3.5" fill="#cc217f"><title>訪問者 2026-06-29: 478</title></circle><circle cx="231.2" cy="146.9" r="3.5" fill="#cc217f"><title>訪問者 2026-07-06: 402</title></circle><circle cx="297.0" cy="156.6" r="3.5" fill="#cc217f"><title>訪問者 2026-07-13: 268</title></circle><circle cx="362.8" cy="149.7" r="3.5" fill="#cc217f"><title>訪問者 2026-07-20: 364</title></circle><circle cx="428.5" cy="151.4" r="3.5" fill="#cc217f"><title>訪問者 2026-07-27: 340</title></circle><circle cx="494.2" cy="147.6" r="3.5" fill="#cc217f"><title>訪問者 2026-08-03: 393</title></circle><circle cx="560.0" cy="140.8" r="3.5" fill="#cc217f"><title>訪問者 2026-08-10: 486</title></circle><polyline points="34.0,174.0 99.8,34.0 165.5,126.3 231.2,135.8 297.0,148.4 362.8,138.8 428.5,143.3 494.2,133.5 560.0,128.9" fill="none" stroke="#0F182B" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/><circle cx="34.0" cy="174.0" r="3.5" fill="#0F182B"><title>セッション 2026-06-15: 27</title></circle><circle cx="99.8" cy="34.0" r="3.5" fill="#0F182B"><title>セッション 2026-06-22: 1,963</title></circle><circle cx="165.5" cy="126.3" r="3.5" fill="#0F182B"><title>セッション 2026-06-29: 687</title></circle><circle cx="231.2" cy="135.8" r="3.5" fill="#0F182B"><title>セッション 2026-07-06: 556</title></circle><circle cx="297.0" cy="148.4" r="3.5" fill="#0F182B"><title>セッション 2026-07-13: 382</title></circle><circle cx="362.8" cy="138.8" r="3.5" fill="#0F182B"><title>セッション 2026-07-20: 514</title></circle><circle cx="428.5" cy="143.3" r="3.5" fill="#0F182B"><title>セッション 2026-07-27: 452</title></circle><circle cx="494.2" cy="133.5" r="3.5" fill="#0F182B"><title>セッション 2026-08-03: 587</title></circle><circle cx="560.0" cy="128.9" r="3.5" fill="#0F182B"><title>セッション 2026-08-10: 651</title></circle><text x="34.0" y="202" class="xlab">06-15</text><text x="99.8" y="202" class="xlab">06-22</text><text x="165.5" y="202" class="xlab">06-29</text><text x="231.2" y="202" class="xlab">07-06</text><text x="297.0" y="202" class="xlab">07-13</text><text x="362.8" y="202" class="xlab">07-20</text><text x="428.5" y="202" class="xlab">07-27</text><text x="494.2" y="202" class="xlab">08-03</text><text x="560.0" y="202" class="xlab">08-10</text></svg></div>
+<div id="tip"></div>
+<button id="ai-fab">💬 AIに相談</button>
+<div id="ai-panel">
+  <div id="ai-head"><span>データAI相談<small>Gemini 3.6 Flash で回答</small></span><span id="ai-close">×</span></div>
+  <div id="ai-msgs"></div>
+  <form id="ai-form"><input id="ai-in" placeholder="数字について質問してみる…" maxlength="1000" autocomplete="off"><button id="ai-send" type="submit">送信</button></form>
 </div>
+<script>
+const D = {"weeks": [{"users": 13, "sessions": 27, "newUsers": 13, "reserve": 10, "line": 0, "share": 1, "tokyo": 0, "kansai": 27, "lp": 0, "stores": {"神戸トアロード店": 3, "千駄ヶ谷店": 2, "神戸店": 2, "赤坂店": 1, "麹町店": 1, "西新宿店": 1}, "storeViews": {"神戸店": 23, "神戸トアロード店": 15, "箕面店": 8, "麹町店": 3, "西新宿店": 2, "赤坂店": 1}, "channels": {"Direct": 26, "Unassigned": 1}, "devices": {"mobile": 21, "desktop": 8}, "sources": {"(direct)": 26, "(not set)": 1}, "landings": {"/": 12, "/swing-type": 7, "/privacy": 3, "/message": 2, "/store/kobe": 2, "(not set)": 1}, "pages": {"/": 110, "/store/": 36, "/store/kobe/": 23, "/swing-type/": 22, "/message/": 19, "/store/kobetorroad/": 15, "/concept/": 12, "/store/minoh/": 8, "/voice/": 7, "/privacy/": 4}, "cta": {}, "sc_imp": 0, "sc_clicks": 0, "sc_pos": 0.0, "week": "2026-06-15"}, {"users": 1603, "sessions": 1963, "newUsers": 1531, "reserve": 32, "line": 0, "share": 49, "tokyo": 309, "kansai": 559, "lp": 0, "stores": {"箕面店": 16, "神戸トアロード店": 7, "神戸店": 6, "西新宿店": 2, "麹町店": 1}, "storeViews": {"神戸店": 76, "箕面店": 53, "神戸トアロード店": 37, "西新宿店": 5, "麹町店": 8, "千駄ヶ谷店": 9, "赤坂店": 7}, "channels": {"Organic Search": 710, "Organic Social": 532, "Unassigned": 245, "Direct": 453, "Referral": 20, "Organic Video": 2, "AI Assistant": 1}, "devices": {"mobile": 1872, "desktop": 85, "tablet": 9}, "sources": {"google": 586, "l.instagram.com": 455, "(direct)": 453, "(not set)": 245, "yahoo": 119, "ig": 40, "tiktok.com": 21, "l.threads.com": 15}, "landings": {"/swing-type": 1551, "/": 262, "(not set)": 39, "/contact": 34, "/store/kobe": 21, "/store": 13, "/store/minoh": 11, "/privacy": 9}, "pages": {"/swing-type/": 3229, "/": 435, "/store/": 201, "/store/kobe/": 76, "/store/minoh/": 53, "/store/kobetorroad/": 37, "/contact/": 35, "/concept/": 25, "/voice/": 17, "/faq/": 14}, "cta": {}, "sc_imp": 1347, "sc_clicks": 572, "sc_pos": 5.8, "week": "2026-06-22"}, {"users": 478, "sessions": 687, "newUsers": 421, "reserve": 23, "line": 0, "share": 11, "tokyo": 95, "kansai": 198, "lp": 0, "stores": {"神戸トアロード店": 7, "神戸店": 9, "箕面店": 3, "赤坂店": 2, "麹町店": 2}, "storeViews": {"神戸店": 73, "箕面店": 44, "神戸トアロード店": 48, "赤坂店": 12, "西新宿店": 8, "千駄ヶ谷店": 14, "麹町店": 7}, "channels": {"Organic Search": 416, "Direct": 192, "Organic Social": 63, "Referral": 13, "AI Assistant": 2, "Organic Video": 1}, "devices": {"mobile": 633, "desktop": 52, "tablet": 2}, "sources": {"google": 331, "(direct)": 192, "yahoo": 80, "l.instagram.com": 43, "ig": 11, "tiktok.com": 6, "bing": 5, "joagolf.jp": 5}, "landings": {"/swing-type": 465, "/": 133, "/store/kobe": 25, "/store/minoh": 19, "/store/kobetorroad": 17, "(not set)": 14, "/store/sendagaya": 6, "/store": 5}, "pages": {"/swing-type/": 921, "/": 206, "/store/": 92, "/store/kobe/": 73, "/store/kobetorroad/": 48, "/store/minoh/": 44, "/concept/": 17, "/faq/": 15, "/store/sendagaya/": 14, "/store/akasaka/": 12}, "cta": {}, "sc_imp": 1195, "sc_clicks": 212, "sc_pos": 9.0, "week": "2026-06-29"}, {"users": 402, "sessions": 556, "newUsers": 360, "reserve": 23, "line": 0, "share": 6, "tokyo": 113, "kansai": 148, "lp": 0, "stores": {"神戸店": 8, "箕面店": 6, "神戸トアロード店": 9}, "storeViews": {"神戸店": 67, "箕面店": 33, "神戸トアロード店": 25, "西新宿店": 7, "赤坂店": 4, "麹町店": 4, "千駄ヶ谷店": 9}, "channels": {"Organic Search": 317, "Direct": 178, "Organic Social": 43, "AI Assistant": 6, "Organic Video": 6, "Referral": 6}, "devices": {"mobile": 479, "desktop": 74, "tablet": 3}, "sources": {"google": 250, "(direct)": 178, "yahoo": 64, "l.instagram.com": 31, "chatgpt.com": 6, "youtube.com": 6, "ig": 6, "joagolf.jp": 4}, "landings": {"/swing-type": 342, "/": 110, "/store/kobe": 36, "/store/minoh": 18, "(not set)": 15, "/store": 9, "/store/sendagaya": 6, "/store/kobetorroad": 4}, "pages": {"/swing-type/": 690, "/": 153, "/store/": 76, "/store/kobe/": 67, "/store/minoh/": 33, "/store/kobetorroad/": 25, "/concept/": 23, "/faq/": 10, "/store/sendagaya/": 9, "/news/": 8}, "cta": {}, "sc_imp": 1098, "sc_clicks": 167, "sc_pos": 8.1, "week": "2026-07-06"}, {"users": 268, "sessions": 382, "newUsers": 224, "reserve": 37, "line": 0, "share": 3, "tokyo": 54, "kansai": 132, "lp": 0, "stores": {"神戸店": 15, "箕面店": 11, "赤坂店": 3, "麹町店": 2, "西新宿店": 1, "神戸トアロード店": 4, "千駄ヶ谷店": 1}, "storeViews": {"神戸店": 84, "箕面店": 27, "神戸トアロード店": 41, "赤坂店": 7, "麹町店": 7, "西新宿店": 5, "千駄ヶ谷店": 3}, "channels": {"Organic Search": 249, "Direct": 90, "Organic Social": 29, "Organic Video": 7, "Referral": 5, "AI Assistant": 2}, "devices": {"mobile": 309, "desktop": 71, "tablet": 2}, "sources": {"google": 192, "(direct)": 90, "yahoo": 54, "l.instagram.com": 20, "youtube.com": 6, "ig": 6, "xfound-corp.com": 2, "chatgpt.com": 2}, "landings": {"/swing-type": 164, "/": 105, "/store/kobe": 40, "/store/kobetorroad": 17, "/store/minoh": 16, "(not set)": 14, "/store": 12, "/concept": 6}, "pages": {"/swing-type/": 322, "/": 155, "/store/kobe/": 84, "/store/": 69, "/store/kobetorroad/": 41, "/store/minoh/": 27, "/concept/": 25, "/news/": 11, "/faq/": 9, "/store/akasaka/": 7}, "cta": {}, "sc_imp": 991, "sc_clicks": 134, "sc_pos": 9.1, "week": "2026-07-13"}, {"users": 364, "sessions": 514, "newUsers": 306, "reserve": 47, "line": 0, "share": 5, "tokyo": 84, "kansai": 192, "lp": 0, "stores": {"箕面店": 23, "神戸店": 10, "神戸トアロード店": 7, "赤坂店": 2, "千駄ヶ谷店": 2, "西新宿店": 1, "麹町店": 2}, "storeViews": {"箕面店": 56, "神戸店": 83, "神戸トアロード店": 37, "西新宿店": 8, "千駄ヶ谷店": 12, "赤坂店": 8, "麹町店": 8}, "channels": {"Organic Search": 339, "Direct": 92, "Organic Social": 53, "Referral": 17, "Organic Video": 10, "AI Assistant": 3}, "devices": {"mobile": 429, "desktop": 80, "tablet": 6}, "sources": {"google": 272, "(direct)": 92, "yahoo": 57, "l.instagram.com": 38, "joagolf.jp": 14, "ig": 14, "youtube.com": 10, "bing": 6}, "landings": {"/swing-type": 258, "/": 140, "/store/kobe": 31, "/store/minoh": 20, "(not set)": 17, "/news/03": 10, "/store/kobetorroad": 9, "/store": 7}, "pages": {"/swing-type/": 545, "/": 210, "/store/": 111, "/store/kobe/": 83, "/store/minoh/": 56, "/news/": 39, "/store/kobetorroad/": 37, "/concept/": 29, "/news/03/": 28, "/voice/": 16}, "cta": {}, "sc_imp": 1202, "sc_clicks": 165, "sc_pos": 7.5, "week": "2026-07-20"}, {"users": 340, "sessions": 452, "newUsers": 291, "reserve": 49, "line": 0, "share": 4, "tokyo": 80, "kansai": 178, "lp": 0, "stores": {"神戸店": 18, "箕面店": 20, "千駄ヶ谷店": 4, "赤坂店": 2, "西新宿店": 2, "神戸トアロード店": 3}, "storeViews": {"箕面店": 88, "神戸店": 100, "神戸トアロード店": 42, "西新宿店": 14, "千駄ヶ谷店": 15, "赤坂店": 11, "麹町店": 7}, "channels": {"Organic Search": 289, "Direct": 82, "Organic Social": 46, "AI Assistant": 7, "Organic Video": 18, "Referral": 10}, "devices": {"mobile": 392, "desktop": 58, "tablet": 2}, "sources": {"google": 223, "(direct)": 82, "yahoo": 61, "l.instagram.com": 26, "youtube.com": 18, "ig": 17, "chatgpt.com": 7, "bing": 4}, "landings": {"/swing-type": 177, "/": 119, "/store/minoh": 52, "/store/kobe": 41, "(not set)": 17, "/store/kobetorroad": 15, "/store": 6, "/store/nishi-shinjuku": 5}, "pages": {"/swing-type/": 373, "/": 169, "/store/kobe/": 100, "/store/": 98, "/store/minoh/": 88, "/store/kobetorroad/": 42, "/concept/": 26, "/news/06/": 20, "/news/": 19, "/news/04/": 19}, "cta": {}, "sc_imp": 1346, "sc_clicks": 164, "sc_pos": 8.5, "week": "2026-07-27"}, {"users": 393, "sessions": 587, "newUsers": 340, "reserve": 50, "line": 0, "share": 8, "tokyo": 116, "kansai": 162, "lp": 0, "stores": {"神戸店": 22, "箕面店": 18, "神戸トアロード店": 6, "麹町店": 2, "千駄ヶ谷店": 1, "西新宿店": 1}, "storeViews": {"神戸店": 70, "箕面店": 68, "神戸トアロード店": 28, "赤坂店": 6, "西新宿店": 9, "千駄ヶ谷店": 8, "麹町店": 6}, "channels": {"Organic Search": 405, "Direct": 103, "Organic Social": 52, "Organic Video": 12, "Referral": 13, "Unassigned": 2}, "devices": {"mobile": 509, "desktop": 74, "tablet": 4}, "sources": {"google": 328, "(direct)": 103, "yahoo": 66, "l.instagram.com": 33, "youtube.com": 12, "ig": 11, "bing": 10, "l.threads.com": 9}, "landings": {"/swing-type": 325, "/": 110, "/store/minoh": 47, "/store/kobe": 32, "(not set)": 15, "/store": 13, "/store/kobetorroad": 10, "/news/04": 5}, "pages": {"/swing-type/": 615, "/": 155, "/store/": 73, "/store/kobe/": 70, "/store/minoh/": 68, "/store/kobetorroad/": 28, "/news/04/": 28, "/news/06/": 14, "/voice/": 11, "/store/nishi-shinjuku/": 9}, "cta": {}, "sc_imp": 1272, "sc_clicks": 181, "sc_pos": 8.0, "week": "2026-08-03"}, {"users": 486, "sessions": 651, "newUsers": 440, "reserve": 39, "line": 0, "share": 3, "tokyo": 108, "kansai": 171, "lp": 0, "stores": {"神戸店": 26, "神戸トアロード店": 4, "西新宿店": 2, "箕面店": 6, "千駄ヶ谷店": 1}, "storeViews": {"神戸店": 96, "箕面店": 70, "神戸トアロード店": 37, "西新宿店": 14, "赤坂店": 6, "麹町店": 8, "千駄ヶ谷店": 6}, "channels": {"Organic Search": 427, "Organic Social": 85, "Direct": 114, "Referral": 14, "Unassigned": 5, "AI Assistant": 2, "Organic Video": 4, "Cross-network": 1}, "devices": {"mobile": 583, "desktop": 62, "tablet": 6}, "sources": {"google": 350, "(direct)": 114, "yahoo": 75, "l.instagram.com": 74, "joagolf.jp": 8, "openai": 5, "facebook.com": 4, "youtube.com": 4}, "landings": {"/swing-type": 369, "/": 105, "/store/minoh": 41, "/store/kobe": 40, "/news/06": 26, "(not set)": 25, "/store": 12, "/store/kobetorroad": 12}, "pages": {"/swing-type/": 720, "/": 182, "/store/": 107, "/store/kobe/": 96, "/store/minoh/": 70, "/news/06/": 41, "/store/kobetorroad/": 37, "/news/04/": 23, "/concept/": 17, "/store/nishi-shinjuku/": 14}, "cta": {}, "sc_imp": 1714, "sc_clicks": 239, "sc_pos": 8.6, "week": "2026-08-10"}], "scQueries": [{"q": "ジョアゴルフ スイング診断", "imp": 267, "clicks": 241, "pos": 1.1}, {"q": "ジョアゴルフスイング診断", "imp": 243, "clicks": 227, "pos": 1.2}, {"q": "スイングタイプ診断", "imp": 228, "clicks": 180, "pos": 1.5}, {"q": "ジョアゴルフ", "imp": 158, "clicks": 92, "pos": 1.1}, {"q": "ゴルフスイングタイプ診断", "imp": 107, "clicks": 51, "pos": 1.6}, {"q": "joagolf", "imp": 64, "clicks": 32, "pos": 2.5}, {"q": "joagolf studio", "imp": 45, "clicks": 28, "pos": 1.2}, {"q": "ジョアゴルフスタジオ", "imp": 51, "clicks": 28, "pos": 1.1}, {"q": "ゴルフ スイングタイプ 診断", "imp": 42, "clicks": 23, "pos": 1.2}, {"q": "joa golf", "imp": 33, "clicks": 20, "pos": 1.8}, {"q": "joagolf studio kobe", "imp": 24, "clicks": 18, "pos": 2.1}, {"q": "ゴルフ診断", "imp": 52, "clicks": 16, "pos": 2.8}, {"q": "ジョアゴルフ 箕面", "imp": 47, "clicks": 15, "pos": 1.4}, {"q": "スイング診断 ゴルフ", "imp": 73, "clicks": 14, "pos": 7.8}, {"q": "ゴルフスイング診断", "imp": 107, "clicks": 12, "pos": 9.1}, {"q": "スイング診断", "imp": 82, "clicks": 11, "pos": 5.8}, {"q": "ゴルフ タイプ診断", "imp": 51, "clicks": 10, "pos": 3.5}, {"q": "joagolf スイングタイプ診断", "imp": 9, "clicks": 9, "pos": 1}, {"q": "スイングタイプ", "imp": 49, "clicks": 9, "pos": 3.8}, {"q": "ジョアゴルフ診断", "imp": 8, "clicks": 8, "pos": 1.1}], "areaQueries": [{"q": "ゴルフ レッスン 神戸", "imp": 117, "clicks": 1, "pos": 6.8, "tokyo": false}, {"q": "神戸市 ゴルフ レッスン", "imp": 78, "clicks": 0, "pos": 10.4, "tokyo": false}, {"q": "神戸市 ゴルフ教室", "imp": 60, "clicks": 0, "pos": 9.7, "tokyo": false}, {"q": "神戸市 ゴルフスクール", "imp": 58, "clicks": 0, "pos": 7.8, "tokyo": false}, {"q": "ゴルフスクール 神戸", "imp": 57, "clicks": 1, "pos": 6.4, "tokyo": false}, {"q": "ジョアゴルフ 箕面", "imp": 47, "clicks": 15, "pos": 1.4, "tokyo": false}, {"q": "ゴルフレッスン 神戸", "imp": 47, "clicks": 6, "pos": 6.3, "tokyo": false}, {"q": "神戸 ゴルフレッスン", "imp": 44, "clicks": 7, "pos": 7.2, "tokyo": false}, {"q": "箕面 ゴルフ レッスン", "imp": 43, "clicks": 5, "pos": 8.0, "tokyo": false}, {"q": "箕面 ゴルフレッスン", "imp": 38, "clicks": 7, "pos": 5, "tokyo": false}, {"q": "箕面 インドアゴルフ", "imp": 34, "clicks": 2, "pos": 8.3, "tokyo": false}, {"q": "三宮 ゴルフ レッスン", "imp": 34, "clicks": 0, "pos": 20.6, "tokyo": false}, {"q": "箕面 ゴルフ練習場", "imp": 27, "clicks": 2, "pos": 14.9, "tokyo": false}, {"q": "ゴルフ教室 神戸", "imp": 22, "clicks": 0, "pos": 9.0, "tokyo": false}, {"q": "ゴルフ レッスン 美人 コーチ 大阪", "imp": 21, "clicks": 0, "pos": 12.8, "tokyo": false}, {"q": "神戸 ゴルフ レッスン マンツーマン", "imp": 21, "clicks": 0, "pos": 8.4, "tokyo": false}, {"q": "神戸 ゴルフスクール", "imp": 19, "clicks": 0, "pos": 7.9, "tokyo": false}, {"q": "ゴルフ レッスン jr神戸線", "imp": 18, "clicks": 0, "pos": 34, "tokyo": false}, {"q": "三宮 ゴルフレッスン", "imp": 17, "clicks": 0, "pos": 6.1, "tokyo": false}, {"q": "兵庫県 神戸市 中央区 ゴルフレッスン", "imp": 17, "clicks": 0, "pos": 21.2, "tokyo": false}], "updated": "2026-08-23", "launch": "2026-06-21", "tokyoStores": ["麹町店", "西新宿店", "千駄ヶ谷店", "赤坂店"], "storeNames": ["麹町店", "西新宿店", "千駄ヶ谷店", "赤坂店", "神戸トアロード店", "神戸店", "箕面店"]};
+const W = D.weeks;
+const COLORS = {pink:"#cc217f", navy:"#0F182B", gold:"#B08D4F", green:"#06c755",
+  blue:"#4a9fd8", purple:"#8a63c9", orange:"#e08b3c", teal:"#2aa8a0"};
+const CH_COLORS = ["#cc217f","#0F182B","#4a9fd8","#B08D4F","#8a63c9","#2aa8a0","#e08b3c"];
+const METRICS = {
+  users:{label:"訪問者数", color:COLORS.pink, f:w=>w.users},
+  sessions:{label:"セッション", color:COLORS.navy, f:w=>w.sessions},
+  reserve:{label:"体験予約クリック", color:COLORS.gold, f:w=>w.reserve},
+  line:{label:"LINE友だち追加", color:COLORS.green, f:w=>w.line},
+  cvr:{label:"予約クリック率(%)", color:COLORS.purple, f:w=>w.sessions?+(w.reserve/w.sessions*100).toFixed(1):0},
+  lp:{label:"キャンペーンLP閲覧", color:COLORS.blue, f:w=>w.lp},
+  sc_imp:{label:"検索表示回数", color:COLORS.teal, f:w=>w.sc_imp},
+  sc_clicks:{label:"検索クリック", color:COLORS.orange, f:w=>w.sc_clicks},
+  sc_ctr:{label:"検索クリック率(%)", color:COLORS.pink, f:w=>w.sc_imp?+(w.sc_clicks/w.sc_imp*100).toFixed(1):0},
+};
+const TABS = [["overview","概要"],["stores","店舗"],["traffic","集客チャネル"],
+  ["search","検索"],["lp","キャンペーンLP"],["table","データ表"]];
+let S = {tab:"overview", metric:"users", period:"all", store:"全店",
+  sort:{key:"week", dir:-1}};
 
-<div class="two">
-  <div class="card">
-    <h3>東京 vs 関西（訪問セッション）</h3>
-    <p class="note">キャンペーンの主戦場である東京が伸びているか</p>
-    <div class="legend"><span><i style="background:#cc217f"></i>東京</span><span><i style="background:#4a9fd8"></i>関西</span></div>
-    <div class="scroll"><svg viewBox="0 0 594 210" class="chart" preserveAspectRatio="xMidYMid meet"><line x1="34" y1="34.0" x2="560" y2="34.0" class="grid"/><text x="28" y="38.0" class="ylab">559</text><line x1="34" y1="69.5" x2="560" y2="69.5" class="grid"/><text x="28" y="73.5" class="ylab">419</text><line x1="34" y1="105.0" x2="560" y2="105.0" class="grid"/><text x="28" y="109.0" class="ylab">280</text><line x1="34" y1="140.5" x2="560" y2="140.5" class="grid"/><text x="28" y="144.5" class="ylab">140</text><line x1="34" y1="176.0" x2="560" y2="176.0" class="grid"/><text x="28" y="180.0" class="ylab">0</text><polyline points="34.0,176.0 99.8,97.5 165.5,151.9 231.2,147.3 297.0,162.3 362.8,154.7 428.5,155.7 494.2,146.5 560.0,148.6" fill="none" stroke="#cc217f" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/><circle cx="34.0" cy="176.0" r="3.5" fill="#cc217f"><title>東京 2026-06-15: 0</title></circle><circle cx="99.8" cy="97.5" r="3.5" fill="#cc217f"><title>東京 2026-06-22: 309</title></circle><circle cx="165.5" cy="151.9" r="3.5" fill="#cc217f"><title>東京 2026-06-29: 95</title></circle><circle cx="231.2" cy="147.3" r="3.5" fill="#cc217f"><title>東京 2026-07-06: 113</title></circle><circle cx="297.0" cy="162.3" r="3.5" fill="#cc217f"><title>東京 2026-07-13: 54</title></circle><circle cx="362.8" cy="154.7" r="3.5" fill="#cc217f"><title>東京 2026-07-20: 84</title></circle><circle cx="428.5" cy="155.7" r="3.5" fill="#cc217f"><title>東京 2026-07-27: 80</title></circle><circle cx="494.2" cy="146.5" r="3.5" fill="#cc217f"><title>東京 2026-08-03: 116</title></circle><circle cx="560.0" cy="148.6" r="3.5" fill="#cc217f"><title>東京 2026-08-10: 108</title></circle><polyline points="34.0,169.1 99.8,34.0 165.5,125.7 231.2,138.4 297.0,142.5 362.8,127.2 428.5,130.8 494.2,134.8 560.0,132.6" fill="none" stroke="#4a9fd8" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/><circle cx="34.0" cy="169.1" r="3.5" fill="#4a9fd8"><title>関西 2026-06-15: 27</title></circle><circle cx="99.8" cy="34.0" r="3.5" fill="#4a9fd8"><title>関西 2026-06-22: 559</title></circle><circle cx="165.5" cy="125.7" r="3.5" fill="#4a9fd8"><title>関西 2026-06-29: 198</title></circle><circle cx="231.2" cy="138.4" r="3.5" fill="#4a9fd8"><title>関西 2026-07-06: 148</title></circle><circle cx="297.0" cy="142.5" r="3.5" fill="#4a9fd8"><title>関西 2026-07-13: 132</title></circle><circle cx="362.8" cy="127.2" r="3.5" fill="#4a9fd8"><title>関西 2026-07-20: 192</title></circle><circle cx="428.5" cy="130.8" r="3.5" fill="#4a9fd8"><title>関西 2026-07-27: 178</title></circle><circle cx="494.2" cy="134.8" r="3.5" fill="#4a9fd8"><title>関西 2026-08-03: 162</title></circle><circle cx="560.0" cy="132.6" r="3.5" fill="#4a9fd8"><title>関西 2026-08-10: 171</title></circle><text x="34.0" y="202" class="xlab">06-15</text><text x="99.8" y="202" class="xlab">06-22</text><text x="165.5" y="202" class="xlab">06-29</text><text x="231.2" y="202" class="xlab">07-06</text><text x="297.0" y="202" class="xlab">07-13</text><text x="362.8" y="202" class="xlab">07-20</text><text x="428.5" y="202" class="xlab">07-27</text><text x="494.2" y="202" class="xlab">08-03</text><text x="560.0" y="202" class="xlab">08-10</text></svg></div>
+const $ = s => document.querySelector(s);
+const fmt = n => (typeof n==="number") ? n.toLocaleString("ja-JP") : n;
+const short = k => k.slice(5).replace("-","/");
+const jdate = d => `${d.getMonth()+1}/${d.getDate()}(${"日月火水木金土"[d.getDay()]})`;
+const escT = s => s.replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const aiReviewKey = () => "aiReview:" + W[W.length-1].week;
+function weekRange(mon){
+  const a=new Date(mon+"T00:00:00"), b=new Date(a); b.setDate(b.getDate()+6);
+  return `${jdate(a)}〜${jdate(b)}`;
+}
+function slice(){
+  if(S.period==="all") return W;
+  return W.slice(-parseInt(S.period));
+}
+function delta(cur, prev){
+  if(prev===undefined||prev===null) return '<span class="flat">—</span>';
+  if(prev===0) return cur===0?'<span class="flat">—</span>':'<span class="up">新規</span>';
+  const p=(cur-prev)/prev*100, cls=p>=0?"up":"down";
+  return `<span class="${cls}">${p>=0?"+":""}${p.toFixed(0)}%</span>`;
+}
+
+/* ---------- チャート ---------- */
+function lineChart(labels, series, opts={}){
+  const n=labels.length; if(n<2) return '<p class="empty">データが2週分たまると表示されます</p>';
+  const MB=matchMedia("(max-width:767px)").matches;
+  const H=opts.h||220, P=MB?30:36, Wd=MB?344:720;
+  const mx=Math.max(1,...series.flatMap(s=>s.vals));
+  const x=i=>P+i*(Wd-P*2)/(n-1), y=v=>H-P-(v/mx)*(H-P*2);
+  let o=`<svg viewBox="0 0 ${Wd} ${H}" class="chart">`;
+  for(let g=0;g<5;g++){const gy=P+(H-P*2)*g/4;
+    o+=`<line x1="${P}" y1="${gy}" x2="${Wd-P}" y2="${gy}" class="grid-l"/>`;
+    o+=`<text x="${P-6}" y="${gy+3.5}" class="ylab">${fmt(Math.round(mx*(4-g)/4))}</text>`;}
+  for(const s of series){
+    const pts=s.vals.map((v,i)=>`${x(i)},${y(v)}`).join(" ");
+    o+=`<polyline points="${pts}" fill="none" stroke="${s.color}" stroke-width="2.5"
+        stroke-linejoin="round" stroke-linecap="round"/>`;
+    s.vals.forEach((v,i)=>{o+=`<circle cx="${x(i)}" cy="${y(v)}" r="${MB?3.5:4.5}" fill="${s.color}"
+      data-tip="${s.label}｜${labels[i]}の週: ${fmt(v)}${opts.unit||""}"/>`;});}
+  const step=Math.max(1,Math.ceil(n/(MB?6:12)));
+  labels.forEach((l,i)=>{if(i%step===0||i===n-1)o+=`<text x="${x(i)}" y="${H-9}" class="xlab">${short(l)}</text>`;});
+  return o+"</svg>";
+}
+function hbars(items, color){
+  if(!items.length) return '<p class="empty">データなし</p>';
+  const mx=Math.max(...items.map(x=>x[1]),1);
+  return '<div class="bars">'+items.map(([k,v])=>
+    `<div class="bar-row"><span class="bar-name" title="${k}">${k}</span>
+     <span class="bar-track"><span class="bar-fill" style="width:${v/mx*100}%;background:${color}"></span></span>
+     <span class="bar-val">${fmt(v)}</span></div>`).join("")+"</div>";
+}
+function sum(rows, f){const m={};for(const w of rows){const d=f(w);for(const k in d)m[k]=(m[k]||0)+d[k];}
+  return Object.entries(m).sort((a,b)=>b[1]-a[1]);}
+
+/* ---------- タブ ---------- */
+function chips(list, cur, attr){
+  return `<div class="chips">`+list.map(([v,l])=>
+    `<span class="chip ${v===cur?"on":""}" data-${attr}="${v}">${l}</span>`).join("")+`</div>`;
+}
+function periodChips(){
+  return chips([["all","全期間"],["8","直近8週"],["4","直近4週"]], S.period, "period");
+}
+
+function vOverview(){
+  const ws=slice(), last=W[W.length-1], prev=W[W.length-2]||{};
+  const kpi=(key)=>{const m=METRICS[key],v=m.f(last),pv=prev.week?m.f(prev):undefined;
+    return `<div class="kpi ${S.metric===key?"on":""}" data-metric="${key}">
+      <p class="kpi-t">${m.label}</p><p class="kpi-v">${fmt(v)}</p>
+      <p class="kpi-d">前週比 ${delta(v,pv)}</p></div>`;};
+  const m=METRICS[S.metric];
+  return `
+  <div class="period-bar"><b>直近1週間の数値</b><span>集計期間：${weekRange(last.week)}</span>
+    <small>前週比は ${weekRange(prev.week||last.week)} との比較</small></div>
+  <div class="kpis">${Object.keys(METRICS).map(kpi).join("")}</div>
+  <p class="hint">↑ カードをクリックするとグラフが切り替わります</p>
+
+  <div class="card" id="metric-chart">
+    <h3>${m.label} の推移</h3>${periodChips()}
+    <div class="scroll">${lineChart(ws.map(w=>w.week),[{label:m.label,vals:ws.map(m.f),color:m.color}],
+      {unit:S.metric==="cvr"?"%":""})}</div>
   </div>
-  <div class="card">
-    <h3>体験予約クリック（東京 vs 関西）</h3>
-    <p class="note">サイトが送客できた数</p>
-    <div class="legend"><span><i style="background:#cc217f"></i>東京4店舗</span><span><i style="background:#4a9fd8"></i>関西3店舗</span></div>
-    <div class="scroll"><svg viewBox="0 0 594 210" class="chart" preserveAspectRatio="xMidYMid meet"><line x1="34" y1="34.0" x2="560" y2="34.0" class="grid"/><text x="28" y="38.0" class="ylab">46</text><line x1="34" y1="69.5" x2="560" y2="69.5" class="grid"/><text x="28" y="73.5" class="ylab">34</text><line x1="34" y1="105.0" x2="560" y2="105.0" class="grid"/><text x="28" y="109.0" class="ylab">23</text><line x1="34" y1="140.5" x2="560" y2="140.5" class="grid"/><text x="28" y="144.5" class="ylab">12</text><line x1="34" y1="176.0" x2="560" y2="176.0" class="grid"/><text x="28" y="180.0" class="ylab">0</text><polyline points="34.0,160.6 99.8,166.7 165.5,163.7 231.2,176.0 297.0,154.4 362.8,154.4 428.5,151.3 494.2,163.7 560.0,166.7" fill="none" stroke="#cc217f" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/><circle cx="34.0" cy="160.6" r="3.5" fill="#cc217f"><title>東京 2026-06-15: 5</title></circle><circle cx="99.8" cy="166.7" r="3.5" fill="#cc217f"><title>東京 2026-06-22: 3</title></circle><circle cx="165.5" cy="163.7" r="3.5" fill="#cc217f"><title>東京 2026-06-29: 4</title></circle><circle cx="231.2" cy="176.0" r="3.5" fill="#cc217f"><title>東京 2026-07-06: 0</title></circle><circle cx="297.0" cy="154.4" r="3.5" fill="#cc217f"><title>東京 2026-07-13: 7</title></circle><circle cx="362.8" cy="154.4" r="3.5" fill="#cc217f"><title>東京 2026-07-20: 7</title></circle><circle cx="428.5" cy="151.3" r="3.5" fill="#cc217f"><title>東京 2026-07-27: 8</title></circle><circle cx="494.2" cy="163.7" r="3.5" fill="#cc217f"><title>東京 2026-08-03: 4</title></circle><circle cx="560.0" cy="166.7" r="3.5" fill="#cc217f"><title>東京 2026-08-10: 3</title></circle><polyline points="34.0,160.6 99.8,86.5 165.5,117.3 231.2,105.0 297.0,83.4 362.8,52.5 428.5,49.4 494.2,34.0 560.0,64.9" fill="none" stroke="#4a9fd8" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/><circle cx="34.0" cy="160.6" r="3.5" fill="#4a9fd8"><title>関西 2026-06-15: 5</title></circle><circle cx="99.8" cy="86.5" r="3.5" fill="#4a9fd8"><title>関西 2026-06-22: 29</title></circle><circle cx="165.5" cy="117.3" r="3.5" fill="#4a9fd8"><title>関西 2026-06-29: 19</title></circle><circle cx="231.2" cy="105.0" r="3.5" fill="#4a9fd8"><title>関西 2026-07-06: 23</title></circle><circle cx="297.0" cy="83.4" r="3.5" fill="#4a9fd8"><title>関西 2026-07-13: 30</title></circle><circle cx="362.8" cy="52.5" r="3.5" fill="#4a9fd8"><title>関西 2026-07-20: 40</title></circle><circle cx="428.5" cy="49.4" r="3.5" fill="#4a9fd8"><title>関西 2026-07-27: 41</title></circle><circle cx="494.2" cy="34.0" r="3.5" fill="#4a9fd8"><title>関西 2026-08-03: 46</title></circle><circle cx="560.0" cy="64.9" r="3.5" fill="#4a9fd8"><title>関西 2026-08-10: 36</title></circle><text x="34.0" y="202" class="xlab">06-15</text><text x="99.8" y="202" class="xlab">06-22</text><text x="165.5" y="202" class="xlab">06-29</text><text x="231.2" y="202" class="xlab">07-06</text><text x="297.0" y="202" class="xlab">07-13</text><text x="362.8" y="202" class="xlab">07-20</text><text x="428.5" y="202" class="xlab">07-27</text><text x="494.2" y="202" class="xlab">08-03</text><text x="560.0" y="202" class="xlab">08-10</text></svg></div>
+  <div class="card"><h3>今週の自動診断</h3>
+    <p class="note">データから機械的に判定した要注意ポイントと好調ポイント（毎週自動更新）</p>
+    <ul class="diag-list">${diagItems().map(d=>`<li class="${d.lv}"><i>${{warn:"⚠️",good:"✅",info:"💡"}[d.lv]}</i><span>${d.t}</span></li>`).join("")}</ul>
+    ${(c=>c?`<div class="ai-review-box">🤖 <b>AI分析（Gemini 3.6 Flash）</b>\n${escT(c)}</div>
+      <p class="hint">この分析は今週分として保存済み。データが更新される来週また生成できます</p>`
+      :`<p style="margin-top:8px"><span class="btn" id="ai-review-btn">🤖 AIの週次分析を生成する</span></p>
+      <p class="hint">押すとAI（Gemini 3.6 Flash）が今週のデータを総評します（無料枠を1回分使用）</p>`)(localStorage.getItem(aiReviewKey()))}
+    <p class="hint">深掘りしたいときは右下の「💬 AIに相談」でこのデータについて質問できます</p>
   </div>
-</div>
+  <div class="two">
+    <div class="card"><h3>東京 vs 関西（セッション）</h3>
+      <p class="note">キャンペーンの主戦場・東京が伸びているか</p>
+      <div class="legend"><span><i style="background:${COLORS.pink}"></i>東京</span><span><i style="background:${COLORS.blue}"></i>関西</span></div>
+      <div class="scroll">${lineChart(ws.map(w=>w.week),[
+        {label:"東京",vals:ws.map(w=>w.tokyo),color:COLORS.pink},
+        {label:"関西",vals:ws.map(w=>w.kansai),color:COLORS.blue}])}</div></div>
+    <div class="card"><h3>体験予約クリック（東京4店 vs 関西3店）</h3>
+      <p class="note">サイトが送客できた数</p>
+      <div class="legend"><span><i style="background:${COLORS.pink}"></i>東京4店舗</span><span><i style="background:${COLORS.blue}"></i>関西3店舗</span></div>
+      <div class="scroll">${lineChart(ws.map(w=>w.week),[
+        {label:"東京4店舗",vals:ws.map(w=>D.tokyoStores.reduce((a,s)=>a+(w.stores[s]||0),0)),color:COLORS.pink},
+        {label:"関西3店舗",vals:ws.map(w=>Object.entries(w.stores).reduce((a,[s,v])=>a+(D.tokyoStores.includes(s)?0:v),0)),color:COLORS.blue}])}</div></div>
+  </div>`;
+}
 
-<div class="two">
-  <div class="card">
-    <h3>検索での見え方（Search Console）</h3>
-    <div class="legend"><span><i style="background:#B08D4F"></i>表示回数</span><span><i style="background:#0F182B"></i>クリック</span></div>
-    <div class="scroll"><svg viewBox="0 0 594 210" class="chart" preserveAspectRatio="xMidYMid meet"><line x1="34" y1="34.0" x2="560" y2="34.0" class="grid"/><text x="28" y="38.0" class="ylab">1,705</text><line x1="34" y1="69.5" x2="560" y2="69.5" class="grid"/><text x="28" y="73.5" class="ylab">1,279</text><line x1="34" y1="105.0" x2="560" y2="105.0" class="grid"/><text x="28" y="109.0" class="ylab">852</text><line x1="34" y1="140.5" x2="560" y2="140.5" class="grid"/><text x="28" y="144.5" class="ylab">426</text><line x1="34" y1="176.0" x2="560" y2="176.0" class="grid"/><text x="28" y="180.0" class="ylab">0</text><polyline points="34.0,176.0 99.8,63.8 165.5,76.5 231.2,84.6 297.0,93.5 362.8,75.9 428.5,63.9 494.2,70.1 560.0,34.0" fill="none" stroke="#B08D4F" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/><circle cx="34.0" cy="176.0" r="3.5" fill="#B08D4F"><title>表示 2026-06-15: 0</title></circle><circle cx="99.8" cy="63.8" r="3.5" fill="#B08D4F"><title>表示 2026-06-22: 1,347</title></circle><circle cx="165.5" cy="76.5" r="3.5" fill="#B08D4F"><title>表示 2026-06-29: 1,195</title></circle><circle cx="231.2" cy="84.6" r="3.5" fill="#B08D4F"><title>表示 2026-07-06: 1,098</title></circle><circle cx="297.0" cy="93.5" r="3.5" fill="#B08D4F"><title>表示 2026-07-13: 991</title></circle><circle cx="362.8" cy="75.9" r="3.5" fill="#B08D4F"><title>表示 2026-07-20: 1,202</title></circle><circle cx="428.5" cy="63.9" r="3.5" fill="#B08D4F"><title>表示 2026-07-27: 1,346</title></circle><circle cx="494.2" cy="70.1" r="3.5" fill="#B08D4F"><title>表示 2026-08-03: 1,272</title></circle><circle cx="560.0" cy="34.0" r="3.5" fill="#B08D4F"><title>表示 2026-08-10: 1,705</title></circle><polyline points="34.0,176.0 99.8,128.4 165.5,158.3 231.2,162.1 297.0,164.8 362.8,162.3 428.5,162.3 494.2,160.9 560.0,156.3" fill="none" stroke="#0F182B" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/><circle cx="34.0" cy="176.0" r="3.5" fill="#0F182B"><title>クリック 2026-06-15: 0</title></circle><circle cx="99.8" cy="128.4" r="3.5" fill="#0F182B"><title>クリック 2026-06-22: 572</title></circle><circle cx="165.5" cy="158.3" r="3.5" fill="#0F182B"><title>クリック 2026-06-29: 212</title></circle><circle cx="231.2" cy="162.1" r="3.5" fill="#0F182B"><title>クリック 2026-07-06: 167</title></circle><circle cx="297.0" cy="164.8" r="3.5" fill="#0F182B"><title>クリック 2026-07-13: 134</title></circle><circle cx="362.8" cy="162.3" r="3.5" fill="#0F182B"><title>クリック 2026-07-20: 165</title></circle><circle cx="428.5" cy="162.3" r="3.5" fill="#0F182B"><title>クリック 2026-07-27: 164</title></circle><circle cx="494.2" cy="160.9" r="3.5" fill="#0F182B"><title>クリック 2026-08-03: 181</title></circle><circle cx="560.0" cy="156.3" r="3.5" fill="#0F182B"><title>クリック 2026-08-10: 236</title></circle><text x="34.0" y="202" class="xlab">06-15</text><text x="99.8" y="202" class="xlab">06-22</text><text x="165.5" y="202" class="xlab">06-29</text><text x="231.2" y="202" class="xlab">07-06</text><text x="297.0" y="202" class="xlab">07-13</text><text x="362.8" y="202" class="xlab">07-20</text><text x="428.5" y="202" class="xlab">07-27</text><text x="494.2" y="202" class="xlab">08-03</text><text x="560.0" y="202" class="xlab">08-10</text></svg></div>
+function vStores(){
+  const ws=slice();
+  const names=["全店",...D.storeNames];
+  const get=(w,f)=>S.store==="全店"
+    ? Object.values(f(w)).reduce((a,b)=>a+b,0) : (f(w)[S.store]||0);
+  const rows=D.storeNames.map(nm=>{
+    const v=W.reduce((a,w)=>a+(w.storeViews[nm]||0),0);
+    const c=W.reduce((a,w)=>a+(w.stores[nm]||0),0);
+    const lw=W[W.length-1];
+    return {nm,v,c,cvr:v?+(c/v*100).toFixed(1):0,lv:lw.storeViews[nm]||0,lc:lw.stores[nm]||0,
+      tokyo:D.tokyoStores.includes(nm)};});
+  rows.sort((a,b)=>b.v-a.v);
+  return `
+  <div class="card"><h3>店舗を選ぶ</h3>
+    ${chips(names.map(n=>[n,n+(D.tokyoStores.includes(n)?" ★":"")]),S.store,"store")}
+    <div class="legend"><span><i style="background:${COLORS.navy}"></i>店舗ページ閲覧</span><span><i style="background:${COLORS.gold}"></i>予約クリック</span></div>
+    ${periodChips()}
+    <div class="scroll">${lineChart(ws.map(w=>w.week),[
+      {label:"閲覧",vals:ws.map(w=>get(w,x=>x.storeViews)),color:COLORS.navy},
+      {label:"予約クリック",vals:ws.map(w=>get(w,x=>x.stores)),color:COLORS.gold}])}</div>
   </div>
-  <div class="card">
-    <h3>キャンペーンLP・LINE</h3>
-    <div class="legend"><span><i style="background:#06c755"></i>LINE友だち追加</span></div>
-    <div class="scroll"><svg viewBox="0 0 594 210" class="chart" preserveAspectRatio="xMidYMid meet"><line x1="34" y1="34.0" x2="560" y2="34.0" class="grid"/><text x="28" y="38.0" class="ylab">1</text><line x1="34" y1="69.5" x2="560" y2="69.5" class="grid"/><text x="28" y="73.5" class="ylab">1</text><line x1="34" y1="105.0" x2="560" y2="105.0" class="grid"/><text x="28" y="109.0" class="ylab">0</text><line x1="34" y1="140.5" x2="560" y2="140.5" class="grid"/><text x="28" y="144.5" class="ylab">0</text><line x1="34" y1="176.0" x2="560" y2="176.0" class="grid"/><text x="28" y="180.0" class="ylab">0</text><polyline points="34.0,176.0 99.8,176.0 165.5,176.0 231.2,176.0 297.0,176.0 362.8,176.0 428.5,176.0 494.2,176.0 560.0,176.0" fill="none" stroke="#06c755" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/><circle cx="34.0" cy="176.0" r="3.5" fill="#06c755"><title>LINE 2026-06-15: 0</title></circle><circle cx="99.8" cy="176.0" r="3.5" fill="#06c755"><title>LINE 2026-06-22: 0</title></circle><circle cx="165.5" cy="176.0" r="3.5" fill="#06c755"><title>LINE 2026-06-29: 0</title></circle><circle cx="231.2" cy="176.0" r="3.5" fill="#06c755"><title>LINE 2026-07-06: 0</title></circle><circle cx="297.0" cy="176.0" r="3.5" fill="#06c755"><title>LINE 2026-07-13: 0</title></circle><circle cx="362.8" cy="176.0" r="3.5" fill="#06c755"><title>LINE 2026-07-20: 0</title></circle><circle cx="428.5" cy="176.0" r="3.5" fill="#06c755"><title>LINE 2026-07-27: 0</title></circle><circle cx="494.2" cy="176.0" r="3.5" fill="#06c755"><title>LINE 2026-08-03: 0</title></circle><circle cx="560.0" cy="176.0" r="3.5" fill="#06c755"><title>LINE 2026-08-10: 0</title></circle><text x="34.0" y="202" class="xlab">06-15</text><text x="99.8" y="202" class="xlab">06-22</text><text x="165.5" y="202" class="xlab">06-29</text><text x="231.2" y="202" class="xlab">07-06</text><text x="297.0" y="202" class="xlab">07-13</text><text x="362.8" y="202" class="xlab">07-20</text><text x="428.5" y="202" class="xlab">07-27</text><text x="494.2" y="202" class="xlab">08-03</text><text x="560.0" y="202" class="xlab">08-10</text></svg></div>
+  <div class="card"><h3>店舗別の累計成績（公開〜現在）</h3>
+    <p class="note">★=キャンペーン対象の東京4店舗 ／ 行クリックでグラフを切替</p>
+    <div class="scroll"><table><thead><tr><th>店舗</th><th>ページ閲覧</th><th>予約クリック</th>
+    <th>転換率</th><th>直近週の閲覧</th><th>直近週のクリック</th></tr></thead><tbody>
+    ${rows.map(r=>`<tr data-store="${r.nm}" style="cursor:pointer" class="${r.v>=30&&r.c===0?"warn":""}">
+      <td>${r.nm}${r.tokyo?" ★":""}</td><td>${fmt(r.v)}</td><td>${fmt(r.c)}</td>
+      <td>${r.cvr}%</td><td>${fmt(r.lv)}</td><td>${fmt(r.lc)}</td></tr>`).join("")}
+    </tbody></table></div>
+    <p class="hint">薄ピンクの行 = 閲覧はあるのに予約クリック0（改善の優先候補）</p>
+  </div>`;
+}
+
+const CH_JP={"Organic Search":"無料の検索から","Paid Search":"検索広告","Direct":"直接アクセス",
+  "Referral":"他サイトのリンク","Organic Social":"SNS投稿から","Paid Social":"SNS広告","Email":"メール",
+  "Display":"バナー広告","Organic Video":"動画から","Unassigned":"分類不能","Cross-network":"複合広告",
+  "Affiliates":"アフィリエイト","Organic Shopping":"ショッピング","AI Assistant":"AI経由"};
+const CH_DESC={"Organic Search":"GoogleやYahoo!で検索して、広告ではなく検索結果からたどり着いた訪問。SEO(検索対策)の成果がここに出ます",
+  "Direct":"URLを直接入力・ブックマーク・QRコード・LINEのトークなどから。店名を知っている人やリピーターが中心",
+  "Organic Social":"InstagramなどSNSの通常投稿(広告ではない)から来た訪問",
+  "Paid Social":"InstagramなどのSNS広告から来た訪問",
+  "Paid Search":"Google広告など、検索結果の広告枠から来た訪問",
+  "Referral":"ほかのWebサイトに貼られたリンクから来た訪問(例:ポータルサイト・ブログ)",
+  "Email":"メールの中のリンクから来た訪問",
+  "Unassigned":"出どころをGoogleが判別できなかった訪問(アプリ内ブラウザ経由などで起きがち)",
+  "Organic Video":"YouTubeなど動画サイトから来た訪問",
+  "Display":"Webサイト上のバナー広告から来た訪問",
+  "AI Assistant":"ChatGPTなどのAIチャットが紹介したリンクから来た訪問。最近増えている新しい経路"};
+const chJp=c=>CH_JP[c]?`${c}（${CH_JP[c]}）`:c;
+function vTraffic(){
+  const ws=slice();
+  const chTot=sum(W,w=>w.channels), top=chTot.slice(0,5).map(x=>x[0]);
+  const series=top.map((c,i)=>({label:chJp(c),vals:ws.map(w=>w.channels[c]||0),color:CH_COLORS[i%CH_COLORS.length]}));
+  const devTot=sum(W,w=>w.devices);
+  const devJp={mobile:"スマホ",desktop:"PC",tablet:"タブレット"};
+  const lw=W[W.length-1];
+  return `
+  <div class="card"><h3>流入チャネルの推移</h3>
+    <p class="note">「どこから来たか」の分類別のセッション数。各分類の意味は下の用語解説へ</p>
+    <div class="legend">${top.map((c,i)=>`<span><i style="background:${CH_COLORS[i%CH_COLORS.length]}"></i>${chJp(c)}</span>`).join("")}</div>
+    ${periodChips()}
+    <div class="scroll">${lineChart(ws.map(w=>w.week),series)}</div></div>
+  <div class="two">
+    <div class="card"><h3>チャネル別 累計</h3>${hbars(chTot.slice(0,7).map(([k,v])=>[chJp(k),v]),COLORS.navy)}</div>
+    <div class="card"><h3>参照元 累計（上位）</h3>
+      <p class="note">具体的にどのサイト・サービスから来たか</p>${hbars(sum(W,w=>w.sources).slice(0,8),COLORS.pink)}</div>
   </div>
-</div>
+  <div class="two">
+    <div class="card"><h3>端末（累計）</h3>${hbars(devTot.map(([k,v])=>[devJp[k]||k,v]),COLORS.gold)}
+      <p class="hint">直近週のスマホ比率:
+      ${(()=>{const t=Object.values(lw.devices).reduce((a,b)=>a+b,0);
+        return t?Math.round((lw.devices.mobile||0)/t*100):0})()}%</p></div>
+    <div class="card"><h3>最初に着地したページ（累計）</h3>${hbars(sum(W,w=>w.landings).slice(0,8),COLORS.teal)}</div>
+  </div>
+  <div class="card"><h3>よく見られたページ（累計）</h3>${hbars(sum(W,w=>w.pages).slice(0,10),COLORS.purple)}</div>
+  <div class="card"><h3>用語の解説（流入チャネルとは）</h3>
+    <p class="note">Google Analyticsが「訪問者がどこから来たか」を自動分類したもの。このサイトで実際に発生している分類だけを載せています</p>
+    <ul class="diag-list">${chTot.filter(([k])=>CH_DESC[k]).map(([k,v])=>
+      `<li><i>🔎</i><span><b>${chJp(k)}</b>｜累計${fmt(v)}セッション\n${CH_DESC[k]}</span></li>`).join("")}</ul>
+  </div>`;
+}
 
-<h2>累計（公開〜現在）</h2>
-<div class="two">
-  <div class="card"><h3>店舗別 体験予約クリック</h3>
-    <div class="bars"><div class="bar-row"><span class="bar-name">神戸店</span><span class="bar-track"><span class="bar-fill" style="width:100.0%;background:#cc217f"></span></span><span class="bar-val">116</span></div><div class="bar-row"><span class="bar-name">箕面店</span><span class="bar-track"><span class="bar-fill" style="width:88.8%;background:#cc217f"></span></span><span class="bar-val">103</span></div><div class="bar-row"><span class="bar-name">神戸トアロード店</span><span class="bar-track"><span class="bar-fill" style="width:43.1%;background:#cc217f"></span></span><span class="bar-val">50</span></div><div class="bar-row"><span class="bar-name">千駄ヶ谷店</span><span class="bar-track"><span class="bar-fill" style="width:9.5%;background:#cc217f"></span></span><span class="bar-val">11</span></div><div class="bar-row"><span class="bar-name">赤坂店</span><span class="bar-track"><span class="bar-fill" style="width:8.6%;background:#cc217f"></span></span><span class="bar-val">10</span></div><div class="bar-row"><span class="bar-name">麹町店</span><span class="bar-track"><span class="bar-fill" style="width:8.6%;background:#cc217f"></span></span><span class="bar-val">10</span></div><div class="bar-row"><span class="bar-name">西新宿店</span><span class="bar-track"><span class="bar-fill" style="width:8.6%;background:#cc217f"></span></span><span class="bar-val">10</span></div></div></div>
-  <div class="card"><h3>流入チャネル</h3>
-    <div class="bars"><div class="bar-row"><span class="bar-name">Organic Search</span><span class="bar-track"><span class="bar-fill" style="width:100.0%;background:#0F182B"></span></span><span class="bar-val">3,152</span></div><div class="bar-row"><span class="bar-name">Direct</span><span class="bar-track"><span class="bar-fill" style="width:42.2%;background:#0F182B"></span></span><span class="bar-val">1,330</span></div><div class="bar-row"><span class="bar-name">Organic Social</span><span class="bar-track"><span class="bar-fill" style="width:28.6%;background:#0F182B"></span></span><span class="bar-val">903</span></div><div class="bar-row"><span class="bar-name">Unassigned</span><span class="bar-track"><span class="bar-fill" style="width:8.0%;background:#0F182B"></span></span><span class="bar-val">253</span></div><div class="bar-row"><span class="bar-name">Referral</span><span class="bar-track"><span class="bar-fill" style="width:3.1%;background:#0F182B"></span></span><span class="bar-val">98</span></div><div class="bar-row"><span class="bar-name">Organic Video</span><span class="bar-track"><span class="bar-fill" style="width:1.9%;background:#0F182B"></span></span><span class="bar-val">60</span></div><div class="bar-row"><span class="bar-name">AI Assistant</span><span class="bar-track"><span class="bar-fill" style="width:0.7%;background:#0F182B"></span></span><span class="bar-val">23</span></div></div></div>
-</div>
+function vSearch(){
+  const ws=slice();
+  const tkCount=D.areaQueries.filter(q=>q.tokyo).length;
+  const ctr=(c,i)=>i?(c/i*100).toFixed(1)+"%":"—";
+  const qtable=(rows,warn)=>rows.length?`<div class="scroll"><table><thead><tr>
+    <th>検索キーワード</th><th>表示</th><th>クリック</th><th>クリック率</th><th>平均順位</th></tr></thead><tbody>
+    ${rows.map(r=>`<tr class="${warn&&r.tokyo?"warn":""}"><td>${r.q}${r.tokyo?" 🗼":""}</td>
+    <td>${fmt(r.imp)}</td><td>${fmt(r.clicks)}</td><td>${ctr(r.clicks,r.imp)}</td><td>${r.pos}</td></tr>`).join("")}
+    </tbody></table></div>`:'<p class="empty">データなし</p>';
+  return `
+  <div class="card"><h3>検索での表示回数・クリックの推移</h3>
+    <div class="legend"><span><i style="background:${COLORS.teal}"></i>表示回数</span><span><i style="background:${COLORS.orange}"></i>クリック</span></div>
+    ${periodChips()}
+    <div class="scroll">${lineChart(ws.map(w=>w.week),[
+      {label:"表示回数",vals:ws.map(w=>w.sc_imp),color:COLORS.teal},
+      {label:"クリック",vals:ws.map(w=>w.sc_clicks),color:COLORS.orange}])}</div></div>
+  <div class="card"><h3>クリック率（CTR）の推移</h3>
+    <p class="note">表示されたうち、実際にクリックされた割合。順位が上がるとここが伸びます</p>
+    <div class="scroll">${lineChart(ws.map(w=>w.week),[
+      {label:"クリック率",vals:ws.map(w=>w.sc_imp?+(w.sc_clicks/w.sc_imp*100).toFixed(1):0),color:COLORS.pink}],{h:170,unit:"%"})}</div></div>
+  <div class="card"><h3>平均掲載順位の推移（下がるほど良い＝検索結果の何番目に出たか）</h3>
+    <div class="scroll">${lineChart(ws.map(w=>w.week),[
+      {label:"平均順位",vals:ws.map(w=>w.sc_pos),color:COLORS.navy}],{h:170,unit:"位"})}</div></div>
+  <div class="two">
+    <div class="card"><h3>検索キーワード 上位（累計）</h3>${qtable(D.scQueries.slice(0,15),false)}</div>
+    <div class="card"><h3>地域キーワード（MEO指標）</h3>
+      <p class="note">🗼=東京エリア（現在 ${tkCount}種）${tkCount<5?" ─ 東京のローカル検索での露出が課題":""}</p>
+      ${qtable(D.areaQueries.slice(0,15),true)}</div>
+  </div>`;
+}
 
-<h2>全週データ</h2>
-<div class="card scroll" style="padding:0">
-<table>
-<thead><tr><th>週</th><th>訪問者</th><th>セッション</th><th>予約クリック</th><th>CVR</th>
-<th>LINE</th><th>東京</th><th>関西</th><th>LP閲覧</th><th>検索表示</th><th>検索クリック</th></tr></thead>
-<tbody><tr><td>2026-08-10〜08/16</td><td>486</td><td>651</td><td>39</td><td>6.0%</td><td>0</td><td>108</td><td>171</td><td>0</td><td>1,705</td><td>236</td></tr><tr><td>2026-08-03〜08/09</td><td>393</td><td>587</td><td>50</td><td>8.5%</td><td>0</td><td>116</td><td>162</td><td>0</td><td>1,272</td><td>181</td></tr><tr><td>2026-07-27〜08/02</td><td>340</td><td>452</td><td>49</td><td>10.8%</td><td>0</td><td>80</td><td>178</td><td>0</td><td>1,346</td><td>164</td></tr><tr><td>2026-07-20〜07/26</td><td>364</td><td>514</td><td>47</td><td>9.1%</td><td>0</td><td>84</td><td>192</td><td>0</td><td>1,202</td><td>165</td></tr><tr><td>2026-07-13〜07/19</td><td>268</td><td>382</td><td>37</td><td>9.7%</td><td>0</td><td>54</td><td>132</td><td>0</td><td>991</td><td>134</td></tr><tr><td>2026-07-06〜07/12</td><td>402</td><td>556</td><td>23</td><td>4.1%</td><td>0</td><td>113</td><td>148</td><td>0</td><td>1,098</td><td>167</td></tr><tr><td>2026-06-29〜07/05</td><td>478</td><td>687</td><td>23</td><td>3.3%</td><td>0</td><td>95</td><td>198</td><td>0</td><td>1,195</td><td>212</td></tr><tr><td>2026-06-22〜06/28</td><td>1,603</td><td>1,963</td><td>32</td><td>1.6%</td><td>0</td><td>309</td><td>559</td><td>0</td><td>1,347</td><td>572</td></tr><tr><td>2026-06-15〜06/21</td><td>13</td><td>27</td><td>10</td><td>37.0%</td><td>0</td><td>0</td><td>27</td><td>0</td><td>0</td><td>0</td></tr></tbody></table></div>
+function vLp(){
+  const ws=slice();
+  const ctaTot=sum(W,w=>w.cta);
+  const lpTotal=W.reduce((a,w)=>a+w.lp,0), lineTotal=W.reduce((a,w)=>a+w.line,0);
+  return `
+  <div class="kpis">
+    <div class="kpi"><p class="kpi-t">LP閲覧（累計）</p><p class="kpi-v">${fmt(lpTotal)}</p></div>
+    <div class="kpi"><p class="kpi-t">LINE友だち追加クリック（累計）</p><p class="kpi-v">${fmt(lineTotal)}</p></div>
+    <div class="kpi"><p class="kpi-t">LP→LINE転換率</p><p class="kpi-v">${lpTotal?(lineTotal/lpTotal*100).toFixed(1):0}<small>%</small></p></div>
+  </div>
+  <div class="card"><h3>LP閲覧とLINE友だち追加の推移</h3>
+    <p class="note">LPは2026-08-18公開。計測もその日からです</p>
+    <div class="legend"><span><i style="background:${COLORS.blue}"></i>LP閲覧</span><span><i style="background:${COLORS.green}"></i>LINE友だち追加</span></div>
+    ${periodChips()}
+    <div class="scroll">${lineChart(ws.map(w=>w.week),[
+      {label:"LP閲覧",vals:ws.map(w=>w.lp),color:COLORS.blue},
+      {label:"LINE追加",vals:ws.map(w=>w.line),color:COLORS.green}])}</div></div>
+  <div class="card"><h3>LINEボタンが押された場所（累計）</h3>
+    ${ctaTot.length?hbars(ctaTot,COLORS.green):'<p class="empty">まだクリックがありません。データが入ると、LP内のどのボタンが効いているかが表示されます</p>'}</div>`;
+}
 
-<p class="meta" style="margin-top:22px">
-累計 体験予約クリック <b>310件</b>／
-Googleマップ（MEO）の数字は週報の手入力欄をご覧ください。
-</p>
-</div></body></html>
+function vTable(){
+  const cols=[["week","週"],["users","訪問者"],["sessions","セッション"],["reserve","予約クリック"],
+    ["cvr","CVR%"],["line","LINE"],["tokyo","東京"],["kansai","関西"],["lp","LP閲覧"],
+    ["sc_imp","検索表示"],["sc_clicks","検索クリック"],["sc_ctr","検索CTR%"],["sc_pos","平均順位"]];
+  const rows=W.map(w=>({...w,cvr:w.sessions?+(w.reserve/w.sessions*100).toFixed(1):0,
+    sc_ctr:w.sc_imp?+(w.sc_clicks/w.sc_imp*100).toFixed(1):0}));
+  rows.sort((a,b)=>{const k=S.sort.key,d=S.sort.dir;
+    return (a[k]>b[k]?1:a[k]<b[k]?-1:0)*d;});
+  return `
+  <div class="card"><h3>全週データ</h3>
+    <p class="note">列見出しをクリックすると並び替え ／ CSVで会議資料にも使えます</p>
+    <p style="margin-bottom:8px"><span class="btn" id="csv">CSVをダウンロード</span></p>
+    <div class="scroll"><table><thead><tr>
+      ${cols.map(([k,l])=>`<th data-sort="${k}">${l}${S.sort.key===k?(S.sort.dir>0?" ▲":" ▼"):""}</th>`).join("")}
+    </tr></thead><tbody>
+      ${rows.map(w=>`<tr><td>${w.week}</td>${cols.slice(1).map(([k])=>`<td>${fmt(w[k])}</td>`).join("")}</tr>`).join("")}
+    </tbody></table></div></div>`;
+}
+
+/* ---------- 自動診断 ---------- */
+function diagItems(){
+  const out=[], lw=W[W.length-1], pw=W[W.length-2];
+  const agg={}; D.storeNames.forEach(nm=>agg[nm]={v:0,c:0});
+  for(const w of W){
+    for(const k in w.storeViews) if(agg[k]) agg[k].v+=w.storeViews[k];
+    for(const k in w.stores) if(agg[k]) agg[k].c+=w.stores[k];
+  }
+  const rated=Object.entries(agg).filter(([,a])=>a.v>=30&&a.c>0).sort((x,y)=>y[1].c/y[1].v-x[1].c/x[1].v);
+  const best=rated[0];
+  for(const [nm,a] of Object.entries(agg)){
+    if(a.v>=30&&(a.c===0||(best&&a.c/a.v<best[1].c/best[1].v*0.4)))
+      out.push({lv:"warn",t:`${nm}：ページ閲覧${a.v}に対し予約クリック${a.c}（転換率${(a.c/a.v*100).toFixed(1)}%）。`+
+        (best?`${best[0]}の${(best[1].c/best[1].v*100).toFixed(1)}%と比べ低く、ページ内容や予約導線の見直しが優先課題`:"予約導線の見直しが優先課題")});
+  }
+  const tkV=D.tokyoStores.reduce((s,nm)=>s+agg[nm].v,0);
+  const knV=Object.entries(agg).reduce((s,[nm,a])=>s+(D.tokyoStores.includes(nm)?0:a.v),0);
+  if(knV>0&&tkV<knV*0.5)
+    out.push({lv:"warn",t:`東京4店舗の店舗ページ閲覧は累計${fmt(tkV)}で、関西3店舗（${fmt(knV)}）の半分未満。キャンペーン中の東京こそ店舗ページへの導線強化が必要`});
+  const tkq=D.areaQueries.filter(q=>q.tokyo).length;
+  if(tkq<5) out.push({lv:"warn",t:`検索に表示される地域キーワードのうち東京系は${tkq}種のみ（関西系が大半）。東京エリアの検索露出（SEO/MEO）が課題`});
+  if(pw){
+    if(lw.reserve<pw.reserve*0.8) out.push({lv:"warn",t:`体験予約クリックが${pw.reserve}→${lw.reserve}に減少（${((lw.reserve-pw.reserve)/pw.reserve*100).toFixed(0)}%）。要因の確認を`});
+    else if(lw.reserve>pw.reserve*1.2) out.push({lv:"good",t:`体験予約クリックが${pw.reserve}→${lw.reserve}に増加。この調子`});
+    if(lw.sc_clicks>pw.sc_clicks&&lw.sc_imp>pw.sc_imp)
+      out.push({lv:"good",t:`検索は表示${fmt(pw.sc_imp)}→${fmt(lw.sc_imp)}・クリック${pw.sc_clicks}→${lw.sc_clicks}と伸びており、検索経由の集客は好調`});
+  }
+  const lpT=W.reduce((a,w)=>a+w.lp,0), lnT=W.reduce((a,w)=>a+w.line,0);
+  if(lpT>0) out.push({lv:"info",t:`キャンペーンLPは閲覧${fmt(lpT)}・LINE追加${lnT}${lnT===0?"。まずはLPへの流入を増やす段階（SNS・店頭・バナーでの告知）":`（転換率${(lnT/lpT*100).toFixed(1)}%）`}`});
+  const mob=Object.entries(W.reduce((m,w)=>{for(const k in w.devices)m[k]=(m[k]||0)+w.devices[k];return m},{}));
+  const mt=mob.reduce((s,[,v])=>s+v,0), mv=mob.find(([k])=>k==="mobile");
+  if(mv&&mv[1]/mt>0.8) out.push({lv:"info",t:`閲覧の${(mv[1]/mt*100).toFixed(0)}%がスマホ。施策や新ページは常にスマホ表示を最優先で確認を`});
+  out.sort((a,b)=>({warn:0,good:1,info:2}[a.lv]-{warn:0,good:1,info:2}[b.lv]));
+  return out.slice(0,6);
+}
+const VIEWS={overview:vOverview,stores:vStores,traffic:vTraffic,search:vSearch,lp:vLp,table:vTable};
+function render(){
+  $("#tabs").innerHTML=TABS.map(([k,l])=>`<span class="tab ${S.tab===k?"on":""}" data-tab="${k}">${l}</span>`).join("");
+  $("#view").innerHTML=VIEWS[S.tab]();
+}
+document.addEventListener("click",e=>{
+  const t=e.target.closest("[data-tab],[data-metric],[data-period],[data-store],[data-sort],#csv,#ai-review-btn,tr[data-store]");
+  if(!t)return;
+  if(t.id==="ai-review-btn"){
+    t.innerHTML='🤖 分析中（10秒ほどお待ちください）<span class="ai-typing"><i></i><i></i><i></i></span>';
+    t.style.pointerEvents="none";
+    fetch("api.php",{method:"POST",headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({question:"直近週のデータを総評してください。①今週の総評（2〜3行） ②良かった点 ③悪かった点 ④来週の最優先の打ち手（1つに絞る）を、必ず具体的な数字を根拠に、全体で400字以内でまとめてください。",history:[]})})
+    .then(r=>r.json()).then(j=>{
+      if(j.answer){localStorage.setItem(aiReviewKey(),j.answer);render();}
+      else{t.textContent="エラー: "+(j.error||"取得に失敗しました");t.style.pointerEvents="";}
+    }).catch(()=>{t.textContent="接続できません（本番の /dashboard/ でご利用ください）";t.style.pointerEvents="";});
+    return;
+  }
+  if(t.dataset.tab){S.tab=t.dataset.tab;render();window.scrollTo({top:0});}
+  else if(t.dataset.metric){S.metric=t.dataset.metric;S.tab="overview";render();
+    const c=document.querySelector("#metric-chart");
+    if(c){const r=c.getBoundingClientRect();
+      if(r.top<0||r.bottom>window.innerHeight)c.scrollIntoView({behavior:"smooth",block:"nearest"});}}
+  else if(t.dataset.period){S.period=t.dataset.period;render();}
+  else if(t.dataset.store!==undefined&&t.dataset.store){S.store=t.dataset.store;S.tab="stores";render();}
+  else if(t.dataset.sort){const k=t.dataset.sort;
+    S.sort=S.sort.key===k?{key:k,dir:-S.sort.dir}:{key:k,dir:-1};render();}
+  else if(t.id==="csv"){
+    const cols=["week","users","sessions","reserve","line","tokyo","kansai","lp","sc_imp","sc_clicks","sc_pos"];
+    const head="週,訪問者,セッション,予約クリック,LINE追加,東京,関西,LP閲覧,検索表示,検索クリック,検索CTR%,平均順位";
+    const csv=[head,...W.map(w=>[...cols.slice(0,-1),"ctr","sc_pos"].map(k=>
+      k==="ctr"?(w.sc_imp?(w.sc_clicks/w.sc_imp*100).toFixed(1):0):w[k]).join(","))].join("\n");
+    const a=document.createElement("a");
+    a.href=URL.createObjectURL(new Blob(["﻿"+csv],{type:"text/csv"}));
+    a.download="joagolf_web_weekly.csv";a.click();}
+});
+const tip=$("#tip");
+document.addEventListener("mouseover",e=>{
+  const c=e.target.closest("[data-tip]");
+  if(c){tip.textContent=c.dataset.tip;tip.style.opacity=1;}
+  else tip.style.opacity=0;});
+document.addEventListener("mousemove",e=>{
+  if(tip.style.opacity==="1"){
+    tip.style.left=Math.min(e.clientX+14,window.innerWidth-tip.offsetWidth-8)+"px";
+    tip.style.top=(e.clientY-36)+"px";}});
+render();
+
+/* ---------- AIチャット ---------- */
+const AI_SUGS=["今、一番緊急で取り組むべきことは？","先週の結果を3行で要約して","東京の集客を伸ばすには？","検索対策は次に何をすべき？"];
+const aiHist=[];
+let aiBusy=false;
+const esc=s=>s.replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+function aiAdd(cls,text){
+  const d=document.createElement("div");
+  d.className="ai-m "+cls; d.innerHTML=esc(text);
+  $("#ai-msgs").appendChild(d);
+  $("#ai-msgs").scrollTop=$("#ai-msgs").scrollHeight;
+  return d;
+}
+function aiSugs(){
+  for(const q of AI_SUGS){
+    const b=document.createElement("button");
+    b.type="button"; b.className="ai-sug"; b.textContent=q;
+    b.onclick=()=>aiSend(q);
+    $("#ai-msgs").appendChild(b);
+  }
+}
+async function aiSend(q){
+  if(aiBusy||!q.trim())return;
+  aiBusy=true; $("#ai-send").disabled=true;
+  document.querySelectorAll(".ai-sug").forEach(x=>x.remove());
+  aiAdd("user",q);
+  const wait=aiAdd("model","");
+  wait.innerHTML='考え中<span class="ai-typing"><i></i><i></i><i></i></span>';
+  try{
+    const r=await fetch("api.php",{method:"POST",headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({question:q,history:aiHist})});
+    const j=await r.json();
+    wait.remove();
+    if(j.answer){
+      aiAdd("model",j.answer);
+      aiHist.push({role:"user",text:q},{role:"model",text:j.answer});
+      while(aiHist.length>8)aiHist.shift();
+    }else aiAdd("err",j.error||"エラーが発生しました");
+  }catch(e){
+    wait.remove();
+    aiAdd("err","AIサーバーに接続できません。社内ダッシュボード（joagolfstudio.jp/dashboard/）上でご利用ください。");
+  }
+  aiBusy=false; $("#ai-send").disabled=false;
+}
+$("#ai-fab").onclick=()=>{
+  $("#ai-panel").classList.add("open"); $("#ai-fab").style.display="none";
+  if(matchMedia("(max-width:767px)").matches)document.body.style.overflow="hidden";
+  if(!$("#ai-msgs").children.length){
+    aiAdd("model","こんにちは！このダッシュボードの数字について、なんでも聞いてください。");
+    aiSugs();
+  }
+  if(!matchMedia("(max-width:767px)").matches)$("#ai-in").focus();
+  aiFit();
+};
+$("#ai-close").onclick=()=>{$("#ai-panel").classList.remove("open");$("#ai-fab").style.display="";
+  document.body.style.overflow="";
+  $("#ai-panel").style.height="";$("#ai-panel").style.top="";};
+function aiFit(){
+  if(!window.visualViewport)return;
+  const p=$("#ai-panel");
+  if(!p.classList.contains("open")||!matchMedia("(max-width:767px)").matches){
+    p.style.height="";p.style.top="";return;
+  }
+  const vv=window.visualViewport;
+  p.style.top=vv.offsetTop+"px";
+  p.style.height=vv.height+"px";
+  $("#ai-msgs").scrollTop=$("#ai-msgs").scrollHeight;
+}
+if(window.visualViewport){
+  window.visualViewport.addEventListener("resize",aiFit);
+  window.visualViewport.addEventListener("scroll",aiFit);
+}
+$("#ai-form").addEventListener("submit",e=>{
+  e.preventDefault();
+  const q=$("#ai-in").value; $("#ai-in").value="";
+  aiSend(q);
+});
+</script></body></html>

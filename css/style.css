@@ -27,6 +27,12 @@ body {
   overflow-x: hidden;
 }
 
+/* スマホで画面外のメニュー等が横スクロール領域を作らないようにする(iOS Safari対策) */
+html {
+  overflow-x: hidden;
+  overflow-x: clip;
+}
+
 img {
   max-width: 100%;
   height: auto;
@@ -3418,7 +3424,8 @@ body:not(.is-result) .sticky-cta--result-only.is-visible {
     gap: 24px;
     padding: 90px 40px 40px;
     transform: translateX(100%);
-    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    visibility: hidden;
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), visibility 0s linear 0.4s;
     box-shadow: -8px 0 32px rgba(0, 0, 0, 0.08);
     overflow-y: auto;
   }
@@ -3428,6 +3435,8 @@ body:not(.is-result) .sticky-cta--result-only.is-visible {
 
   .nav.is-open {
     transform: translateX(0);
+    visibility: visible;
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), visibility 0s;
   }
 
   .nav__list {
