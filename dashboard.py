@@ -38,6 +38,8 @@ KANSAI_CITIES = ["Osaka", "Kobe", "Minoh", "Mino", "Kyoto", "Nishinomiya", "Ashi
 AREA_WORDS = ["麹町", "西新宿", "千駄ヶ谷", "赤坂", "新宿", "半蔵門", "北参道", "渋谷",
               "神戸", "元町", "三宮", "トアロード", "箕面", "東京", "大阪"]
 TOKYO_WORDS = ["麹町", "西新宿", "千駄ヶ谷", "赤坂", "新宿", "半蔵門", "北参道", "渋谷", "東京"]
+LINE_STORE = {"line-kojimachi": "麹町店", "line-nishi-shinjuku": "西新宿店",
+              "line-sendagaya": "千駄ヶ谷店", "line-akasaka": "赤坂店"}
 CTA_MAP = {"cta-header": "ヘッダー", "cta-hero": "ファーストビュー", "cta-nav": "メニュー内",
            "cta-offer": "料金セクション", "cta-final": "最終CTA", "cta-sticky": "追従ボタン"}
 
@@ -122,6 +124,11 @@ def fetch(c):
             name = CTA_MAP.get(lid)
             if name:
                 w["cta"][name] = w["cta"].get(name, 0) + n
+            # 東京4店舗のLINE予約ボタン(id=line-店舗-N)は店舗別の予約クリックにも計上
+            st = next((v for k, v in LINE_STORE.items() if lid and lid.startswith(k)), None)
+            if st:
+                w["reserve"] += n
+                w["stores"][st] = w["stores"].get(st, 0) + n
         elif "line.me" in url:
             w["share"] += n
         else:

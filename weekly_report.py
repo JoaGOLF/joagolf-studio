@@ -31,6 +31,18 @@ OUT_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "_reports")
 LP_PATH = "/campaign/tokyo-a-3months/"
 
 # 予約リンク → 店舗名
+# 東京4店舗は公式LINEが予約導線(2026-08-23〜)。ボタンのid(linkId)で店舗を判別する
+LINE_STORE = {"line-kojimachi": "麹町店", "line-nishi-shinjuku": "西新宿店",
+              "line-sendagaya": "千駄ヶ谷店", "line-akasaka": "赤坂店"}
+
+
+def line_store(link_id):
+    for k, v in LINE_STORE.items():
+        if link_id and link_id.startswith(k):
+            return v
+    return None
+
+
 RESERVE_MAP = {
     "schedule/3/11": "麹町店", "schedule/4/12": "西新宿店",
     "schedule/2/6": "千駄ヶ谷店", "schedule/1/5": "赤坂店",
@@ -167,23 +179,27 @@ def build(start, end, pstart, pend):
                  limit=10, order_by_metric="sessions")
 
     # ③ 外部クリック（予約・LINE）
-    out = ga4_run(ga, start, end, ["linkUrl"], ["eventCount"],
+    out = ga4_run(ga, start, end, ["linkUrl", "linkId"], ["eventCount"],
                   dim_filter=contains_filter("eventName", "click"),
-                  limit=100, order_by_metric="eventCount")
+                  limit=200, order_by_metric="eventCount")
     reserve, line_clicks, share_clicks = {}, 0, 0
-    for url, n in out:
-        if "page.line.me" in url:          # LINE友だち追加(キャンペーンLP)
+    for url, lid, n in out:
+        if "page.line.me" in url:          # LINE友だち追加(LP + 東京4店の予約ボタン)
             line_clicks += n
+            st = line_store(lid)           # 東京店舗ページのLINE予約ボタンは店舗別予約としても集計
+            if st:
+                reserve[st] = reserve.get(st, 0) + n
         elif "line.me" in url:             # 診断結果のLINEシェア
             share_clicks += n
         else:
             name = label_for(url, RESERVE_MAP)
             if name:
                 reserve[name] = reserve.get(name, 0) + n
-    prev_out = ga4_run(ga, pstart, pend, ["linkUrl"], ["eventCount"],
-                       dim_filter=contains_filter("eventName", "click"), limit=100)
-    prev_reserve = sum(n for u, n in prev_out if label_for(u, RESERVE_MAP))
-    prev_line = sum(n for u, n in prev_out if "page.line.me" in u)
+    prev_out = ga4_run(ga, pstart, pend, ["linkUrl", "linkId"], ["eventCount"],
+                       dim_filter=contains_filter("eventName", "click"), limit=200)
+    prev_reserve = sum(n for u, l, n in prev_out
+                       if label_for(u, RESERVE_MAP) or ("page.line.me" in u and line_store(l)))
+    prev_line = sum(n for u, l, n in prev_out if "page.line.me" in u)
 
     # ④ LP
     lp = ga4_run(ga, start, end, ["pagePath"], ["screenPageViews", "activeUsers"],
