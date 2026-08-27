@@ -2494,6 +2494,43 @@ button {
   line-height: 1.7;
 }
 
+/* 体験レッスン無料の訴求＋条件タグ */
+.price-lead__trial {
+  margin: -8px 0 10px;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.6;
+}
+
+.price-lead__trial strong {
+  font-size: 19px;
+  color: var(--color-primary);
+}
+
+.price-lead__tags {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0 0 14px;
+  padding: 0;
+}
+
+.price-lead__tags li {
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  padding: 5px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--color-line);
+  background: #fff;
+  color: var(--color-sub);
+}
+
+.price-lead__tags + .price-section__lead {
+  margin-top: 0;
+}
+
 /* ---------- Highlighted row (通い放題など) ---------- */
 .price-table tbody tr.is-highlight {
   background: linear-gradient(135deg, rgba(204, 33, 127, 0.08), rgba(204, 33, 127, 0.03));
