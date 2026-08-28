@@ -2289,24 +2289,24 @@ button {
 }
 
 /* 料金表「内容」欄の箇条書き */
-.price-table .plan-feats {
+.plan-feats {
   list-style: none;
   margin: 0;
   padding: 0;
 }
 
-.price-table .plan-feats li {
+.plan-feats li {
   position: relative;
   padding-left: 22px;
   font-size: 14px;
   line-height: 1.7;
 }
 
-.price-table .plan-feats li + li {
+.plan-feats li + li {
   margin-top: 6px;
 }
 
-.price-table .plan-feats li::before {
+.plan-feats li::before {
   content: "";
   position: absolute;
   left: 2px;
@@ -2318,13 +2318,13 @@ button {
   transform: rotate(-45deg);
 }
 
-.price-table .plan-feats li.is-note {
+.plan-feats li.is-note {
   font-size: 13px;
   color: var(--color-sub);
   margin-top: 4px;
 }
 
-.price-table .plan-feats li.is-note::before {
+.plan-feats li.is-note::before {
   content: "※";
   border: none;
   transform: none;
@@ -2529,6 +2529,216 @@ button {
 
 .price-lead__tags + .price-section__lead {
   margin-top: 0;
+}
+
+/* ---------- 体験レッスン無料ボックス ---------- */
+.price-trial {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 20px;
+  border: 1px dashed var(--color-primary);
+  border-radius: 14px;
+  padding: 16px 22px;
+  margin: 0 0 18px;
+  background: #fff;
+}
+
+.price-trial .price-lead__trial {
+  margin: 0;
+  white-space: nowrap;
+}
+
+.price-trial .price-lead__tags {
+  margin: 0;
+}
+
+/* ---------- キャンペーンプラン カード ---------- */
+.camp-plan {
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius);
+  overflow: hidden;
+  background: #fff;
+  box-shadow: var(--shadow-sm);
+}
+
+.camp-plan__head {
+  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark));
+  color: #fff;
+  padding: 26px 30px;
+}
+
+.camp-plan__limited {
+  display: inline-block;
+  font-family: "Outfit", sans-serif;
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  padding: 4px 11px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  margin-bottom: 11px;
+}
+
+.camp-plan__title {
+  font-size: 21px;
+  font-weight: 700;
+  margin: 0;
+  line-height: 1.45;
+}
+
+.camp-plan__title em {
+  font-style: normal;
+  border-bottom: 2px solid rgba(255, 255, 255, 0.6);
+  padding-bottom: 2px;
+}
+
+.camp-plan__stores {
+  margin: 9px 0 0;
+  font-size: 12.5px;
+  opacity: 0.9;
+}
+
+.camp-plan__price {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 6px 18px;
+  padding: 26px 30px 22px;
+  text-align: center;
+  background: var(--color-primary-light);
+}
+
+.camp-plan__price-num {
+  margin: 0;
+  font-family: "Outfit", sans-serif;
+  font-size: 44px;
+  font-weight: 800;
+  color: var(--color-primary);
+  line-height: 1;
+}
+
+.camp-plan__price-num span {
+  font-family: "Noto Sans JP", sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-sub);
+  margin-left: 5px;
+}
+
+.camp-plan__price-say {
+  margin: 0;
+  font-size: 14.5px;
+  font-weight: 700;
+  text-align: left;
+}
+
+.camp-plan__price-say small {
+  display: block;
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--color-sub);
+  margin-top: 3px;
+}
+
+.camp-plan__steps {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1px;
+  background: var(--color-line);
+}
+
+.camp-plan__step {
+  background: #fff;
+  padding: 22px 26px;
+}
+
+.camp-plan__step-when {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin-bottom: 3px;
+}
+
+.camp-plan__step-when b {
+  font-size: 16.5px;
+}
+
+.camp-plan__step-badge {
+  background: var(--color-primary);
+  color: #fff;
+  font-size: 10.5px;
+  font-weight: 600;
+  padding: 3px 9px;
+  border-radius: 999px;
+}
+
+.camp-plan__step-badge--plain {
+  background: var(--color-bg-alt);
+  color: var(--color-sub);
+  border: 1px solid var(--color-line);
+}
+
+.camp-plan__step-desc {
+  margin: 0 0 12px;
+  font-size: 12.5px;
+  color: var(--color-sub);
+}
+
+.camp-plan__foot {
+  padding: 16px 30px 20px;
+  background: var(--color-bg-alt);
+  border-top: 1px solid var(--color-line);
+}
+
+.camp-plan__foot p {
+  margin: 0;
+  font-size: 12.5px;
+  color: var(--color-sub);
+  line-height: 1.75;
+}
+
+@media (max-width: 767px) {
+  .price-trial {
+    padding: 14px 18px;
+    gap: 10px;
+  }
+
+  .camp-plan__head {
+    padding: 22px 20px;
+  }
+
+  .camp-plan__title {
+    font-size: 18px;
+  }
+
+  .camp-plan__price {
+    padding: 22px 20px 18px;
+    gap: 4px;
+  }
+
+  .camp-plan__price-num {
+    font-size: 38px;
+  }
+
+  .camp-plan__price-say {
+    width: 100%;
+    text-align: center;
+  }
+
+  .camp-plan__steps {
+    grid-template-columns: 1fr;
+  }
+
+  .camp-plan__step {
+    padding: 18px 20px;
+  }
+
+  .camp-plan__foot {
+    padding: 14px 20px 18px;
+  }
 }
 
 /* ---------- Highlighted row (通い放題など) ---------- */

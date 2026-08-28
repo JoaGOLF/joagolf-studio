@@ -28,7 +28,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Noto+Sans+JP:wght@400;500;700;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/css/style.css?v=20260827b">
+  <link rel="stylesheet" href="/css/style.css?v=20260827c">
 
   <script type="application/ld+json">
   {
@@ -237,26 +237,36 @@
       <div class="container">
         <div class="section__head"><p class="section__label">Price</p><h2 class="section__title">料金プラン</h2></div>
         <!-- 新規ご入会（3ヶ月受け放題キャンペーン） -->
-        <h3 class="price-section__title">新規ご入会の方｜3ヶ月レッスン受け放題キャンペーン</h3>
-        <p class="price-lead__trial">まずは<strong>体験レッスン無料</strong></p>
-        <ul class="price-lead__tags"><li>手ぶらでOK</li><li>初心者歓迎</li><li>1回だけでもOK</li><li>無理な勧誘なし</li></ul>
-        <p class="price-section__lead">「集中して上達する期間」と「上達をキープする期間」を、ひとつの月額で。<br>麹町・西新宿・千駄ヶ谷・赤坂の4店舗限定の特別キャンペーンです。</p>
-        <table class="price-table">
-          <thead><tr><th>期間</th><th>内容</th><th>料金</th></tr></thead>
-          <tbody>
-            <tr>
-              <td data-label="期間"><div class="plan-name"><span class="plan-badge">キャンペーン</span>1〜3ヶ月目<small>集中して上達する期間</small></div></td>
-              <td data-label="内容"><ul class="plan-feats"><li>レッスン受け放題</li><li>施設通い放題</li></ul></td>
-              <td data-label="料金"><span class="plan-price">44,550<small>円 / 月</small></span></td>
-            </tr>
-            <tr>
-              <td data-label="期間"><div class="plan-name">4ヶ月目以降<small>上達をキープする期間</small></div></td>
-              <td data-label="内容"><ul class="plan-feats"><li>施設通い放題</li><li class="is-note">レッスンは都度チケット制</li></ul></td>
-              <td data-label="料金"><span class="plan-price">44,550<small>円 / 月</small></span></td>
-            </tr>
-          </tbody>
-        </table>
-        <p class="price-note">※ 上記金額は税込です。ご入会後、金額はずっと変わりません。<br>※ 少人数制のため、各店舗のご案内枠には限りがあります。</p>
+        <div class="price-trial">
+          <p class="price-lead__trial">まずは<strong>体験レッスン無料</strong></p>
+          <ul class="price-lead__tags"><li>手ぶらでOK</li><li>初心者歓迎</li><li>1回だけでもOK</li><li>無理な勧誘なし</li></ul>
+        </div>
+        <div class="camp-plan">
+          <div class="camp-plan__head">
+            <span class="camp-plan__limited">4 Studios Limited</span>
+            <h3 class="camp-plan__title">新規ご入会の方｜<br>3ヶ月レッスン<em>受け放題</em>キャンペーン</h3>
+            <p class="camp-plan__stores">麹町・西新宿・千駄ヶ谷・赤坂の4店舗限定</p>
+          </div>
+          <div class="camp-plan__price">
+            <p class="camp-plan__price-num">44,550<span>円 / 月（税込）</span></p>
+            <p class="camp-plan__price-say">ご入会後、ずっとこの金額<small>「集中して上達する期間」と「上達をキープする期間」を、ひとつの月額で。</small></p>
+          </div>
+          <div class="camp-plan__steps">
+            <div class="camp-plan__step">
+              <div class="camp-plan__step-when"><span class="camp-plan__step-badge">キャンペーン</span><b>1〜3ヶ月目</b></div>
+              <p class="camp-plan__step-desc">集中して上達する期間</p>
+              <ul class="plan-feats"><li>レッスン受け放題</li><li>施設通い放題</li></ul>
+            </div>
+            <div class="camp-plan__step">
+              <div class="camp-plan__step-when"><span class="camp-plan__step-badge camp-plan__step-badge--plain">その後</span><b>4ヶ月目以降</b></div>
+              <p class="camp-plan__step-desc">上達をキープする期間</p>
+              <ul class="plan-feats"><li>施設通い放題</li><li class="is-note">レッスンは都度チケット制</li></ul>
+            </div>
+          </div>
+          <div class="camp-plan__foot">
+            <p>※ 少人数制のため、各店舗のご案内枠には限りがあります。</p>
+          </div>
+        </div>
         <div style="margin:20px 0 8px">
           <a href="/campaign/tokyo-a-3months/" class="camp-banner__card" data-cta="campaign-price-akasaka">
             <div class="camp-banner__bg" aria-hidden="true"><img src="/images/stores/akasaka1.webp" alt="" loading="lazy"></div>
@@ -276,7 +286,7 @@
           <tbody>
             <tr>
               <td data-label="プラン"><div class="plan-name">ゴールドプラン</div></td>
-              <td data-label="内容"><ul class="plan-feats"><li>打席使い放題（90分・1日2コマ・月無制限）</li><li>24時間365日いつでも利用可</li><li>1店舗固定</li><li>同伴OK（会員＋3名まで）</li><li>入会時 無料レッスンチケット1枚付き</li><li class="is-note">レッスンチケットの有効期限：1ヶ月</li></ul></td>
+              <td data-label="内容"><ul class="plan-feats"><li>打席使い放題（90分・1日2コマ・月無制限）</li><li>24時間365日いつでも利用可</li><li>1店舗固定</li><li>同伴OK（会員＋3名まで）</li><li>入会時 無料レッスンチケット1枚付き</li></ul></td>
               <td data-label="料金"><span class="plan-price">44,550<small>円 / 月</small></span></td>
             </tr>
           </tbody>
