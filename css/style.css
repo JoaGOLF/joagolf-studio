@@ -2681,6 +2681,17 @@ button {
   padding: 22px 26px;
 }
 
+/* PCでは矢印の左右に余白を作り、文字と重ならないようにする */
+@media (min-width: 768px) {
+  .camp-plan__step:first-child {
+    padding-right: 56px;
+  }
+
+  .camp-plan__step:last-child {
+    padding-left: 56px;
+  }
+}
+
 .camp-plan__step-when {
   display: flex;
   align-items: center;
