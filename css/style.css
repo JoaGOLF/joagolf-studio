@@ -1227,17 +1227,28 @@ button {
   margin: 0;
 }
 
+/* 店舗カードの最寄り駅 */
+.store-card__access {
+  margin: 6px 0 0;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-primary);
+}
+
 .store-card__actions {
   display: flex;
-  gap: 12px;
+  flex-direction: column;
+  gap: 10px;
   padding: 20px 28px 28px;
   margin-top: auto;
 }
 
 .store-card__actions .btn {
-  flex: 1;
-  padding: 10px 16px;
+  width: 100%;
+  padding: 12px 16px;
   font-size: 13px;
+  white-space: normal;
+  text-align: center;
 }
 
 /* ---------- Voices ---------- */
