@@ -1760,6 +1760,16 @@ button {
   margin: 0 0 24px;
 }
 
+/* h1内のブランド名（検索エンジンに正式名称を伝えつつ、見た目は小さく） */
+.store-hero__brand {
+  display: block;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  opacity: 0.85;
+  margin-bottom: 6px;
+}
+
 .store-hero__addr {
   font-size: 16px;
   line-height: 1.9;
