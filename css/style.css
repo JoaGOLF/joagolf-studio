@@ -1804,6 +1804,45 @@ button {
   font-weight: 600;
 }
 
+/* 駅チップ（ヒーローのアクセス表示） */
+.store-hero__meta-item:first-child .store-hero__meta-value {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  max-width: 420px;
+}
+
+.store-hero__station {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  background: rgba(255, 255, 255, 0.12);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.store-hero__station em {
+  font-style: normal;
+  font-weight: 700;
+  font-family: "Outfit", "Noto Sans JP", sans-serif;
+}
+
+/* 最寄り駅（先頭）は白抜きで強調 */
+.store-hero__station:first-child {
+  background: #fff;
+  border-color: #fff;
+  color: var(--color-text);
+}
+
+.store-hero__station:first-child em {
+  color: var(--color-primary);
+}
+
 /* Breadcrumb */
 .breadcrumb {
   padding: 24px 0 0;
@@ -3931,6 +3970,21 @@ body:not(.is-result) .sticky-cta--result-only.is-visible {
 
   .store-hero__meta-value {
     font-size: 14px;
+  }
+
+  .store-hero__station {
+    background: #fff;
+    border-color: var(--color-line);
+    color: var(--color-text);
+  }
+
+  .store-hero__station em {
+    color: var(--color-primary);
+  }
+
+  .store-hero__station:first-child {
+    background: var(--color-primary-light);
+    border-color: transparent;
   }
 
   /* Instructor */
