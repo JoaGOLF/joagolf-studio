@@ -29,7 +29,8 @@ STATE_FILE = ".deploy-state.json"
 # サイトの一部ではないもの(アップロードしない)
 EXCLUDE_DIRS = {".git", ".claude", "__pycache__"}
 EXCLUDE_FILES = {STATE_FILE, "deploy.py", "weekly_report.py", "dashboard.py",
-                 "CLAUDE.md", "README.md", ".gitignore", ".DS_Store"}
+                 "CLAUDE.md", "AGENTS.md", "STATUS.md", "TODO.md",
+                 "README.md", ".gitignore", ".DS_Store"}
 EXCLUDE_PREFIXES = ("_",)  # _bg-options.html などの作業用ファイル
 
 
