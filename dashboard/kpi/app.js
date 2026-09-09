@@ -54,6 +54,27 @@ function html(tag, className, content) {
 
 const seriesColor = (slot) => `var(--series-${slot})`;
 
+/**
+ * グラフ内の文字は画面幅に応じて拡大している（styles.css の --chart-scale）。
+ * 文字が大きくなるぶん軸まわりの余白も広げないと、目盛りが見切れる。
+ */
+function chartScale() {
+  const v = parseFloat(
+    getComputedStyle(document.documentElement).getPropertyValue('--chart-scale')
+  );
+  return Number.isFinite(v) && v > 0 ? v : 1;
+}
+
+/** 文字の大きさに合わせた余白。scale=1 のときに従来と同じ値になる */
+function chartMargins(sc, { right = 96, top = 18 } = {}) {
+  return {
+    top,
+    right: Math.round((right - 60) * sc + 60),
+    bottom: Math.round(22 + 18 * sc),
+    left: Math.round(20 + 24 * sc),
+  };
+}
+
 const pct = (n, d) => (d > 0 ? (n / d) * 100 : null);
 
 function fmtPct(v, digits = 1) {
@@ -215,8 +236,9 @@ function tipNode(title, rows) {
 
 function renderUtilChart() {
   const W = 900;
-  const H = 330;
-  const m = { top: 18, right: 96, bottom: 40, left: 44 };
+  const sc = chartScale();
+  const m = chartMargins(sc, { right: 96 });
+  const H = Math.round(330 + (m.bottom - 40));
   const iw = W - m.left - m.right;
   const ih = H - m.top - m.bottom;
 
@@ -391,8 +413,9 @@ function renderUtilChart() {
 
 function renderLessonsChart() {
   const W = 900;
-  const H = 300;
-  const m = { top: 18, right: 16, bottom: 40, left: 44 };
+  const sc = chartScale();
+  const m = chartMargins(sc, { right: 76 });
+  const H = Math.round(300 + (m.bottom - 40));
   const iw = W - m.left - m.right;
   const ih = H - m.top - m.bottom;
 
@@ -501,8 +524,9 @@ function renderLessonsChart() {
 
 function renderTrialChart() {
   const W = 900;
-  const H = 260;
-  const m = { top: 18, right: 16, bottom: 40, left: 44 };
+  const sc = chartScale();
+  const m = chartMargins(sc, { right: 76 });
+  const H = Math.round(260 + (m.bottom - 40));
   const iw = W - m.left - m.right;
   const ih = H - m.top - m.bottom;
 
@@ -1307,45 +1331,6 @@ function renderStoreFilter() {
   );
 }
 
-function setupTheme() {
-  const btn = $('#theme-toggle');
-  const label = $('#theme-toggle-label');
-
-  let saved = null;
-  try {
-    saved = localStorage.getItem('joagolf.theme');
-  } catch {
-    /* 無視 */
-  }
-  // 白背景を既定にする。OSが暗い設定でも、明示的に切り替えるまでは白のまま。
-  document.documentElement.setAttribute(
-    'data-theme',
-    saved === 'dark' || saved === 'light' ? saved : 'light'
-  );
-
-  const sync = () => {
-    const current =
-      document.documentElement.getAttribute('data-theme') ??
-      (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-    label.textContent = current === 'dark' ? '暗い表示' : '明るい表示';
-  };
-  sync();
-
-  btn.addEventListener('click', () => {
-    const current =
-      document.documentElement.getAttribute('data-theme') ??
-      (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-    const next = current === 'dark' ? 'light' : 'dark';
-    document.documentElement.setAttribute('data-theme', next);
-    try {
-      localStorage.setItem('joagolf.theme', next);
-    } catch {
-      /* 無視 */
-    }
-    sync();
-  });
-}
-
 /* ==========================================================================
    描画
    ========================================================================== */
@@ -1464,9 +1449,22 @@ function init() {
     /* 無視 */
   }
 
-  setupTheme();
   renderAll();
   window.addEventListener('scroll', hideTooltip, { passive: true });
+
+  // 画面幅が変わると文字の拡大率も変わるので、余白を取り直すために描き直す
+  let resizeTimer = null;
+  let lastScale = chartScale();
+  window.addEventListener('resize', () => {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(() => {
+      const now = chartScale();
+      if (now !== lastScale) {
+        lastScale = now;
+        renderAll();
+      }
+    }, 200);
+  });
 
   loadFromSheet();
 }
