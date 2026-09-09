@@ -169,6 +169,51 @@ function channelsOf(note) {
 }
 
 /* ==========================================================================
+   月ごとのまとめ
+   ========================================================================== */
+
+/**
+ * 週ラベル（例「8/4-10」「7/28-8/3」）から、その週が属する月を返す。
+ * 月をまたぐ週は「週の始まりの日が入る月」に数える。
+ */
+function monthOfWeek(label) {
+  const m = String(label).match(/^(\d{1,2})\//);
+  return m ? Number(m[1]) : null;
+}
+
+/** 記録のある週を月ごとにまとめる。古い順 */
+function monthGroups() {
+  const order = [];
+  const byMonth = new Map();
+  for (const wi of ACTIVE_WEEKS) {
+    const mo = monthOfWeek(WEEKS[wi]);
+    if (mo === null) continue;
+    if (!byMonth.has(mo)) {
+      byMonth.set(mo, []);
+      order.push(mo);
+    }
+    byMonth.get(mo).push(wi);
+  }
+  return order.map((mo) => ({ month: mo, weeks: byMonth.get(mo) }));
+}
+
+/** 複数の週を合計する（いま選ばれている店舗の範囲で）。記録が1つも無ければ null */
+function sumWeeks(weekIdxs, storeId = state.store) {
+  let any = false;
+  const sum = { slots: 0, lessons: 0, trials: 0, joins: 0 };
+  for (const wi of weekIdxs) {
+    const rec = storeId === 'all' ? totalAt(wi) : toRec(WEEKLY[storeId][wi]);
+    if (!rec) continue;
+    any = true;
+    sum.slots += rec.slots;
+    sum.lessons += rec.lessons;
+    sum.trials += rec.trials;
+    sum.joins += rec.joins;
+  }
+  return any ? sum : null;
+}
+
+/* ==========================================================================
    状態
    ========================================================================== */
 
@@ -761,74 +806,107 @@ function renderKPIs() {
 
   const cur = recordAt(latest);
   const old = prev === undefined ? null : recordAt(prev);
+  box.replaceChildren(...kpiCards(cur, old, '前週比').map(kpiCardNode));
+}
 
-  const cards = [
-    { label: 'レッスン枠', value: cur.slots, unit: '枠', prev: old?.slots ?? null, betterUp: true },
-    {
-      label: '実施レッスン数',
-      value: cur.lessons,
-      unit: '回',
-      prev: old?.lessons ?? null,
-      betterUp: true,
-    },
+/** 現在と比較対象から、KPIカードの定義を作る（週でも月でも同じ形） */
+function kpiCards(cur, old, unitLabel) {
+  return [
+    { label: 'レッスン枠', value: cur.slots, unit: '枠', prev: old?.slots ?? null },
+    { label: '実施レッスン数', value: cur.lessons, unit: '回', prev: old?.lessons ?? null },
     {
       label: '稼働率',
       value: pct(cur.lessons, cur.slots),
       unit: '%',
       isPct: true,
       prev: old ? pct(old.lessons, old.slots) : null,
-      betterUp: true,
     },
-    { label: '体験に来た人数', value: cur.trials, unit: '人', prev: old?.trials ?? null, betterUp: true },
-    { label: '入会した人数', value: cur.joins, unit: '人', prev: old?.joins ?? null, betterUp: true },
+    { label: '体験に来た人数', value: cur.trials, unit: '人', prev: old?.trials ?? null },
+    { label: '入会した人数', value: cur.joins, unit: '人', prev: old?.joins ?? null },
     {
       label: '体験からの入会率',
       value: pct(cur.joins, cur.trials),
       unit: '%',
       isPct: true,
       prev: old ? pct(old.joins, old.trials) : null,
-      betterUp: true,
     },
-  ];
+  ].map((c) => ({ ...c, deltaLabel: unitLabel }));
+}
 
-  box.replaceChildren(
-    ...cards.map((c) => {
-      const node = html('div', 'kpi');
-      node.appendChild(html('p', 'kpi-label', c.label));
+/** KPIカードを1枚のDOMにする */
+function kpiCardNode(c) {
+  const node = html('div', 'kpi');
+  node.appendChild(html('p', 'kpi-label', c.label));
 
-      const val = html('p', 'kpi-value');
-      if (c.value === null || Number.isNaN(c.value)) {
-        val.textContent = '−';
-        val.classList.add('muted');
-      } else {
-        val.textContent = c.isPct ? c.value.toFixed(1) : String(c.value);
-        val.appendChild(html('span', 'kpi-unit', c.unit));
-      }
-      node.appendChild(val);
+  const val = html('p', 'kpi-value');
+  if (c.value === null || Number.isNaN(c.value)) {
+    val.textContent = '−';
+    val.classList.add('muted');
+  } else {
+    val.textContent = c.isPct ? c.value.toFixed(1) : String(c.value);
+    val.appendChild(html('span', 'kpi-unit', c.unit));
+  }
+  node.appendChild(val);
 
-      const d =
-        c.prev === null || c.prev === undefined || c.value === null || Number.isNaN(c.value)
-          ? null
-          : c.value - c.prev;
-      const delta = html('p', 'kpi-delta');
-      if (d === null) {
-        delta.classList.add('flat');
-        delta.textContent = '前週比 −';
-      } else {
-        const up = d > 0.05;
-        const down = d < -0.05;
-        delta.classList.add(up ? 'up' : down ? 'down' : 'flat');
-        const arrow = html('span', 'arrow', up ? '▲' : down ? '▼' : '−');
-        delta.appendChild(arrow);
-        const mag = c.isPct ? `${Math.abs(d).toFixed(1)}pt` : `${Math.abs(d)}${c.unit}`;
-        delta.appendChild(
-          document.createTextNode(up || down ? `前週比 ${mag}` : '前週から変化なし')
-        );
-      }
-      node.appendChild(delta);
-      return node;
-    })
-  );
+  const d =
+    c.prev === null || c.prev === undefined || c.value === null || Number.isNaN(c.value)
+      ? null
+      : c.value - c.prev;
+  const delta = html('p', 'kpi-delta');
+  if (d === null) {
+    delta.classList.add('flat');
+    delta.textContent = `${c.deltaLabel} −`;
+  } else {
+    const up = d > 0.05;
+    const down = d < -0.05;
+    delta.classList.add(up ? 'up' : down ? 'down' : 'flat');
+    delta.appendChild(html('span', 'arrow', up ? '▲' : down ? '▼' : '−'));
+    const mag = c.isPct ? `${Math.abs(d).toFixed(1)}pt` : `${Math.abs(d)}${c.unit}`;
+    delta.appendChild(
+      document.createTextNode(up || down ? `${c.deltaLabel} ${mag}` : `${c.deltaLabel} 変化なし`)
+    );
+  }
+  node.appendChild(delta);
+  return node;
+}
+
+/* ==========================================================================
+   直近1ヶ月のサマリー
+   ========================================================================== */
+
+function renderMonthKPIs() {
+  const groups = monthGroups().filter((g) => sumWeeks(g.weeks) !== null);
+  const latest = groups[groups.length - 1];
+  const prev = groups[groups.length - 2];
+
+  const scopeLabel = state.store === 'all' ? '4店舗の合計' : `${storeName(state.store)}店`;
+  const box = $('#kpi-month');
+  const note = $('#month-scope');
+
+  if (!latest) {
+    note.textContent = `${scopeLabel} — 記録された月がありません`;
+    box.replaceChildren(html('p', 'muted', 'この店舗の月次データはまだ入っていません。'));
+    return;
+  }
+
+  const weeksLabel = `${WEEKS[latest.weeks[0]]} 〜 ${WEEKS[latest.weeks[latest.weeks.length - 1]]}`;
+  note.textContent = `${scopeLabel} ／ ${latest.month}月（${latest.weeks.length}週分：${weeksLabel}）`;
+
+  const cur = sumWeeks(latest.weeks);
+  // 月の途中だと週数が違い、そのまま前月の合計と比べると大きく減ったように見える。
+  // 同じ週数ぶん（前月の頭から）で比べる。
+  const fair = prev ? prev.weeks.slice(0, latest.weeks.length) : null;
+  const old = fair && fair.length ? sumWeeks(fair) : null;
+  const sameLength = !prev || fair.length === prev.weeks.length;
+  const label = sameLength ? '前月比' : `前月の同じ${latest.weeks.length}週比`;
+
+  box.replaceChildren(...kpiCards(cur, old, label).map(kpiCardNode));
+
+  if (!sameLength) {
+    note.textContent +=
+      `　※${latest.month}月はまだ${latest.weeks.length}週分のため、` +
+      `${prev.month}月の最初の${latest.weeks.length}週と比べています`;
+  }
 }
 
 /* ==========================================================================
@@ -1169,24 +1247,28 @@ function renderChurn() {
    気になる点
    ========================================================================== */
 
-function renderAlerts() {
+function collectAlerts() {
   const alerts = [];
+  // 「気になる点」も、上で選んでいる店舗の範囲に合わせる
+  const targets = STORES.filter((s) => state.store === 'all' || s.id === state.store);
 
   // 1. 対応が未完了の退会
-  for (const r of CHURN.filter((c) => c.done === false)) {
+  for (const r of filteredChurn().filter((c) => c.done === false)) {
     alerts.push({
       level: 'critical',
       icon: '!',
+      store: r.store,
       title: `${storeName(r.store)}・${r.name}さんの退会処理が未完了`,
       body: r.reason || '対応状況が「未完了」のままです。',
     });
   }
 
   // 2. 備考に「要確認」が入っている行
-  for (const r of CHURN.filter((c) => c.flag && c.done !== false)) {
+  for (const r of filteredChurn().filter((c) => c.flag && c.done !== false)) {
     alerts.push({
       level: 'warning',
       icon: '△',
+      store: r.store,
       title: `${storeName(r.store)}・${r.name}さんの備考に確認事項`,
       body: r.reason,
     });
@@ -1194,12 +1276,13 @@ function renderAlerts() {
 
   // 3. 直近週にレッスンが0だった店舗
   const last = ACTIVE_WEEKS[ACTIVE_WEEKS.length - 1];
-  for (const s of STORES) {
+  for (const s of targets) {
     const rec = toRec(WEEKLY[s.id][last]);
     if (rec && rec.slots > 0 && rec.lessons === 0) {
       alerts.push({
         level: 'critical',
         icon: '!',
+        store: s.id,
         title: `${s.name}は${WEEKS[last]}の週のレッスンが0回`,
         body: `${rec.slots}枠を用意しましたが、実施は0回でした。集客か枠の設定を見直す余地があります。`,
       });
@@ -1207,7 +1290,7 @@ function renderAlerts() {
   }
 
   // 4. 稼働率が低い店舗（直近週）
-  for (const s of STORES) {
+  for (const s of targets) {
     const rec = toRec(WEEKLY[s.id][last]);
     if (!rec || rec.lessons === 0) continue;
     const u = pct(rec.lessons, rec.slots);
@@ -1215,6 +1298,7 @@ function renderAlerts() {
       alerts.push({
         level: 'warning',
         icon: '△',
+        store: s.id,
         title: `${s.name}の稼働率が${u.toFixed(0)}%（${WEEKS[last]}）`,
         body: `${rec.slots}枠に対して${rec.lessons}回。枠が余っている状態です。`,
       });
@@ -1222,12 +1306,13 @@ function renderAlerts() {
   }
 
   // 5. 体験が0の店舗（直近週）
-  for (const s of STORES) {
+  for (const s of targets) {
     const rec = toRec(WEEKLY[s.id][last]);
     if (rec && rec.trials === 0) {
       alerts.push({
         level: 'info',
         icon: 'i',
+        store: s.id,
         title: `${s.name}は${WEEKS[last]}の週の体験が0人`,
         body: '新規の体験申し込みが入っていません。',
       });
@@ -1236,7 +1321,7 @@ function renderAlerts() {
 
   // 6. 記録の抜け
   const missing = [];
-  for (const s of STORES) {
+  for (const s of targets) {
     const gaps = ACTIVE_WEEKS.filter((wi) => WEEKLY[s.id][wi] === null);
     if (gaps.length) missing.push(`${s.name}（${gaps.length}週分）`);
   }
@@ -1250,7 +1335,7 @@ function renderAlerts() {
   }
 
   // 7. 重複行
-  const dupes = CHURN.filter((c) => c.dupe);
+  const dupes = filteredChurn().filter((c) => c.dupe);
   if (dupes.length) {
     alerts.push({
       level: 'info',
@@ -1264,7 +1349,7 @@ function renderAlerts() {
   }
 
   // 8. プラン未記入の体験者
-  const noPlan = TRIALS.filter(isPending);
+  const noPlan = filteredTrials().filter(isPending);
   if (noPlan.length) {
     alerts.push({
       level: 'info',
@@ -1277,14 +1362,18 @@ function renderAlerts() {
     });
   }
 
+  const rank0 = { critical: 0, warning: 1, info: 2 };
+  alerts.sort((a, b) => rank0[a.level] - rank0[b.level]);
+  return alerts;
+}
+
+function renderAlerts() {
+  const alerts = collectAlerts();
   const box = $('#alerts');
   if (alerts.length === 0) {
     box.replaceChildren(html('p', 'muted', '特に気になる点はありません。'));
     return;
   }
-
-  const rank = { critical: 0, warning: 1, info: 2 };
-  alerts.sort((a, b) => rank[a.level] - rank[b.level]);
 
   box.replaceChildren(
     ...alerts.map((a) => {
@@ -1297,6 +1386,271 @@ function renderAlerts() {
       return node;
     })
   );
+}
+
+/* ==========================================================================
+   レポート（印刷 → PDF）
+   ========================================================================== */
+
+/** 表を1つ作る。rows は文字列の配列の配列 */
+function reportTable(headers, rows, aligns = []) {
+  const table = html('table', 'report-table');
+  const thead = document.createElement('thead');
+  const hr = document.createElement('tr');
+  headers.forEach((h, i) => {
+    const th = html('th', aligns[i] === 'num' ? 'num' : null, h);
+    hr.appendChild(th);
+  });
+  thead.appendChild(hr);
+  const tbody = document.createElement('tbody');
+  for (const r of rows) {
+    const tr = document.createElement('tr');
+    r.forEach((c, i) => tr.appendChild(html('td', aligns[i] === 'num' ? 'num' : null, c)));
+    tbody.appendChild(tr);
+  }
+  table.replaceChildren(thead, tbody);
+  return table;
+}
+
+/** レポートの対象期間を決める。period は 'week' | 'month' */
+function reportPeriod(period) {
+  if (period === 'week') {
+    const withData = ACTIVE_WEEKS.filter((wi) => recordAt(wi) !== null);
+    const latest = withData[withData.length - 1];
+    const prev = withData[withData.length - 2];
+    if (latest === undefined) return null;
+    return {
+      title: '週次レポート',
+      label: `${WEEKS[latest]} の週`,
+      weeks: [latest],
+      prevWeeks: prev === undefined ? null : [prev],
+      compare: '前週比',
+    };
+  }
+  const groups = monthGroups().filter((g) => sumWeeks(g.weeks) !== null);
+  const latest = groups[groups.length - 1];
+  const prev = groups[groups.length - 2];
+  if (!latest) return null;
+  // 月の途中だと週数が違うので、前月も同じ週数ぶんだけ取って比べる
+  const fair = prev ? prev.weeks.slice(0, latest.weeks.length) : null;
+  const sameLength = !prev || fair.length === prev.weeks.length;
+  const span =
+    latest.weeks.length === 1
+      ? `${WEEKS[latest.weeks[0]]} の1週分`
+      : `${WEEKS[latest.weeks[0]]} 〜 ${WEEKS[latest.weeks[latest.weeks.length - 1]]}`;
+  return {
+    title: '月次レポート',
+    label: `${latest.month}月（${span}）`,
+    weeks: latest.weeks,
+    prevWeeks: fair && fair.length ? fair : null,
+    compare: sameLength ? '前月比' : `前月の同じ${latest.weeks.length}週比`,
+    note: sameLength
+      ? null
+      : `${latest.month}月はまだ${latest.weeks.length}週分のため、${prev.month}月の最初の${latest.weeks.length}週と比べています。`,
+  };
+}
+
+function buildReport(period) {
+  const box = $('#report');
+  const spec = reportPeriod(period);
+  if (!spec) {
+    window.alert('この範囲には、レポートに出せる記録がありません。');
+    return false;
+  }
+
+  const scope = state.store === 'all' ? '全店（4店舗合計）' : `${storeName(state.store)}店`;
+  const cur = sumWeeks(spec.weeks);
+  const old = spec.prevWeeks ? sumWeeks(spec.prevWeeks) : null;
+
+  const parts = [];
+
+  // --- 見出し ---
+  const head = html('header', 'report-head');
+  const left = html('div');
+  left.appendChild(html('p', 'report-brand', 'JoaGOLF STUDIO'));
+  left.appendChild(html('h1', null, `${spec.title}　${scope}`));
+  left.appendChild(html('p', 'report-period', `対象期間：${spec.label}`));
+  head.appendChild(left);
+  const right = html('div', 'report-meta');
+  right.appendChild(html('p', null, `作成日：${todayLabel()}`));
+  right.appendChild(html('p', null, DATA_SOURCE === 'sheet' ? 'スプレッドシート最新' : '取り込み済みの内容'));
+  right.appendChild(html('p', 'report-confidential', 'CONFIDENTIAL'));
+  head.appendChild(right);
+  parts.push(head);
+
+  // --- KPI ---
+  const kpiWrap = html('div', 'report-kpis');
+  kpiWrap.replaceChildren(...kpiCards(cur, old, spec.compare).map(kpiCardNode));
+  parts.push(kpiWrap);
+  if (spec.note) parts.push(html('p', 'report-note', `※ ${spec.note}`));
+
+  // --- 内訳 ---
+  if (state.store === 'all') {
+    const rows = STORES.map((s) => {
+      const r = sumWeeks(spec.weeks, s.id);
+      if (!r) return [s.name, '−', '−', '−', '−', '−', '−'];
+      return [
+        s.name,
+        String(r.slots),
+        String(r.lessons),
+        fmtPct(pct(r.lessons, r.slots), 0),
+        String(r.trials),
+        String(r.joins),
+        fmtPct(pct(r.joins, r.trials), 0),
+      ];
+    });
+    rows.push([
+      '全店合計',
+      String(cur.slots),
+      String(cur.lessons),
+      fmtPct(pct(cur.lessons, cur.slots), 0),
+      String(cur.trials),
+      String(cur.joins),
+      fmtPct(pct(cur.joins, cur.trials), 0),
+    ]);
+    parts.push(html('h2', 'report-h2', '店舗別の内訳'));
+    const storeTable = reportTable(
+      ['店舗', '枠', 'レッスン', '稼働率', '体験', '入会', '入会率'],
+      rows,
+      ['', 'num', 'num', 'num', 'num', 'num', 'num']
+    );
+    storeTable.classList.add('has-total');
+    parts.push(storeTable);
+  } else {
+    const rows = spec.weeks.map((wi) => {
+      const r = toRec(WEEKLY[state.store][wi]);
+      if (!r) return [WEEKS[wi], '−', '−', '−', '−', '−', '−'];
+      return [
+        WEEKS[wi],
+        String(r.slots),
+        String(r.lessons),
+        fmtPct(pct(r.lessons, r.slots), 0),
+        String(r.trials),
+        String(r.joins),
+        fmtPct(pct(r.joins, r.trials), 0),
+      ];
+    });
+    parts.push(html('h2', 'report-h2', '週ごとの内訳'));
+    parts.push(
+      reportTable(
+        ['週', '枠', 'レッスン', '稼働率', '体験', '入会', '入会率'],
+        rows,
+        ['', 'num', 'num', 'num', 'num', 'num', 'num']
+      )
+    );
+  }
+
+  // --- 期間内の体験と退会 ---
+  const range = weekRangeDates(spec.weeks);
+  const twoCol = html('div', 'report-two');
+
+  const trials = filteredTrials().filter((x) => inRange(x.date, range));
+  const chCount = new Map();
+  for (const x of trials) for (const c of channelsOf(x.note)) chCount.set(c, (chCount.get(c) ?? 0) + 1);
+  const chRows = [...chCount.entries()].sort((a, b) => b[1] - a[1]).map(([k, v]) => [k, `${v}人`]);
+  const colA = html('div');
+  colA.appendChild(html('h2', 'report-h2', `体験に来たきっかけ（${trials.length}人）`));
+  colA.appendChild(
+    chRows.length
+      ? reportTable(['経路', '人数'], chRows, ['', 'num'])
+      : html('p', 'report-empty', 'この期間の体験はありません。')
+  );
+  twoCol.appendChild(colA);
+
+  const churn = filteredChurn().filter((x) => inRange(x.date, range));
+  const rCount = new Map();
+  for (const x of churn) rCount.set(classifyReason(x), (rCount.get(classifyReason(x)) ?? 0) + 1);
+  const rRows = [...rCount.entries()].sort((a, b) => b[1] - a[1]).map(([k, v]) => [k, `${v}件`]);
+  const colB = html('div');
+  const leave = churn.filter((x) => x.kind === '退会').length;
+  const pause = churn.filter((x) => x.kind === '休会').length;
+  colB.appendChild(
+    html('h2', 'report-h2', `退会・休会（退会${leave}・休会${pause}）`)
+  );
+  colB.appendChild(
+    rRows.length
+      ? reportTable(['理由', '件数'], rRows, ['', 'num'])
+      : html('p', 'report-empty', 'この期間の退会・休会はありません。')
+  );
+  twoCol.appendChild(colB);
+  parts.push(twoCol);
+
+  // --- 気になる点 ---
+  const alerts = collectAlerts().slice(0, 4);
+  if (alerts.length) {
+    parts.push(html('h2', 'report-h2', '気になる点'));
+    const ul = html('ul', 'report-alerts');
+    for (const a of alerts) {
+      const li = document.createElement('li');
+      li.appendChild(html('strong', null, a.title));
+      li.appendChild(document.createTextNode('　' + a.body));
+      ul.appendChild(li);
+    }
+    parts.push(ul);
+  }
+
+  parts.push(
+    html(
+      'footer',
+      'report-foot',
+      '数字の出どころ：Googleスプレッドシート「全店舗実績」。このレポートは表示専用のダッシュボードから出力したものです。'
+    )
+  );
+
+  box.replaceChildren(...parts);
+  return true;
+}
+
+/** 週の並びから、含まれる日付の範囲をざっくり求める（体験・退会の絞り込み用） */
+function weekRangeDates(weekIdxs) {
+  const year = Number(String(SNAPSHOT_DATE).slice(0, 4)) || new Date().getFullYear();
+  const first = String(WEEKS[weekIdxs[0]]);
+  const last = String(WEEKS[weekIdxs[weekIdxs.length - 1]]);
+  const sm = first.match(/^(\d{1,2})\/(\d{1,2})/);
+  const em = last.match(/-(?:(\d{1,2})\/)?(\d{1,2})$/);
+  if (!sm || !em) return null;
+  const startMonth = Number(sm[1]);
+  const startDay = Number(sm[2]);
+  const endMonth = em[1] ? Number(em[1]) : monthOfWeek(last) ?? startMonth;
+  const endDay = Number(em[2]);
+  const pad = (n) => String(n).padStart(2, '0');
+  return {
+    from: `${year}-${pad(startMonth)}-${pad(startDay)}`,
+    to: `${year}-${pad(endMonth)}-${pad(endDay)}`,
+  };
+}
+
+function inRange(iso, range) {
+  if (!range || !iso) return false;
+  return iso >= range.from && iso <= range.to;
+}
+
+function todayLabel() {
+  const d = new Date();
+  return `${d.getFullYear()}年${d.getMonth() + 1}月${d.getDate()}日`;
+}
+
+function setupReportButtons() {
+  for (const btn of document.querySelectorAll('.btn-report')) {
+    btn.addEventListener('click', () => {
+      if (!buildReport(btn.dataset.period)) return;
+      document.body.classList.add('printing');
+      window.print();
+      // 印刷画面を閉じたあとに元へ戻す（対応していないブラウザ向けに保険も置く）
+      const restore = () => document.body.classList.remove('printing');
+      if (window.matchMedia) {
+        const mq = window.matchMedia('print');
+        const once = (e) => {
+          if (!e.matches) {
+            restore();
+            mq.removeEventListener('change', once);
+          }
+        };
+        mq.addEventListener('change', once);
+      }
+      setTimeout(restore, 1500);
+    });
+  }
 }
 
 /* ==========================================================================
@@ -1340,6 +1694,7 @@ function renderAll() {
   renderSourceNote();
   renderStoreFilter();
   renderKPIs();
+  renderMonthKPIs();
   renderUtilChart();
   renderLessonsChart();
   renderTrialChart();
@@ -1449,6 +1804,7 @@ function init() {
     /* 無視 */
   }
 
+  setupReportButtons();
   renderAll();
   window.addEventListener('scroll', hideTooltip, { passive: true });
 

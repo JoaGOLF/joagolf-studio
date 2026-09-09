@@ -52,6 +52,42 @@
         </p>
       </section>
 
+      <!-- 2. 直近1ヶ月サマリー -->
+      <section class="section" aria-labelledby="h-month">
+        <div class="section-head">
+          <h2 id="h-month">直近1ヶ月のサマリー</h2>
+          <p class="section-note" id="month-scope"></p>
+        </div>
+        <div id="kpi-month" class="kpi-row"></div>
+        <p class="caption">
+          週をまとめて月にしています。月をまたぐ週は、<strong>週の始まりの日が入る月</strong>に数えます
+          （例：7/28-8/3 の週は7月）。「前月比」は1つ前の月との差です。
+        </p>
+      </section>
+
+      <!-- レポート出力 -->
+      <section class="section" aria-labelledby="h-report">
+        <div class="section-head">
+          <h2 id="h-report">レポートを作る</h2>
+          <p class="section-note" id="report-scope"></p>
+        </div>
+        <div class="card report-card">
+          <div class="report-actions">
+            <button type="button" class="btn-report" data-period="week">
+              週のレポートを作成する
+            </button>
+            <button type="button" class="btn-report" data-period="month">
+              1ヶ月のレポートを作成する
+            </button>
+          </div>
+          <p class="caption">
+            押すと印刷画面が開きます。そこで「送信先」を
+            <strong>「PDFに保存」</strong>にすると、A4・1枚のPDFになります。
+            上の「店舗」で選んでいる範囲がそのままレポートの対象です。
+          </p>
+        </div>
+      </section>
+
       <!-- 2. 稼働率の推移 -->
       <section class="section" aria-labelledby="h-util">
         <div class="section-head">
@@ -191,6 +227,9 @@
         </p>
       </footer>
     </div>
+
+    <!-- レポートの中身。画面には出さず、印刷のときだけ表示する -->
+    <div id="report" class="report" aria-hidden="true"></div>
 
     <div id="tooltip" class="tooltip" role="status" aria-live="polite"></div>
 
