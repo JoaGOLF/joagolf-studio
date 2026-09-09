@@ -1,0 +1,208 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>JoaGOLF STUDIO 店舗数値ダッシュボード</title>
+    <!-- 会員名を含むページなので、検索避けと参照元の非送出を明示する -->
+    <meta name="robots" content="noindex, nofollow, noarchive" />
+    <meta name="referrer" content="no-referrer" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&family=Noto+Sans+JP:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./styles.css" />
+    <link rel="icon" href="/favicon.svg" />
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="wrap header-inner">
+        <div class="header-title">
+          <span class="confidential">CONFIDENTIAL</span>
+          <h1>JoaGOLF STUDIO 店舗数値</h1>
+          <p class="header-sub">
+            <span id="snapshot-note"></span>
+            <a id="source-link" href="#" target="_blank" rel="noopener noreferrer"
+              >元のスプレッドシートを開く</a
+            >
+          </p>
+          <p class="load-warning" id="load-warning" hidden></p>
+        </div>
+        <button
+          id="theme-toggle"
+          class="theme-toggle"
+          type="button"
+          aria-label="明るい表示と暗い表示を切り替える"
+        >
+          <span class="theme-toggle-icon" aria-hidden="true">◐</span>
+          <span id="theme-toggle-label">表示</span>
+        </button>
+      </div>
+    </header>
+
+    <div class="wrap">
+      <!-- 店舗フィルタ -->
+      <nav class="filters" aria-label="店舗の絞り込み">
+        <span class="filters-label">店舗</span>
+        <div id="store-filter" class="segmented" role="group"></div>
+      </nav>
+
+      <!-- 1. 直近週サマリー -->
+      <section class="section" aria-labelledby="h-summary">
+        <div class="section-head">
+          <h2 id="h-summary">直近週のサマリー</h2>
+          <p class="section-note" id="summary-scope"></p>
+        </div>
+        <div id="kpi-row" class="kpi-row"></div>
+        <p class="caption">
+          「前週比」は1つ前の週との差です。前の週に記録がない場合は表示しません。
+        </p>
+      </section>
+
+      <!-- 2. 稼働率の推移 -->
+      <section class="section" aria-labelledby="h-util">
+        <div class="section-head">
+          <h2 id="h-util">レッスン枠の稼働率の推移</h2>
+          <p class="section-note">
+            用意したレッスン枠のうち、実際にレッスンが入った割合。線の右端に店舗名を表示しています。
+          </p>
+        </div>
+        <div class="card">
+          <div id="chart-util" class="chart"></div>
+          <div id="legend-util" class="legend"></div>
+        </div>
+      </section>
+
+      <!-- 3. レッスン数 -->
+      <section class="section" aria-labelledby="h-lessons">
+        <div class="section-head">
+          <h2 id="h-lessons">実施したレッスン数（週ごと・4店舗の積み上げ）</h2>
+          <p class="section-note">棒の高さが全店の合計、色の区切りが店舗ごとの内訳です。</p>
+        </div>
+        <div class="card">
+          <div id="chart-lessons" class="chart"></div>
+          <div id="legend-lessons" class="legend"></div>
+        </div>
+      </section>
+
+      <!-- 4. 体験→入会 -->
+      <section class="section" aria-labelledby="h-trial">
+        <div class="section-head">
+          <h2 id="h-trial">体験レッスンと、そこからの入会</h2>
+          <p class="section-note">
+            週ごとに、左の棒が体験に来た人数、右の棒がそのうち入会した人数です。色は下の凡例のとおり。
+          </p>
+        </div>
+        <div class="card">
+          <div id="chart-trial" class="chart"></div>
+          <div id="legend-trial" class="legend"></div>
+        </div>
+      </section>
+
+      <!-- 5. 店舗別の数字（表） -->
+      <section class="section" aria-labelledby="h-table">
+        <div class="section-head">
+          <h2 id="h-table">週ごとの数字（表）</h2>
+          <p class="section-note">
+            グラフの元になっている数字です。「−」はスプレッドシートが空欄の週です。
+          </p>
+        </div>
+        <div class="card table-card">
+          <div class="table-scroll">
+            <table id="weekly-table" class="data-table"></table>
+          </div>
+        </div>
+      </section>
+
+      <!-- 6. 流入経路 -->
+      <section class="section" aria-labelledby="h-channel">
+        <div class="section-head">
+          <h2 id="h-channel">体験に来たきっかけ（流入経路）</h2>
+          <p class="section-note">
+            備考欄から分類しています。「HP、インスタ」のように複数書かれている場合は両方に数えています。
+          </p>
+        </div>
+        <div class="card two-col">
+          <div>
+            <h3 class="card-title">経路ごとの体験人数</h3>
+            <div id="chart-channel" class="chart chart-bars"></div>
+          </div>
+          <div>
+            <h3 class="card-title">経路ごとの入会率</h3>
+            <div id="chart-channel-rate" class="chart chart-bars"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 7. プラン別 -->
+      <section class="section" aria-labelledby="h-plan">
+        <div class="section-head">
+          <h2 id="h-plan">入会したプランの内訳</h2>
+          <p class="section-note">体験から入会に至った方のプランです。未入会の方は含みません。</p>
+        </div>
+        <div class="card">
+          <div id="chart-plan" class="chart chart-bars"></div>
+        </div>
+      </section>
+
+      <!-- 8. 体験者一覧 -->
+      <section class="section" aria-labelledby="h-trials-table">
+        <div class="section-head">
+          <h2 id="h-trials-table">体験に来た方の一覧</h2>
+          <p class="section-note" id="trials-count"></p>
+        </div>
+        <div class="card table-card">
+          <div class="table-scroll">
+            <table id="trials-table" class="data-table"></table>
+          </div>
+        </div>
+      </section>
+
+      <!-- 9. 退会・休会 -->
+      <section class="section" aria-labelledby="h-churn">
+        <div class="section-head">
+          <h2 id="h-churn">退会・休会</h2>
+          <p class="section-note" id="churn-count"></p>
+        </div>
+        <div class="card" id="churn-chart-card">
+          <h3 class="card-title">退会・休会の理由</h3>
+          <div id="chart-churn" class="chart chart-bars"></div>
+          <div id="legend-churn" class="legend"></div>
+        </div>
+        <div class="card table-card" id="churn-table-card">
+          <div class="table-scroll">
+            <table id="churn-table" class="data-table"></table>
+          </div>
+        </div>
+        <p class="caption" id="churn-empty" hidden>
+          この店舗には退会・休会の記録がありません。
+        </p>
+      </section>
+
+      <!-- 10. 要対応 -->
+      <section class="section" aria-labelledby="h-alerts">
+        <div class="section-head">
+          <h2 id="h-alerts">気になる点・要対応</h2>
+          <p class="section-note">
+            シートを読んで自動で拾った項目です。対応が済んだらスプレッドシート側を更新してください。
+          </p>
+        </div>
+        <div id="alerts" class="alerts"></div>
+      </section>
+
+      <footer class="site-footer">
+        <p>
+          このページは表示専用です。数字を直すときは
+          <a id="source-link-2" href="#" target="_blank" rel="noopener noreferrer">元のスプレッドシート</a>
+          を更新してください。最大2分ほどでこのページに反映されます。
+        </p>
+      </footer>
+    </div>
+
+    <div id="tooltip" class="tooltip" role="status" aria-live="polite"></div>
+
+    <script type="module" src="./app.js"></script>
+  </body>
+</html>

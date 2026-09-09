@@ -55,4 +55,5 @@ build/
 _*.html
 _reports/
 dashboard/config.php
+dashboard/kpi/config.php
 dashboard/data.json
