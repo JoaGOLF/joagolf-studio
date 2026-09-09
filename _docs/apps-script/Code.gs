@@ -27,6 +27,12 @@
 // ★ここを自分で決めた長い文字列に変えてください（例: 英数字30文字以上）
 var TOKEN = 'ここを長いランダムな文字列に置き換える';
 
+/**
+ * 東京の拠点別データが入った、別のスプレッドシート「東京店実績」のID。
+ * URL の /d/ と /edit のあいだの文字列。読み取りだけ行う。
+ */
+var TOKYO_SHEET_ID = '1uvWkKKe19prMEYBfxtngVRIRTrdDp49MccGZEumlwCM';
+
 /** 店舗の表示名 → ダッシュボード内部で使うID */
 var STORE_IDS = {
   '神戸': 'kobe',
@@ -259,6 +265,109 @@ function readChurn(values, head, out) {
   });
 }
 
+// --- 東京店実績（別スプレッドシート） -------------------------------------
+
+/**
+ * 東京4拠点の稼働率を読む。
+ * 見出しの文字を探して読むので、列を足しても壊れない。
+ * 読めなくても本体の集計は止めず、warnings に残すだけにする。
+ */
+function readTokyo(out) {
+  if (!TOKYO_SHEET_ID) return null;
+
+  var ss;
+  try {
+    ss = SpreadsheetApp.openById(TOKYO_SHEET_ID);
+  } catch (err) {
+    out.warnings.push('東京店実績シートを開けませんでした（共有設定を確認してください）');
+    return null;
+  }
+
+  var sites = [];
+  var months = [];
+  var monthly = {};
+  var monthlyTotal = [];
+
+  ss.getSheets().forEach(function (sheet) {
+    if (sheet.isSheetHidden()) return;
+    var v = sheet.getDataRange().getValues();
+
+    for (var r = 0; r < v.length; r++) {
+      var row = v[r].map(s);
+
+      // ① 拠点ごとのサマリー（店舗名 / 総枠数 / 総予約数 …）
+      if (!sites.length && row.indexOf('店舗名') >= 0 && row.indexOf('総枠数') >= 0) {
+        var c = {
+          name: row.indexOf('店舗名'),
+          slots: row.indexOf('総枠数'),
+          booked: row.indexOf('総予約数'),
+          judge: row.indexOf('シフト見直し判定'),
+        };
+        for (var i = r + 1; i < v.length; i++) {
+          var name = s(v[i][c.name]);
+          if (!name) break; // 合計行や空行で終わり
+          var slots = num(v[i][c.slots]);
+          var booked = num(v[i][c.booked]);
+          if (slots === null) continue;
+          sites.push({
+            name: name,
+            slots: slots,
+            booked: booked === null ? 0 : booked,
+            judge: c.judge >= 0 ? s(v[i][c.judge]) : '',
+          });
+        }
+      }
+
+      // ② 月別稼働率サマリー（「日付 - 年-月」の行に拠点名が並ぶ）
+      if (!months.length && row[0] && row[0].indexOf('日付') >= 0 && row[0].indexOf('月') >= 0) {
+        var cols = [];
+        for (var cc = 1; cc < row.length; cc++) {
+          if (row[cc] && row[cc] !== '総計') cols.push({ name: row[cc], col: cc });
+          if (row[cc] === '総計') break;
+        }
+        var totalCol = row.indexOf('総計');
+        cols.forEach(function (x) {
+          monthly[x.name] = [];
+        });
+        for (var j = r + 1; j < v.length; j++) {
+          var label = s(v[j][0]);
+          if (!label || label === '総計') break;
+          // 「2026-7月」→「7月」
+          var mm = label.match(/(\d{1,2})月/);
+          months.push(mm ? mm[1] + '月' : label);
+          cols.forEach(function (x) {
+            monthly[x.name].push(toRate(v[j][x.col]));
+          });
+          monthlyTotal.push(totalCol >= 0 ? toRate(v[j][totalCol]) : null);
+        }
+      }
+    }
+  });
+
+  if (!sites.length) {
+    out.warnings.push('東京店実績シート: 「店舗名」「総枠数」の見出しが見つかりませんでした');
+    return null;
+  }
+
+  return {
+    sites: sites,
+    months: months,
+    monthly: monthly,
+    monthlyTotal: monthlyTotal,
+    spreadsheetName: ss.getName(),
+  };
+}
+
+/** 「58.3%」や 0.583 を 58.3 という数値にする */
+function toRate(v) {
+  if (v === null || v === undefined || v === '') return null;
+  if (typeof v === 'number') return Math.round((v <= 1 ? v * 100 : v) * 10) / 10;
+  var m = String(v).match(/(-?[\d.]+)\s*%/);
+  if (m) return Math.round(parseFloat(m[1]) * 10) / 10;
+  var n = Number(v);
+  return isNaN(n) ? null : Math.round((n <= 1 ? n * 100 : n) * 10) / 10;
+}
+
 // --- 組み立て ---------------------------------------------------------------
 
 function buildPayload() {
@@ -302,6 +411,14 @@ function buildPayload() {
     }
   });
 
+  // 東京の拠点別（別シート）。読めなくても本体は止めない。
+  try {
+    var tokyo = readTokyo(out);
+    if (tokyo) out.tokyo = tokyo;
+  } catch (err) {
+    out.warnings.push('東京店実績シートの読み取りで問題が起きました: ' + err);
+  }
+
   ['weekly', 'trials', 'churn'].forEach(function (k) {
     if (!found[k]) out.warnings.push(k + ' に対応するシートが見つかりませんでした');
   });
@@ -344,6 +461,7 @@ function testRun() {
   Logger.log(
     '週: ' + d.weeks.length + ' / 体験: ' + d.trials.length + ' / 退会: ' + d.churn.length
   );
+  Logger.log('東京の拠点: ' + (d.tokyo ? d.tokyo.sites.length + '件' : '読めず'));
   Logger.log('警告: ' + JSON.stringify(d.warnings));
   Logger.log(JSON.stringify(describeSheets(), null, 2));
 }

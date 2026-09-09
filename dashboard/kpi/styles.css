@@ -1027,3 +1027,43 @@ body {
     color: #6b6b76;
   }
 }
+
+/* 東京の拠点別（別シート由来） */
+.card-subtitle {
+  margin: 0 0 10px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.tokyo-note {
+  padding: 0 0 14px;
+  margin-top: 0;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 16px;
+}
+
+.tokyo-note a {
+  color: var(--accent-deep);
+  font-weight: 600;
+}
+
+.judge-tag {
+  display: inline-block;
+  font-size: 11px;
+  padding: 1px 8px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+.judge-tag.review {
+  border-color: color-mix(in srgb, var(--warning) 60%, transparent);
+  color: #8a5a00;
+}
+
+.judge-tag.ok {
+  border-color: color-mix(in srgb, var(--good) 45%, transparent);
+  color: var(--delta-up);
+}

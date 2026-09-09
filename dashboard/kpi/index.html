@@ -100,6 +100,32 @@
           <div id="chart-util" class="chart"></div>
           <div id="legend-util" class="legend"></div>
         </div>
+
+        <!-- 東京だけ、拠点ごとの内訳が別シートにある -->
+        <div class="card" id="tokyo-card" hidden>
+          <h3 class="card-title">東京の拠点別 稼働率</h3>
+          <p class="section-note tokyo-note">
+            別のスプレッドシート
+            <a id="tokyo-source" href="#" target="_blank" rel="noopener noreferrer">「東京店実績」</a>
+            より。<strong>上の折れ線とは集計期間も数え方も違う</strong>ため、直接は比べられません
+            （上＝週ごとのレッスン枠と実施数、こちら＝拠点ごとの予約枠と予約数の累計）。
+          </p>
+          <div class="two-col">
+            <div>
+              <h4 class="card-subtitle" id="tokyo-total"></h4>
+              <div id="chart-tokyo-site" class="chart chart-bars"></div>
+            </div>
+            <div>
+              <h4 class="card-subtitle">月ごとの平均稼働率</h4>
+              <div class="table-scroll">
+                <table id="tokyo-month-table" class="data-table"></table>
+              </div>
+              <p class="caption">
+                コマごとの稼働率を平均した値です（枠数での重みづけはしていません）。
+              </p>
+            </div>
+          </div>
+        </div>
       </section>
 
       <!-- 3. レッスン数 -->

@@ -10,6 +10,7 @@ import {
   WEEKLY as FILE_WEEKLY,
   TRIALS as FILE_TRIALS,
   CHURN as FILE_CHURN,
+  TOKYO as FILE_TOKYO,
   classifyReason,
 } from './data.js';
 
@@ -22,6 +23,7 @@ let WEEKS = FILE_WEEKS;
 let WEEKLY = FILE_WEEKLY;
 let TRIALS = FILE_TRIALS;
 let CHURN = FILE_CHURN;
+let TOKYO = FILE_TOKYO;
 let SNAPSHOT_DATE = META.snapshotDate;
 let DATA_SOURCE = 'file'; // 'file' | 'sheet'
 let LOAD_ERROR = null;
@@ -450,6 +452,89 @@ function renderUtilChart() {
 
   $('#chart-util').replaceChildren(svg);
   renderLegend('#legend-util', STORES.map((s) => ({ color: seriesColor(s.slot), label: s.name })));
+}
+
+/* ==========================================================================
+   東京の拠点別 稼働率（別シート）
+   ========================================================================== */
+
+function renderTokyo() {
+  const card = $('#tokyo-card');
+  if (!card) return;
+
+  // 東京のデータなので、全店か東京を選んでいるときだけ出す
+  const show = (state.store === 'all' || state.store === 'tokyo') && TOKYO && TOKYO.sites?.length;
+  card.hidden = !show;
+  if (!show) return;
+
+  const link = $('#tokyo-source');
+  if (link && TOKYO.sourceUrl) link.href = TOKYO.sourceUrl;
+
+  const totalSlots = TOKYO.sites.reduce((a, s) => a + s.slots, 0);
+  const totalBooked = TOKYO.sites.reduce((a, s) => a + s.booked, 0);
+  $('#tokyo-total').textContent =
+    `拠点ごとの稼働率（東京合計 ${fmtPct(pct(totalBooked, totalSlots), 1)}／` +
+    `${totalBooked}件 ÷ ${totalSlots}枠）`;
+
+  // 稼働率は「大きさ」を比べるものなので、店舗の識別色ではなく1色の濃淡で描く
+  const items = [...TOKYO.sites]
+    .map((s) => {
+      const rate = pct(s.booked, s.slots);
+      return {
+        label: s.name,
+        value: rate ?? 0,
+        display: `${fmtPct(rate, 1)}（${s.booked}/${s.slots}）`,
+        tipExtra: [
+          { label: '空き枠', value: `${s.slots - s.booked}枠` },
+          { label: 'シフト判定', value: s.judge || '−' },
+        ],
+      };
+    })
+    .sort((a, b) => b.value - a.value);
+
+  renderHBar('#chart-tokyo-site', items, {
+    unit: '%',
+    maxOverride: 100,
+    labelW: 108,
+    tipLabel: '稼働率',
+    ariaLabel: '東京の拠点ごとの稼働率の横棒グラフ',
+  });
+
+  // 月ごとの平均稼働率
+  const table = $('#tokyo-month-table');
+  const thead = document.createElement('thead');
+  const hr = document.createElement('tr');
+  hr.appendChild(html('th', null, '拠点'));
+  for (const m of TOKYO.months) hr.appendChild(html('th', 'num', m));
+  hr.appendChild(html('th', null, '判定'));
+  thead.appendChild(hr);
+
+  const tbody = document.createElement('tbody');
+  for (const s of TOKYO.sites) {
+    const row = TOKYO.monthly?.[s.name];
+    const tr = document.createElement('tr');
+    tr.appendChild(html('td', null, s.name));
+    TOKYO.months.forEach((_, i) => {
+      const v = row ? row[i] : null;
+      tr.appendChild(html('td', 'num', v === null || v === undefined ? '−' : `${v.toFixed(1)}%`));
+    });
+    const td = html('td');
+    const ok = s.judge === '適正';
+    td.appendChild(html('span', `judge-tag ${ok ? 'ok' : 'review'}`, s.judge || '−'));
+    tr.appendChild(td);
+    tbody.appendChild(tr);
+  }
+  if (Array.isArray(TOKYO.monthlyTotal)) {
+    const tr = document.createElement('tr');
+    tr.className = 'group-head';
+    tr.appendChild(html('td', null, '東京 平均'));
+    TOKYO.monthlyTotal.forEach((v) =>
+      tr.appendChild(html('td', 'num', v === null ? '−' : `${v.toFixed(1)}%`))
+    );
+    tr.appendChild(html('td', null, ''));
+    tbody.appendChild(tr);
+  }
+  table.replaceChildren(thead, tbody);
 }
 
 /* ==========================================================================
@@ -1696,6 +1781,7 @@ function renderAll() {
   renderKPIs();
   renderMonthKPIs();
   renderUtilChart();
+  renderTokyo();
   renderLessonsChart();
   renderTrialChart();
   renderWeeklyTable();
@@ -1781,6 +1867,9 @@ async function loadFromSheet() {
   CHURN = Array.isArray(body.churn) ? body.churn : [];
   SNAPSHOT_DATE = body.snapshotDate || SNAPSHOT_DATE;
   SHEET_WARNINGS = Array.isArray(body.warnings) ? body.warnings : [];
+  if (body.tokyo && Array.isArray(body.tokyo.sites) && body.tokyo.sites.length) {
+    TOKYO = { ...FILE_TOKYO, ...body.tokyo };
+  }
   DATA_SOURCE = 'sheet';
   LOAD_ERROR = null;
 

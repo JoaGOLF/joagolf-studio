@@ -234,3 +234,33 @@ export function classifyReason(row) {
   if (/持病|設備|私用|私的/.test(r)) return '私的理由・その他事情';
   return '理由不明・未記入';
 }
+
+/**
+ * 東京4拠点の稼働率。別のスプレッドシート「東京店実績」から。
+ * https://docs.google.com/spreadsheets/d/1uvWkKKe19prMEYBfxtngVRIRTrdDp49MccGZEumlwCM/edit
+ *
+ * ★上の WEEKLY とは集計期間も数え方も違うので、直接比べないこと。
+ *   WEEKLY の東京 = 週ごとの「レッスン枠と実施数」
+ *   こちら       = 拠点ごとの「予約枠と予約数」の累計
+ */
+export const TOKYO = {
+  sourceUrl:
+    'https://docs.google.com/spreadsheets/d/1uvWkKKe19prMEYBfxtngVRIRTrdDp49MccGZEumlwCM/edit',
+  // 拠点ごとの累計。judge はシートの「シフト見直し判定」
+  sites: [
+    { name: '西新宿', slots: 48, booked: 35, judge: '適正' },
+    { name: '赤坂', slots: 43, booked: 17, judge: '要見直し' },
+    { name: '麹町', slots: 42, booked: 16, judge: '要見直し' },
+    { name: '千駄ヶ谷', slots: 28, booked: 7, judge: '要見直し' },
+  ],
+  // 月ごとの平均稼働率（％）。シートの「月別稼働率サマリー」より。
+  // 枠数で重みづけした割合ではなく、コマごとの稼働率の平均である点に注意。
+  months: ['7月', '8月', '9月'],
+  monthly: {
+    西新宿: [58.3, 100.0, 100.0],
+    赤坂: [33.3, 50.0, 83.3],
+    麹町: [40.0, 75.0, 100.0],
+    千駄ヶ谷: [33.3, 66.7, 100.0],
+  },
+  monthlyTotal: [44.1, 76.2, 94.1],
+};
