@@ -183,6 +183,33 @@ function monthOfWeek(label) {
   return m ? Number(m[1]) : null;
 }
 
+/** 今日から見た「先月」の月番号（1〜12）。9月なら 8 を返す */
+function lastMonthNumber() {
+  const d = new Date();
+  return d.getMonth() === 0 ? 12 : d.getMonth(); // getMonth() は 0=1月なので、そのまま前月になる
+}
+
+/**
+ * 「先月」のまとまりを返す。まだ先月のデータが無ければ、記録のある最後の月を返す。
+ * 返り値の isLastMonth で、本当に先月なのかどうかが分かる。
+ */
+function lastMonthGroup() {
+  const groups = monthGroups().filter((g) => sumWeeks(g.weeks) !== null);
+  if (!groups.length) return null;
+  const target = lastMonthNumber();
+  const hit = groups.find((g) => g.month === target);
+  if (hit) {
+    const idx = groups.indexOf(hit);
+    return { ...hit, prev: idx > 0 ? groups[idx - 1] : null, isLastMonth: true };
+  }
+  const fallback = groups[groups.length - 1];
+  return {
+    ...fallback,
+    prev: groups.length > 1 ? groups[groups.length - 2] : null,
+    isLastMonth: false,
+  };
+}
+
 /** 記録のある週を月ごとにまとめる。古い順 */
 function monthGroups() {
   const order = [];
@@ -501,6 +528,8 @@ function renderTokyo() {
   });
 
   // 月ごとの平均稼働率
+  renderTokyoHeatmaps();
+
   const table = $('#tokyo-month-table');
   const thead = document.createElement('thead');
   const hr = document.createElement('tr');
@@ -535,6 +564,88 @@ function renderTokyo() {
     tbody.appendChild(tr);
   }
   table.replaceChildren(thead, tbody);
+}
+
+/**
+ * 稼働率の濃淡。青1色で、低い→薄い、高い→濃い。
+ * どの段でも文字は黒のまま読めるように、濃い側を上げすぎない。
+ */
+const HEAT_STEPS = [
+  { max: 20, bg: '#f2f7fe' },
+  { max: 40, bg: '#d7e7fc' },
+  { max: 60, bg: '#b0cef7' },
+  { max: 80, bg: '#86b6ef' },
+  { max: 101, bg: '#5598e7' },
+];
+
+function heatColor(v) {
+  for (const s of HEAT_STEPS) if (v < s.max) return s.bg;
+  return HEAT_STEPS[HEAT_STEPS.length - 1].bg;
+}
+
+/** 曜日 × 時間帯 のヒートマップを拠点ごとに描く */
+function renderTokyoHeatmaps() {
+  const box = $('#tokyo-heatmaps');
+  if (!box) return;
+  const days = TOKYO?.days;
+  const times = TOKYO?.times;
+  const maps = TOKYO?.heatmap;
+  if (!days || !times || !maps) {
+    box.replaceChildren(html('p', 'muted', '曜日・時間帯のデータがありません。'));
+    return;
+  }
+
+  const blocks = [];
+  for (const site of TOKYO.sites) {
+    const grid = maps[site.name];
+    if (!grid) continue;
+
+    const wrap = html('div', 'heatmap-site');
+    const h = html('h5', null, site.name);
+    // シフトが入っているコマ数と、その平均を添える
+    const vals = grid.flat().filter((v) => v !== null && v !== undefined);
+    const avg = vals.length ? vals.reduce((a, b) => a + b, 0) / vals.length : null;
+    h.appendChild(
+      html('span', 'hm-sub', `シフト${vals.length}コマ／平均 ${fmtPct(avg, 0)}`)
+    );
+    wrap.appendChild(h);
+
+    const table = html('table', 'hm-table');
+    const thead = document.createElement('thead');
+    const hr = document.createElement('tr');
+    hr.appendChild(html('th', 'hm-time', ''));
+    for (const d of days) hr.appendChild(html('th', null, d));
+    thead.appendChild(hr);
+
+    const tbody = document.createElement('tbody');
+    times.forEach((time, ti) => {
+      const row = grid[ti] || [];
+      // その時間帯にどの曜日もシフトが無ければ、行ごと省く
+      if (!row.some((v) => v !== null && v !== undefined)) return;
+      const tr = document.createElement('tr');
+      tr.appendChild(html('th', 'hm-time', time));
+      days.forEach((day, di) => {
+        const v = row[di];
+        if (v === null || v === undefined) {
+          const td = html('td', 'hm-blank', '−');
+          td.title = `${site.name} ${day}曜 ${time}：シフトなし`;
+          tr.appendChild(td);
+          return;
+        }
+        const td = html('td', null, `${Math.round(v)}%`);
+        td.style.background = heatColor(v);
+        td.title = `${site.name} ${day}曜 ${time}：稼働率 ${Math.round(v)}%`;
+        tr.appendChild(td);
+      });
+      tbody.appendChild(tr);
+    });
+
+    table.replaceChildren(thead, tbody);
+    wrap.appendChild(table);
+    blocks.push(wrap);
+  }
+
+  box.replaceChildren(...blocks);
 }
 
 /* ==========================================================================
@@ -891,31 +1002,48 @@ function renderKPIs() {
 
   const cur = recordAt(latest);
   const old = prev === undefined ? null : recordAt(prev);
-  box.replaceChildren(...kpiCards(cur, old, '前週比').map(kpiCardNode));
+  const avg = lastMonthWeeklyAverage();
+  box.replaceChildren(
+    ...kpiCards(cur, [
+      { rec: old, label: '前週比' },
+      avg ? { rec: avg.rec, label: `${avg.month}月の週平均比` } : null,
+    ]).map(kpiCardNode)
+  );
 }
 
-/** 現在と比較対象から、KPIカードの定義を作る（週でも月でも同じ形） */
-function kpiCards(cur, old, unitLabel) {
-  return [
-    { label: 'レッスン枠', value: cur.slots, unit: '枠', prev: old?.slots ?? null },
-    { label: '実施レッスン数', value: cur.lessons, unit: '回', prev: old?.lessons ?? null },
-    {
-      label: '稼働率',
-      value: pct(cur.lessons, cur.slots),
-      unit: '%',
-      isPct: true,
-      prev: old ? pct(old.lessons, old.slots) : null,
-    },
-    { label: '体験に来た人数', value: cur.trials, unit: '人', prev: old?.trials ?? null },
-    { label: '入会した人数', value: cur.joins, unit: '人', prev: old?.joins ?? null },
-    {
-      label: '体験からの入会率',
-      value: pct(cur.joins, cur.trials),
-      unit: '%',
-      isPct: true,
-      prev: old ? pct(old.joins, old.trials) : null,
-    },
-  ].map((c) => ({ ...c, deltaLabel: unitLabel }));
+/** KPIの6項目。get は集計値から表示する数値を取り出す */
+const KPI_DEFS = [
+  { label: 'レッスン枠', unit: '枠', get: (r) => r.slots },
+  { label: '実施レッスン数', unit: '回', get: (r) => r.lessons },
+  { label: '稼働率', unit: '%', isPct: true, get: (r) => pct(r.lessons, r.slots) },
+  { label: '体験に来た人数', unit: '人', get: (r) => r.trials },
+  { label: '入会した人数', unit: '人', get: (r) => r.joins },
+  { label: '体験からの入会率', unit: '%', isPct: true, get: (r) => pct(r.joins, r.trials) },
+];
+
+/**
+ * KPIカードの定義を作る。
+ * comparisons は [{ rec, label }] の配列で、渡した数だけ「◯◯比」の行が出る。
+ */
+function kpiCards(cur, comparisons) {
+  const list = (comparisons || []).filter((c) => c && c.label);
+  return KPI_DEFS.map((d) => ({
+    label: d.label,
+    unit: d.unit,
+    isPct: d.isPct,
+    value: d.get(cur),
+    deltas: list.map((c) => ({
+      label: c.label,
+      prev: c.rec ? d.get(c.rec) : null,
+    })),
+  }));
+}
+
+/** 小数が出るときだけ小数第1位まで見せる（先月の週平均は割り算で端数が出るため） */
+function fmtDelta(v, unit) {
+  const a = Math.abs(v);
+  const shown = Number.isInteger(a) ? String(a) : a.toFixed(1);
+  return `${shown}${unit}`;
 }
 
 /** KPIカードを1枚のDOMにする */
@@ -933,26 +1061,47 @@ function kpiCardNode(c) {
   }
   node.appendChild(val);
 
-  const d =
-    c.prev === null || c.prev === undefined || c.value === null || Number.isNaN(c.value)
-      ? null
-      : c.value - c.prev;
-  const delta = html('p', 'kpi-delta');
-  if (d === null) {
-    delta.classList.add('flat');
-    delta.textContent = `${c.deltaLabel} −`;
-  } else {
-    const up = d > 0.05;
-    const down = d < -0.05;
-    delta.classList.add(up ? 'up' : down ? 'down' : 'flat');
-    delta.appendChild(html('span', 'arrow', up ? '▲' : down ? '▼' : '−'));
-    const mag = c.isPct ? `${Math.abs(d).toFixed(1)}pt` : `${Math.abs(d)}${c.unit}`;
-    delta.appendChild(
-      document.createTextNode(up || down ? `${c.deltaLabel} ${mag}` : `${c.deltaLabel} 変化なし`)
-    );
+  for (const dlt of c.deltas) {
+    const d =
+      dlt.prev === null || dlt.prev === undefined || c.value === null || Number.isNaN(c.value)
+        ? null
+        : c.value - dlt.prev;
+    const row = html('p', 'kpi-delta');
+    if (d === null) {
+      row.classList.add('flat');
+      row.textContent = `${dlt.label} −`;
+    } else {
+      const up = d > 0.05;
+      const down = d < -0.05;
+      row.classList.add(up ? 'up' : down ? 'down' : 'flat');
+      row.appendChild(html('span', 'arrow', up ? '▲' : down ? '▼' : '−'));
+      const mag = c.isPct ? `${Math.abs(d).toFixed(1)}pt` : fmtDelta(d, c.unit);
+      row.appendChild(
+        document.createTextNode(up || down ? `${dlt.label} ${mag}` : `${dlt.label} 変化なし`)
+      );
+    }
+    node.appendChild(row);
   }
-  node.appendChild(delta);
   return node;
+}
+
+/** 先月の「1週あたり平均」。週の数字と比べられるようにするため */
+function lastMonthWeeklyAverage() {
+  const g = lastMonthGroup();
+  if (!g) return null;
+  const sum = sumWeeks(g.weeks);
+  if (!sum) return null;
+  const n = g.weeks.length || 1;
+  return {
+    rec: {
+      slots: sum.slots / n,
+      lessons: sum.lessons / n,
+      trials: sum.trials / n,
+      joins: sum.joins / n,
+    },
+    month: g.month,
+    weeks: n,
+  };
 }
 
 /* ==========================================================================
@@ -960,37 +1109,35 @@ function kpiCardNode(c) {
    ========================================================================== */
 
 function renderMonthKPIs() {
-  const groups = monthGroups().filter((g) => sumWeeks(g.weeks) !== null);
-  const latest = groups[groups.length - 1];
-  const prev = groups[groups.length - 2];
-
+  const g = lastMonthGroup();
   const scopeLabel = state.store === 'all' ? '4店舗の合計' : `${storeName(state.store)}店`;
   const box = $('#kpi-month');
   const note = $('#month-scope');
 
-  if (!latest) {
+  if (!g) {
     note.textContent = `${scopeLabel} — 記録された月がありません`;
     box.replaceChildren(html('p', 'muted', 'この店舗の月次データはまだ入っていません。'));
     return;
   }
 
-  const weeksLabel = `${WEEKS[latest.weeks[0]]} 〜 ${WEEKS[latest.weeks[latest.weeks.length - 1]]}`;
-  note.textContent = `${scopeLabel} ／ ${latest.month}月（${latest.weeks.length}週分：${weeksLabel}）`;
+  const first = WEEKS[g.weeks[0]];
+  const last = WEEKS[g.weeks[g.weeks.length - 1]];
+  const span = g.weeks.length === 1 ? first : `${first} 〜 ${last}`;
+  note.textContent =
+    `${scopeLabel} ／ ${g.month}月（${g.weeks.length}週分：${span}）` +
+    (g.isLastMonth ? '' : '　※先月の記録がまだ無いため、記録のある最後の月を表示しています');
 
-  const cur = sumWeeks(latest.weeks);
-  // 月の途中だと週数が違い、そのまま前月の合計と比べると大きく減ったように見える。
-  // 同じ週数ぶん（前月の頭から）で比べる。
-  const fair = prev ? prev.weeks.slice(0, latest.weeks.length) : null;
+  const cur = sumWeeks(g.weeks);
+  const fair = g.prev ? g.prev.weeks.slice(0, g.weeks.length) : null;
   const old = fair && fair.length ? sumWeeks(fair) : null;
-  const sameLength = !prev || fair.length === prev.weeks.length;
-  const label = sameLength ? '前月比' : `前月の同じ${latest.weeks.length}週比`;
+  const sameLength = !g.prev || fair.length === g.prev.weeks.length;
+  const label = sameLength ? '前月比' : `前月の同じ${g.weeks.length}週比`;
 
-  box.replaceChildren(...kpiCards(cur, old, label).map(kpiCardNode));
+  box.replaceChildren(...kpiCards(cur, [{ rec: old, label }]).map(kpiCardNode));
 
   if (!sameLength) {
     note.textContent +=
-      `　※${latest.month}月はまだ${latest.weeks.length}週分のため、` +
-      `${prev.month}月の最初の${latest.weeks.length}週と比べています`;
+      `　※${g.month}月は${g.weeks.length}週分のため、${g.prev.month}月の最初の${g.weeks.length}週と比べています`;
   }
 }
 
@@ -1504,34 +1651,42 @@ function reportPeriod(period) {
     const latest = withData[withData.length - 1];
     const prev = withData[withData.length - 2];
     if (latest === undefined) return null;
+    const avg = lastMonthWeeklyAverage();
     return {
       title: '週次レポート',
       label: `${WEEKS[latest]} の週`,
       weeks: [latest],
-      prevWeeks: prev === undefined ? null : [prev],
-      compare: '前週比',
+      comparisons: [
+        { rec: prev === undefined ? null : recordAt(prev), label: '前週比' },
+        avg ? { rec: avg.rec, label: `${avg.month}月の週平均比` } : null,
+      ],
     };
   }
-  const groups = monthGroups().filter((g) => sumWeeks(g.weeks) !== null);
-  const latest = groups[groups.length - 1];
-  const prev = groups[groups.length - 2];
-  if (!latest) return null;
-  // 月の途中だと週数が違うので、前月も同じ週数ぶんだけ取って比べる
-  const fair = prev ? prev.weeks.slice(0, latest.weeks.length) : null;
-  const sameLength = !prev || fair.length === prev.weeks.length;
-  const span =
-    latest.weeks.length === 1
-      ? `${WEEKS[latest.weeks[0]]} の1週分`
-      : `${WEEKS[latest.weeks[0]]} 〜 ${WEEKS[latest.weeks[latest.weeks.length - 1]]}`;
+  const g = lastMonthGroup();
+  if (!g) return null;
+  const fair = g.prev ? g.prev.weeks.slice(0, g.weeks.length) : null;
+  const sameLength = !g.prev || fair.length === g.prev.weeks.length;
+  const first = WEEKS[g.weeks[0]];
+  const last = WEEKS[g.weeks[g.weeks.length - 1]];
+  const span = g.weeks.length === 1 ? first : `${first} 〜 ${last}`;
   return {
     title: '月次レポート',
-    label: `${latest.month}月（${span}）`,
-    weeks: latest.weeks,
-    prevWeeks: fair && fair.length ? fair : null,
-    compare: sameLength ? '前月比' : `前月の同じ${latest.weeks.length}週比`,
-    note: sameLength
-      ? null
-      : `${latest.month}月はまだ${latest.weeks.length}週分のため、${prev.month}月の最初の${latest.weeks.length}週と比べています。`,
+    label: `${g.month}月（${span}）`,
+    weeks: g.weeks,
+    comparisons: [
+      {
+        rec: fair && fair.length ? sumWeeks(fair) : null,
+        label: sameLength ? '前月比' : `前月の同じ${g.weeks.length}週比`,
+      },
+    ],
+    note: [
+      g.isLastMonth ? null : '先月の記録がまだ無いため、記録のある最後の月を出しています。',
+      sameLength
+        ? null
+        : `${g.month}月は${g.weeks.length}週分のため、${g.prev.month}月の最初の${g.weeks.length}週と比べています。`,
+    ]
+      .filter(Boolean)
+      .join(' '),
   };
 }
 
@@ -1545,7 +1700,6 @@ function buildReport(period) {
 
   const scope = state.store === 'all' ? '全店（4店舗合計）' : `${storeName(state.store)}店`;
   const cur = sumWeeks(spec.weeks);
-  const old = spec.prevWeeks ? sumWeeks(spec.prevWeeks) : null;
 
   const parts = [];
 
@@ -1565,7 +1719,7 @@ function buildReport(period) {
 
   // --- KPI ---
   const kpiWrap = html('div', 'report-kpis');
-  kpiWrap.replaceChildren(...kpiCards(cur, old, spec.compare).map(kpiCardNode));
+  kpiWrap.replaceChildren(...kpiCards(cur, spec.comparisons).map(kpiCardNode));
   parts.push(kpiWrap);
   if (spec.note) parts.push(html('p', 'report-note', `※ ${spec.note}`));
 
@@ -1743,7 +1897,14 @@ function setupReportButtons() {
    ========================================================================== */
 
 function renderStoreFilter() {
-  const box = $('#store-filter');
+  // ヘッダーとページ上部の2か所に、同じものを描く
+  for (const sel of ['#store-filter', '#store-filter-header']) {
+    const box = $(sel);
+    if (box) renderStoreFilterInto(box);
+  }
+}
+
+function renderStoreFilterInto(box) {
   const options = [{ id: 'all', name: '全店', slot: null }, ...STORES];
   box.replaceChildren(
     ...options.map((o) => {

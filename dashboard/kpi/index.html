@@ -30,6 +30,10 @@
           </p>
           <p class="load-warning" id="load-warning" hidden></p>
         </div>
+        <!-- 下と同じ内容。スクロールしても切り替えられるようにヘッダーにも置く -->
+        <nav class="header-filters" aria-label="店舗の絞り込み（ヘッダー）">
+          <div id="store-filter-header" class="segmented" role="group"></div>
+        </nav>
       </div>
     </header>
 
@@ -48,20 +52,22 @@
         </div>
         <div id="kpi-row" class="kpi-row"></div>
         <p class="caption">
-          「前週比」は1つ前の週との差です。前の週に記録がない場合は表示しません。
+          上段の「前週比」は1つ前の週との差。下段は<strong>先月の1週あたりの平均</strong>との差です
+          （1週間と1ヶ月をそのまま比べても意味がないため、先月を週数で割った値と比べています）。
         </p>
       </section>
 
       <!-- 2. 直近1ヶ月サマリー -->
       <section class="section" aria-labelledby="h-month">
         <div class="section-head">
-          <h2 id="h-month">直近1ヶ月のサマリー</h2>
+          <h2 id="h-month">先月のサマリー</h2>
           <p class="section-note" id="month-scope"></p>
         </div>
         <div id="kpi-month" class="kpi-row"></div>
         <p class="caption">
-          週をまとめて月にしています。月をまたぐ週は、<strong>週の始まりの日が入る月</strong>に数えます
-          （例：7/28-8/3 の週は7月）。「前月比」は1つ前の月との差です。
+          今日から見た<strong>先月</strong>の集計です（例：9月中なら8月分）。週をまとめて月にしているため、
+          月をまたぐ週は<strong>週の始まりの日が入る月</strong>に数えます（例：7/28-8/3 の週は7月）。
+          「前月比」はさらに1つ前の月との差です。
         </p>
       </section>
 
@@ -124,6 +130,15 @@
                 コマごとの稼働率を平均した値です（枠数での重みづけはしていません）。
               </p>
             </div>
+          </div>
+
+          <div class="heatmap-block">
+            <h4 class="card-subtitle">曜日と時間帯ごとの稼働率（拠点別）</h4>
+            <p class="caption heatmap-note">
+              色が濃いほど埋まっています。<span class="hm-blank-sample"></span> はシフトが入っていないコマです。
+              「0%」はシフトはあるが予約が入らなかったコマなので、意味が違います。
+            </p>
+            <div id="tokyo-heatmaps" class="heatmap-grid"></div>
           </div>
         </div>
       </section>
