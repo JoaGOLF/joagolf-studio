@@ -226,6 +226,32 @@ function monthGroups() {
   return order.map((mo) => ({ month: mo, weeks: byMonth.get(mo) }));
 }
 
+/** その週が、その月の何週目かを返す */
+function weekPositionInMonth(weekIndex) {
+  const groups = monthGroups();
+  for (let i = 0; i < groups.length; i++) {
+    const k = groups[i].weeks.indexOf(weekIndex);
+    if (k >= 0) return { groupIndex: i, index: k, month: groups[i].month };
+  }
+  return null;
+}
+
+/**
+ * 「先月の同じ週目」を返す。
+ * 例：9月の2週目を見ているなら、8月の2週目を返す。
+ * その週が先月に無ければ null。
+ */
+function sameWeekLastMonth(weekIndex) {
+  const pos = weekPositionInMonth(weekIndex);
+  if (!pos || pos.groupIndex === 0) return null;
+  const prev = monthGroups()[pos.groupIndex - 1];
+  const target = prev.weeks[pos.index];
+  if (target === undefined) return null;
+  const rec = recordAt(target);
+  if (!rec) return null;
+  return { rec, nth: pos.index + 1, month: prev.month, weekLabel: WEEKS[target] };
+}
+
 /** 複数の週を合計する（いま選ばれている店舗の範囲で）。記録が1つも無ければ null */
 function sumWeeks(weekIdxs, storeId = state.store) {
   let any = false;
@@ -1003,12 +1029,24 @@ function renderKPIs() {
   const cur = recordAt(latest);
   const old = prev === undefined ? null : recordAt(prev);
   const avg = lastMonthWeeklyAverage();
+  const same = sameWeekLastMonth(latest);
   box.replaceChildren(
     ...kpiCards(cur, [
       { rec: old, label: '前週比' },
-      avg ? { rec: avg.rec, label: `${avg.month}月の週平均比` } : null,
+      avg ? { rec: avg.rec, label: '先月の週平均比' } : null,
+      same ? { rec: same.rec, label: `先月の第${same.nth}週比` } : null,
     ]).map(kpiCardNode)
   );
+
+  // どの週と比べているかは、カードに書ききれないので下に添える
+  const detail = $('#summary-compare');
+  if (detail) {
+    const bits = [];
+    if (prev !== undefined) bits.push(`前週＝${WEEKS[prev]}`);
+    if (avg) bits.push(`先月(${avg.month}月)の週平均＝${avg.weeks}週の平均`);
+    if (same) bits.push(`先月の第${same.nth}週＝${same.weekLabel}`);
+    detail.textContent = bits.length ? `比べている相手：${bits.join(' ／ ')}` : '';
+  }
 }
 
 /** KPIの6項目。get は集計値から表示する数値を取り出す */
@@ -1652,13 +1690,15 @@ function reportPeriod(period) {
     const prev = withData[withData.length - 2];
     if (latest === undefined) return null;
     const avg = lastMonthWeeklyAverage();
+    const same = sameWeekLastMonth(latest);
     return {
       title: '週次レポート',
       label: `${WEEKS[latest]} の週`,
       weeks: [latest],
       comparisons: [
         { rec: prev === undefined ? null : recordAt(prev), label: '前週比' },
-        avg ? { rec: avg.rec, label: `${avg.month}月の週平均比` } : null,
+        avg ? { rec: avg.rec, label: '先月の週平均比' } : null,
+        same ? { rec: same.rec, label: `先月の第${same.nth}週比` } : null,
       ],
     };
   }
@@ -1897,11 +1937,9 @@ function setupReportButtons() {
    ========================================================================== */
 
 function renderStoreFilter() {
-  // ヘッダーとページ上部の2か所に、同じものを描く
-  for (const sel of ['#store-filter', '#store-filter-header']) {
-    const box = $(sel);
-    if (box) renderStoreFilterInto(box);
-  }
+  // 店舗の切り替えはヘッダーだけに置く（常に画面上にあるため）
+  const box = $('#store-filter-header');
+  if (box) renderStoreFilterInto(box);
 }
 
 function renderStoreFilterInto(box) {

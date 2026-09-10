@@ -38,12 +38,6 @@
     </header>
 
     <div class="wrap">
-      <!-- 店舗フィルタ -->
-      <nav class="filters" aria-label="店舗の絞り込み">
-        <span class="filters-label">店舗</span>
-        <div id="store-filter" class="segmented" role="group"></div>
-      </nav>
-
       <!-- 1. 直近週サマリー -->
       <section class="section" aria-labelledby="h-summary">
         <div class="section-head">
@@ -52,9 +46,11 @@
         </div>
         <div id="kpi-row" class="kpi-row"></div>
         <p class="caption">
-          上段の「前週比」は1つ前の週との差。下段は<strong>先月の1週あたりの平均</strong>との差です
-          （1週間と1ヶ月をそのまま比べても意味がないため、先月を週数で割った値と比べています）。
+          3つの見方で比べています。<strong>前週比</strong>＝1つ前の週との差。
+          <strong>先月の週平均比</strong>＝先月の合計を週数で割った値との差（1週間と1ヶ月をそのまま
+          比べても意味がないため）。<strong>先月の第◯週比</strong>＝先月の同じ週目との差です。
         </p>
+        <p class="caption" id="summary-compare"></p>
       </section>
 
       <!-- 2. 直近1ヶ月サマリー -->
