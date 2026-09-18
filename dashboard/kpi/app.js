@@ -5,7 +5,7 @@
 
 import {
   META,
-  STORES,
+  STORES as FILE_STORES,
   WEEKS as FILE_WEEKS,
   WEEKLY as FILE_WEEKLY,
   TRIALS as FILE_TRIALS,
@@ -23,6 +23,7 @@ let WEEKS = FILE_WEEKS;
 let WEEKLY = FILE_WEEKLY;
 let TRIALS = FILE_TRIALS;
 let CHURN = FILE_CHURN;
+let STORES = FILE_STORES;
 let TOKYO = FILE_TOKYO;
 let SNAPSHOT_DATE = META.snapshotDate;
 let DATA_SOURCE = 'file'; // 'file' | 'sheet'
@@ -276,8 +277,22 @@ const state = {
   store: 'all', // 'all' | store id
 };
 
-const storeById = Object.fromEntries(STORES.map((s) => [s.id, s]));
+let storeById = Object.fromEntries(STORES.map((s) => [s.id, s]));
 const storeName = (id) => storeById[id]?.name ?? id;
+
+/**
+ * シートから返ってきた店舗一覧に合わせて、表示する店舗を組み替える。
+ * 東京が「東京」1つの場合も、拠点ごとに分かれている場合も、どちらでも動く。
+ */
+function applyStores(list) {
+  if (!Array.isArray(list) || !list.length) return;
+  // 週次データが1週でも入っている店舗だけを対象にする
+  const used = list.filter((s) => (WEEKLY[s.id] || []).some((x) => x));
+  const target = used.length ? used : list;
+  STORES = target.map((s, i) => ({ id: s.id, name: s.name, slot: (i % 8) + 1 }));
+  storeById = Object.fromEntries(STORES.map((s) => [s.id, s]));
+  if (state.store !== 'all' && !storeById[state.store]) state.store = 'all';
+}
 
 /** いま選ばれている範囲の週次データを取り出す */
 function recordAt(weekIndex) {
@@ -2140,6 +2155,7 @@ async function loadFromSheet() {
   CHURN = Array.isArray(body.churn) ? body.churn : [];
   SNAPSHOT_DATE = body.snapshotDate || SNAPSHOT_DATE;
   SHEET_WARNINGS = Array.isArray(body.warnings) ? body.warnings : [];
+  applyStores(body.stores);
   if (body.tokyo && Array.isArray(body.tokyo.sites) && body.tokyo.sites.length) {
     // シート側が読めなかった項目は null を返してくる。
     // そのまま上書きすると予備データまで消えてしまうので、中身があるものだけ差し替える。

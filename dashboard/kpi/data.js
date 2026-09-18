@@ -27,6 +27,12 @@ export const STORES = [
   { id: 'tokyo', name: '東京', slot: 4 },
 ];
 
+/**
+ * シートが「東京」1ブロックから拠点ごとの列に分かれた場合に使う並び。
+ * app.js が、シートから返ってきた店舗一覧を見て自動で切り替える。
+ */
+export const TOKYO_SITE_IDS = ['nishishinjuku', 'akasaka', 'kojimachi', 'sendagaya'];
+
 /** 週ラベル（シートの行順） */
 export const WEEKS = [
   '6/16-22',
