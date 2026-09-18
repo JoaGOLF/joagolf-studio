@@ -700,7 +700,7 @@ function renderTokyo() {
 /** 拠点名（西新宿・赤坂…）から、その店舗の色を返す */
 function tokyoSiteColor(name) {
   const store = STORES.find((s) => s.name === name);
-  return store ? seriesColor(store.slot) : 'var(--seq-450)';
+  return store ? seriesColor(store.slot) : 'var(--bar-neutral)';
 }
 
 const cssColorCache = new Map();
@@ -1081,6 +1081,16 @@ function renderTrialChart() {
    ========================================================================== */
 
 /**
+ * いま見ている範囲を表す棒の色。
+ * 全店＝どの店舗でもないので灰。1店舗を選んでいるなら、その店舗の色。
+ * （以前は常に青だったので、箕面を見ているのに神戸の色、ということが起きていた）
+ */
+function currentBarColor() {
+  const store = storeById[state.store];
+  return store ? seriesColor(store.slot) : 'var(--bar-neutral)';
+}
+
+/**
  * items: [{ label, value, display, segments? }]
  * segments を渡すと積み上げ横棒になる: [{ value, color, name }]
  */
@@ -1183,7 +1193,7 @@ function renderHBar(selector, items, opts = {}) {
           width: Math.max(4, (d.value / max) * barW),
           height: bh,
           rx: 4,
-          fill: d.color ?? 'var(--seq-450)',
+          fill: d.color ?? opts.barColor ?? 'var(--bar-neutral)',
         })
       );
     }
@@ -1559,6 +1569,7 @@ function renderChannelCharts() {
   renderHBar('#chart-channel', items, {
     unit: '人',
     tipLabel: '体験',
+    barColor: currentBarColor(),
     ariaLabel: '流入経路ごとの体験人数の横棒グラフ',
   });
   renderLegend(
@@ -1582,6 +1593,7 @@ function renderChannelCharts() {
 
   renderHBar('#chart-channel-rate', rateItems, {
     unit: '%',
+    barColor: currentBarColor(),
     maxOverride: 100,
     valueW: 108, // 「100%（1/1）」が棒に重ならない幅
     tipLabel: '入会率',
@@ -1626,6 +1638,7 @@ function renderPlanChart() {
   renderHBar('#chart-plan', items, {
     unit: '人',
     tipLabel: '入会',
+    barColor: currentBarColor(),
     ariaLabel: 'プランごとの入会人数の横棒グラフ',
   });
 
@@ -1687,7 +1700,16 @@ function renderTrialsTable() {
    退会・休会
    ========================================================================== */
 
-const KIND_COLOR = { 退会: 'var(--series-1)', 休会: 'var(--series-2)', その他: 'var(--series-3)' };
+/*
+ * 退会・休会は「店舗」ではないのに、以前は神戸の青と箕面のオレンジを使っていた。
+ * 店舗の色と紛らわしいので、色みのない灰の濃淡にする。
+ * 濃いほど重い（退会 > 休会 > その他）。色覚特性があっても濃さで区別できる。
+ */
+const KIND_COLOR = {
+  退会: 'var(--kind-leave)',
+  休会: 'var(--kind-pause)',
+  その他: 'var(--kind-other)',
+};
 
 function filteredChurn() {
   return CHURN.filter((c) => state.store === 'all' || c.store === state.store);
@@ -1735,6 +1757,7 @@ function renderChurn() {
     renderHBar('#chart-churn', items, {
       unit: '件',
       labelW: 176,
+      barColor: currentBarColor(),
       ariaLabel: '退会・休会の理由ごとの件数の横棒グラフ',
     });
     // 色だけで区分が分かる状態にしないよう、凡例を必ず出す
