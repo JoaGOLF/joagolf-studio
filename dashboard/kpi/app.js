@@ -620,13 +620,14 @@ function renderTokyo() {
     `拠点ごとの稼働率（東京合計 ${fmtPct(pct(totalBooked, totalSlots), 1)}／` +
     `${totalBooked}件 ÷ ${totalSlots}枠）`;
 
-  // 稼働率は「大きさ」を比べるものなので、店舗の識別色ではなく1色の濃淡で描く
+  // 棒は拠点ごとの色にする（青1色だと神戸の数字と見間違えるため）
   const items = [...TOKYO.sites]
     .map((s) => {
       const rate = pct(s.booked, s.slots);
       return {
         label: s.name,
         value: rate ?? 0,
+        color: tokyoSiteColor(s.name),
         display: `${fmtPct(rate, 1)}（${s.booked}/${s.slots}）`,
         tipExtra: [
           { label: '空き枠', value: `${s.slots - s.booked}枠` },
@@ -659,7 +660,13 @@ function renderTokyo() {
   for (const s of TOKYO.sites) {
     const row = TOKYO.monthly?.[s.name];
     const tr = document.createElement('tr');
-    tr.appendChild(html('td', null, s.name));
+    const nameCell = html('td');
+    const sw = html('span', 'swatch');
+    sw.style.background = tokyoSiteColor(s.name);
+    sw.style.marginRight = '7px';
+    nameCell.appendChild(sw);
+    nameCell.appendChild(document.createTextNode(s.name));
+    tr.appendChild(nameCell);
     TOKYO.months.forEach((_, i) => {
       const v = row ? row[i] : null;
       tr.appendChild(html('td', 'num', v === null || v === undefined ? '−' : `${v.toFixed(1)}%`));
@@ -683,21 +690,81 @@ function renderTokyo() {
   table.replaceChildren(thead, tbody);
 }
 
-/**
- * 稼働率の濃淡。青1色で、低い→薄い、高い→濃い。
- * どの段でも文字は黒のまま読めるように、濃い側を上げすぎない。
- */
-const HEAT_STEPS = [
-  { max: 20, bg: '#f2f7fe' },
-  { max: 40, bg: '#d7e7fc' },
-  { max: 60, bg: '#b0cef7' },
-  { max: 80, bg: '#86b6ef' },
-  { max: 101, bg: '#5598e7' },
-];
+/* --------------------------------------------------------------------------
+   東京の拠点の色
+   拠点ごとの稼働率とヒートマップは、以前は全部が青1色だった。
+   青は神戸の色なので、東京の数字を神戸と見間違えるおそれがある。
+   拠点ごとに、その店舗の色で描く。
+   -------------------------------------------------------------------------- */
 
-function heatColor(v) {
-  for (const s of HEAT_STEPS) if (v < s.max) return s.bg;
-  return HEAT_STEPS[HEAT_STEPS.length - 1].bg;
+/** 拠点名（西新宿・赤坂…）から、その店舗の色を返す */
+function tokyoSiteColor(name) {
+  const store = STORES.find((s) => s.name === name);
+  return store ? seriesColor(store.slot) : 'var(--seq-450)';
+}
+
+const cssColorCache = new Map();
+
+/** var(--series-5) のような指定を、実際の色（#rrggbb）に直す */
+function resolveColor(value) {
+  if (!cssColorCache.has(value)) {
+    const probe = document.createElement('span');
+    probe.style.cssText = `color:${value};position:absolute;visibility:hidden`;
+    document.body.appendChild(probe);
+    const rgb = getComputedStyle(probe).color.match(/\d+(\.\d+)?/g) || [0, 0, 0];
+    probe.remove();
+    cssColorCache.set(value, rgb.slice(0, 3).map(Number));
+  }
+  return cssColorCache.get(value);
+}
+
+/* 文字は常に黒のまま読めるようにしたいので、
+   コントラストが 4.5:1 を切らない濃さまでしか濃くしない。 */
+const HEAT_INK = [26, 26, 26]; // --text-primary #1a1a1a
+const HEAT_MIX = [0.1, 0.28, 0.46, 0.64, 0.82];
+
+function relLuminance([r, g, b]) {
+  const f = (c) => {
+    const x = c / 255;
+    return x <= 0.03928 ? x / 12.92 : ((x + 0.055) / 1.055) ** 2.4;
+  };
+  return 0.2126 * f(r) + 0.7152 * f(g) + 0.0722 * f(b);
+}
+
+function contrast(a, b) {
+  const [hi, lo] = [relLuminance(a), relLuminance(b)].sort((x, y) => y - x);
+  return (hi + 0.05) / (lo + 0.05);
+}
+
+const heatRampCache = new Map();
+
+/** その拠点の色から、薄い→濃い の5段を作る */
+function heatRamp(color) {
+  if (heatRampCache.has(color)) return heatRampCache.get(color);
+  const base = resolveColor(color);
+  const mix = (t) => base.map((v) => Math.round(v * t + 255 * (1 - t)));
+
+  // 黒文字が 4.5:1 を保てる、いちばん濃いところを探す
+  let maxT = 0.1;
+  for (let t = 1; t >= 0.1; t -= 0.01) {
+    if (contrast(mix(t), HEAT_INK) >= 4.5) {
+      maxT = t;
+      break;
+    }
+  }
+  const top = Math.min(0.82, maxT);
+  const steps = HEAT_MIX.map((x) => 0.1 + ((x - 0.1) * (top - 0.1)) / 0.72).map((t) => {
+    const [r, g, b] = mix(t);
+    return `rgb(${r} ${g} ${b})`;
+  });
+  heatRampCache.set(color, steps);
+  return steps;
+}
+
+function heatColor(v, siteName) {
+  const steps = heatRamp(tokyoSiteColor(siteName));
+  const i = Math.min(steps.length - 1, Math.max(0, Math.floor(v / 20)));
+  return steps[i];
 }
 
 /** 曜日 × 時間帯 のヒートマップを拠点ごとに描く */
@@ -718,7 +785,12 @@ function renderTokyoHeatmaps() {
     if (!grid) continue;
 
     const wrap = html('div', 'heatmap-site');
-    const h = html('h5', null, site.name);
+    const h = html('h5');
+    const sw = html('span', 'swatch');
+    sw.style.background = tokyoSiteColor(site.name);
+    sw.style.marginRight = '7px';
+    h.appendChild(sw);
+    h.appendChild(document.createTextNode(site.name));
     // シフトが入っているコマ数と、その平均を添える
     const vals = grid.flat().filter((v) => v !== null && v !== undefined);
     const avg = vals.length ? vals.reduce((a, b) => a + b, 0) / vals.length : null;
@@ -750,7 +822,7 @@ function renderTokyoHeatmaps() {
           return;
         }
         const td = html('td', null, `${Math.round(v)}%`);
-        td.style.background = heatColor(v);
+        td.style.background = heatColor(v, site.name);
         td.title = `${site.name} ${day}曜 ${time}：稼働率 ${Math.round(v)}%`;
         tr.appendChild(td);
       });
