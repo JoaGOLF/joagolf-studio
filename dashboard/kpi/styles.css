@@ -412,14 +412,15 @@ body {
 
 .bar-value {
   fill: var(--text-secondary);
-  font-size: calc(11px * var(--chart-scale));
   font-family: var(--font);
   font-variant-numeric: tabular-nums;
 }
 
+/* 文字の大きさは app.js が指定する。
+   横棒グラフは viewBox の幅を表示幅に合わせているので、
+   ここで px を決めるとそのまま画面上の実寸になる。 */
 .bar-name {
   fill: var(--text-primary);
-  font-size: calc(12px * var(--chart-scale));
   font-family: var(--font);
 }
 
@@ -517,6 +518,14 @@ body {
 .data-table thead th:first-child {
   background: var(--accent-soft);
   z-index: 3;
+}
+
+/*
+ * 週ごとの表は1店舗で3列ぶん使う。区切りが無いと、どの数字がどの店舗のものか
+ * 目で追えなくなるので、店舗のかたまりの左端に縦線を引く。
+ */
+.data-table .g-start {
+  border-left: 2px solid var(--axis);
 }
 
 .data-table tbody tr:hover td:first-child {

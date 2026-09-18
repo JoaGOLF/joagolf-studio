@@ -1014,23 +1014,33 @@ function renderTrialChart() {
  */
 function renderHBar(selector, items, opts = {}) {
   const { unit = '件', maxOverride = null } = opts;
-  const sc = chartScale();
-  const rowH = Math.round(30 * Math.min(sc, 1.3));
+  const host = $(selector);
+
+  /*
+   * 横棒グラフは viewBox の幅を「実際に表示される幅」に合わせる。
+   * 幅を決め打ちにすると、同じ 620 でも半分の幅の枠では縮んで文字が小さく、
+   * 幅いっぱいの枠では引き伸ばされて文字だけ大きくなってしまう。
+   * （プラン内訳と退会理由の文字が、折れ線グラフの1.5倍ほどになっていた）
+   * 表示幅に合わせておけば、下の px がそのまま画面上の大きさになる。
+   */
+  const NAME_PX = 13;
+  const VALUE_PX = 12;
+  const ROW_PX = 30;
+  const hostW = opts._width || Math.round(host?.getBoundingClientRect().width || 0) || 620;
 
   /*
    * ラベルの幅は、いちばん長い項目に合わせて決める。
-   * 固定値のままだと、狭い画面で文字だけ大きくなったとき
-   * 「レッスン日程が合わない」のような長い項目が左にはみ出して切れる。
-   * 日本語はほぼ全角なので「文字数 × 文字サイズ」で見積もる。
+   * 固定値のままだと「レッスン日程が合わない」のような長い項目が
+   * 左にはみ出して切れる。日本語はほぼ全角なので「文字数 × 文字サイズ」で見積もる。
    */
-  const nameFont = 12 * sc;
   const longest = items.reduce((a, d) => Math.max(a, String(d.label).length), 0);
-  const needed = Math.ceil(longest * nameFont) + 16;
+  const needed = Math.ceil(longest * NAME_PX) + 16;
   const labelW = Math.max(opts.labelW ?? 132, needed);
-  const valueW = Math.round((opts.valueW ?? 58) * Math.min(sc, 1.4));
+  const valueW = opts.valueW ?? 58;
 
-  // ラベルが広がったぶん全体も広げる（棒が潰れないように）
-  const W = Math.max(620, labelW + valueW + 190);
+  // ラベルが長くて表示幅に収まらないときだけ、全体を広げる（＝そのぶん縮んで表示される）
+  const rowH = ROW_PX;
+  const W = Math.max(hostW, labelW + valueW + 120);
   const H = Math.max(rowH * items.length + 8, 40);
   const barX = labelW;
   const barW = W - labelW - valueW;
@@ -1051,7 +1061,13 @@ function renderHBar(selector, items, opts = {}) {
     svg.appendChild(
       el(
         'text',
-        { class: 'bar-name', x: labelW - 10, y: cy + 4, 'text-anchor': 'end' },
+        {
+          class: 'bar-name',
+          x: labelW - 10,
+          y: cy + 4,
+          'text-anchor': 'end',
+          'font-size': NAME_PX,
+        },
         d.label
       )
     );
@@ -1103,7 +1119,7 @@ function renderHBar(selector, items, opts = {}) {
     svg.appendChild(
       el(
         'text',
-        { class: 'bar-value', x: W - 6, y: cy + 4, 'text-anchor': 'end' },
+        { class: 'bar-value', x: W - 6, y: cy + 4, 'text-anchor': 'end', 'font-size': VALUE_PX },
         d.display ?? `${d.value}${unit}`
       )
     );
@@ -1123,7 +1139,19 @@ function renderHBar(selector, items, opts = {}) {
     svg.appendChild(hit);
   });
 
-  $(selector).replaceChildren(svg);
+  host.replaceChildren(svg);
+
+  /*
+   * 狭い画面では CSS の min-width で SVG が枠より広げられる（横スクロールになる）。
+   * その場合は viewBox とズレて文字の大きさが変わるので、
+   * 実際に表示された幅を見て一度だけ組み直す。
+   */
+  if (!opts._retry) {
+    const shown = Math.round(svg.getBoundingClientRect().width);
+    if (shown > 0 && Math.abs(shown - W) > 2) {
+      renderHBar(selector, items, { ...opts, _retry: true, _width: shown });
+    }
+  }
 }
 
 function renderLegend(selector, items) {
@@ -1340,7 +1368,8 @@ function renderWeeklyTable() {
   thWeek.rowSpan = 2;
   r1.appendChild(thWeek);
   for (const s of targets) {
-    const th = html('th');
+    // 店舗のかたまりの左端に縦線を引く（どこからどこまでが1店舗か分かるように）
+    const th = html('th', 'g-start');
     th.colSpan = metrics.length;
     const sw = html('span', 'swatch');
     sw.style.background = seriesColor(s.slot);
@@ -1350,15 +1379,19 @@ function renderWeeklyTable() {
     r1.appendChild(th);
   }
   if (isAll) {
-    const th = html('th', null, '全店合計');
+    const th = html('th', 'g-start', '全店合計');
     th.colSpan = 4;
     r1.appendChild(th);
   }
   thead.appendChild(r1);
 
   const r2 = document.createElement('tr');
-  for (const _ of targets) for (const mname of metrics) r2.appendChild(html('th', 'num', mname));
-  if (isAll) for (const mname of ['稼働率', '体験', '入会', '入会率']) r2.appendChild(html('th', 'num', mname));
+  for (const _ of targets)
+    metrics.forEach((mname, i) => r2.appendChild(html('th', i === 0 ? 'num g-start' : 'num', mname)));
+  if (isAll)
+    ['稼働率', '体験', '入会', '入会率'].forEach((mname, i) =>
+      r2.appendChild(html('th', i === 0 ? 'num g-start' : 'num', mname))
+    );
   thead.appendChild(r2);
 
   // 表は新しい週を上に出す（グラフは時間の流れどおり左→右のまま）
@@ -1368,10 +1401,11 @@ function renderWeeklyTable() {
     for (const s of targets) {
       const rec = toRec(WEEKLY[s.id][wi]);
       if (!rec) {
-        for (let k = 0; k < metrics.length; k++) tr.appendChild(html('td', 'num muted', '−'));
+        for (let k = 0; k < metrics.length; k++)
+          tr.appendChild(html('td', k === 0 ? 'num muted g-start' : 'num muted', '−'));
         continue;
       }
-      tr.appendChild(html('td', 'num', fmtNum(rec.slots)));
+      tr.appendChild(html('td', 'num g-start', fmtNum(rec.slots)));
       tr.appendChild(html('td', 'num', fmtNum(rec.lessons)));
       tr.appendChild(html('td', 'num', fmtPct(pct(rec.lessons, rec.slots), 0)));
       if (!isAll) {
@@ -1382,7 +1416,7 @@ function renderWeeklyTable() {
     }
     if (isAll) {
       const t = totalAt(wi);
-      tr.appendChild(html('td', 'num', t ? fmtPct(pct(t.lessons, t.slots), 0) : '−'));
+      tr.appendChild(html('td', 'num g-start', t ? fmtPct(pct(t.lessons, t.slots), 0) : '−'));
       tr.appendChild(html('td', 'num', t ? fmtNum(t.trials) : '−'));
       tr.appendChild(html('td', 'num', t ? fmtNum(t.joins) : '−'));
       tr.appendChild(html('td', 'num', t ? fmtPct(pct(t.joins, t.trials), 0) : '−'));

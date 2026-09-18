@@ -19,6 +19,7 @@ import json
 import netrc
 import os
 import posixpath
+import re
 import sys
 from ftplib import FTP_TLS, error_perm
 
@@ -32,6 +33,15 @@ EXCLUDE_FILES = {STATE_FILE, "deploy.py", "weekly_report.py", "dashboard.py",
                  "CLAUDE.md", "AGENTS.md", "STATUS.md", "TODO.md",
                  "README.md", ".gitignore", ".DS_Store"}
 EXCLUDE_PREFIXES = ("_",)  # _bg-options.html などの作業用ファイル
+
+# サーバーは CSS を30日・JS を7日キャッシュするよう返してくる。
+# そのままだと、直して上げても見ている人の画面は古いままになる
+# （実際に、配色が更新されず棒グラフが黒く出る不具合として現れた）。
+# HTML は毎回読み直されるので、HTML 側の読み込み先に中身の印を付けて、
+# 中身が変わったら別のURLになるようにする。
+STAMPED_PAGES = {
+    "dashboard/kpi/index.html": ["styles.css", "app.js"],
+}
 
 
 def site_files():
@@ -50,6 +60,29 @@ def sha1(path):
         for chunk in iter(lambda: fp.read(65536), b""):
             h.update(chunk)
     return h.hexdigest()
+
+
+def stamp_assets():
+    """HTML の中の CSS/JS の読み込み先に ?v=中身の印 を付け直す"""
+    for page, assets in STAMPED_PAGES.items():
+        if not os.path.exists(page):
+            continue
+        with open(page, encoding="utf-8") as fp:
+            html = before = fp.read()
+        for name in assets:
+            path = posixpath.join(posixpath.dirname(page), name)
+            if not os.path.exists(path):
+                continue
+            mark = sha1(path)[:8]
+            html = re.sub(
+                rf'(["\'])(\.?/?{re.escape(name)})(\?v=[0-9a-f]+)?\1',
+                rf'\g<1>\g<2>?v={mark}\g<1>',
+                html,
+            )
+        if html != before:
+            with open(page, "w", encoding="utf-8") as fp:
+                fp.write(html)
+            print(f"  キャッシュ対策: {page} の読み込み先を更新しました")
 
 
 def load_state():
@@ -96,6 +129,7 @@ def main():
 
     os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
+    stamp_assets()
     current = {p: sha1(p) for p in sorted(site_files())}
 
     if args.init:
