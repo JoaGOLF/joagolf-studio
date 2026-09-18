@@ -2181,6 +2181,17 @@ function init() {
   renderAll();
   window.addEventListener('scroll', hideTooltip, { passive: true });
 
+  // スマホでは、少しスクロールしたらヘッダーの見出しを畳む。
+  // 見出しが常に出ていると、画面の1/4を占めて数字が読みにくいため。
+  const header = document.querySelector('.site-header');
+  if (header) {
+    const syncCompact = () => {
+      header.classList.toggle('compact', window.scrollY > 60);
+    };
+    window.addEventListener('scroll', syncCompact, { passive: true });
+    syncCompact();
+  }
+
   // 画面幅が変わると文字の拡大率も変わるので、余白を取り直すために描き直す
   let resizeTimer = null;
   let lastScale = chartScale();

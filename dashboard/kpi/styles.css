@@ -301,7 +301,8 @@ body {
 
 .two-col {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  /* minmax(0,…) にしないと、中のグラフの最小幅に押し広げられて枠をはみ出す */
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 28px;
 }
 
@@ -760,7 +761,7 @@ body {
   }
 
   .two-col {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
     gap: 24px;
   }
 
@@ -1094,6 +1095,17 @@ body {
     width: 100%;
   }
 
+  /* 枠がボタンの幅だけになるようにする（横いっぱいに伸びると間延びして見える） */
+  .header-filters .segmented {
+    width: fit-content;
+    max-width: 100%;
+  }
+
+  /* KPIは3+3で割れるようにする（4+2だと右下が空いて不格好） */
+  .kpi-row {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
   .header-filters .segmented {
     display: flex;
     flex-wrap: nowrap;
@@ -1137,6 +1149,11 @@ body {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 20px 26px;
+}
+
+/* グラフは自分の枠内で横スクロールさせる（外の段組みを押し広げない） */
+.chart {
+  min-width: 0;
 }
 
 .heatmap-site h5 {
@@ -1188,7 +1205,163 @@ body {
 
 @media (max-width: 767px) {
   .heatmap-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
     gap: 22px;
+  }
+}
+
+/* ==========================================================================
+   スマホ・タブレットの細かい詰め
+   ========================================================================== */
+
+@media (max-width: 1024px) {
+  /* 段組みの中のグラフが、列を押し広げないようにする */
+  .two-col > *,
+  .heatmap-site {
+    min-width: 0;
+  }
+}
+
+@media (max-width: 767px) {
+  /* --- ヘッダーを詰める（画面の1/4を占めていた） --- */
+  .header-inner {
+    padding-top: 9px;
+    padding-bottom: 9px;
+    gap: 8px;
+  }
+
+  .confidential {
+    font-size: 9.5px;
+    padding: 1px 6px;
+    margin-bottom: 2px;
+    letter-spacing: 0.08em;
+  }
+
+  .site-header h1 {
+    font-size: 15.5px;
+  }
+
+  .header-sub {
+    font-size: 11px;
+    gap: 2px 8px;
+    margin-top: 1px;
+  }
+
+  .source-badge {
+    font-size: 10.5px;
+    padding: 0 7px;
+  }
+
+  .load-warning {
+    font-size: 11px;
+    margin-top: 4px;
+  }
+
+  /* --- 店舗ボタン：枠ごと切れて見えるのをやめ、粒で並べる --- */
+  .header-filters .segmented {
+    background: transparent;
+    border: 0;
+    border-radius: 0;
+    padding: 2px 0;
+    gap: 6px;
+    /* 端まで流してから余白を作る。枠の角が切れて見えないようにする */
+    margin: 0 -14px;
+    padding-left: 14px;
+    padding-right: 14px;
+  }
+
+  .header-filters .segmented button {
+    border: 1px solid var(--border);
+    background: var(--surface-1);
+    padding: 5px 13px;
+  }
+
+  /* 選択中の色を、上の指定で打ち消してしまわないよう明示する */
+  .header-filters .segmented button[aria-pressed='true'] {
+    background: var(--accent);
+    color: var(--accent-ink);
+    border-color: transparent;
+  }
+
+  /* --- KPI：3行の比較が入るよう、余白と文字を詰める --- */
+  .kpi {
+    padding: 11px 11px 12px;
+  }
+
+  .kpi-label {
+    font-size: 11px;
+    margin-bottom: 4px;
+  }
+
+  .kpi-value {
+    font-size: 22px;
+  }
+
+  .kpi-delta {
+    font-size: 10.5px;
+    margin-top: 3px;
+    gap: 4px;
+  }
+
+  .kpi-delta .arrow {
+    font-size: 9px;
+  }
+
+  /* --- 説明文が長いので、行間を詰めて読みやすく --- */
+  .section-note,
+  .caption {
+    font-size: 12px;
+    line-height: 1.6;
+  }
+
+  .section h2 {
+    font-size: 15.5px;
+  }
+
+  /* --- レポートのボタンは横幅いっぱいに --- */
+  .report-actions {
+    flex-direction: column;
+  }
+
+  .btn-report {
+    width: 100%;
+    padding: 13px 18px;
+  }
+
+  /* --- ヒートマップの文字が小さくなりすぎないように --- */
+  .hm-table {
+    font-size: 10.5px;
+  }
+
+  .hm-table td {
+    min-width: 26px;
+    padding: 5px 1px;
+  }
+}
+
+/* 本当に狭い端末（iPhone SE など）だけ KPI を1列にする */
+@media (max-width: 359px) {
+  .kpi-row {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .kpi-value {
+    font-size: 24px;
+  }
+}
+
+/* スクロールしたら、ヘッダーの見出し部分を畳んで店舗ボタンだけ残す */
+@media (max-width: 767px) {
+  .site-header .header-title {
+    transition: opacity 0.15s;
+  }
+
+  .site-header.compact .header-title {
+    display: none;
+  }
+
+  .site-header.compact .header-inner {
+    padding-top: 5px;
+    padding-bottom: 5px;
   }
 }
