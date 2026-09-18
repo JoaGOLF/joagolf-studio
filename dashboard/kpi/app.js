@@ -1014,10 +1014,23 @@ function renderTrialChart() {
  */
 function renderHBar(selector, items, opts = {}) {
   const { unit = '件', maxOverride = null } = opts;
-  const rowH = 30;
-  const labelW = opts.labelW ?? 132;
-  const valueW = opts.valueW ?? 58;
-  const W = 620;
+  const sc = chartScale();
+  const rowH = Math.round(30 * Math.min(sc, 1.3));
+
+  /*
+   * ラベルの幅は、いちばん長い項目に合わせて決める。
+   * 固定値のままだと、狭い画面で文字だけ大きくなったとき
+   * 「レッスン日程が合わない」のような長い項目が左にはみ出して切れる。
+   * 日本語はほぼ全角なので「文字数 × 文字サイズ」で見積もる。
+   */
+  const nameFont = 12 * sc;
+  const longest = items.reduce((a, d) => Math.max(a, String(d.label).length), 0);
+  const needed = Math.ceil(longest * nameFont) + 16;
+  const labelW = Math.max(opts.labelW ?? 132, needed);
+  const valueW = Math.round((opts.valueW ?? 58) * Math.min(sc, 1.4));
+
+  // ラベルが広がったぶん全体も広げる（棒が潰れないように）
+  const W = Math.max(620, labelW + valueW + 190);
   const H = Math.max(rowH * items.length + 8, 40);
   const barX = labelW;
   const barW = W - labelW - valueW;
