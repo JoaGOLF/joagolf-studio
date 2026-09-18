@@ -121,7 +121,18 @@ function totalAt(weekIndex) {
 let ACTIVE_WEEKS = [];
 
 function recomputeActiveWeeks() {
-  ACTIVE_WEEKS = WEEKS.map((_, i) => i).filter((i) => totalAt(i) !== null);
+  // まだ終わっていない週は途中経過なので、グラフ・表とも対象から外す。
+  // 完了した週と並べると、伸びていないように見えて誤解を生むため。
+  ACTIVE_WEEKS = WEEKS.map((_, i) => i).filter(
+    (i) => totalAt(i) !== null && isWeekFinished(WEEKS[i])
+  );
+}
+
+/** 記録はあるが、まだ終わっていない週（注記に使う） */
+function ongoingWeeks() {
+  return WEEKS.map((_, i) => i).filter(
+    (i) => totalAt(i) !== null && !isWeekFinished(WEEKS[i])
+  );
 }
 
 /**
@@ -152,6 +163,35 @@ function normalizeWeeks(rawWeeks) {
     if (bare && month !== null) return `${month}/${bare[1]}-${bare[2]}`;
     return t;
   });
+}
+
+/**
+ * 週ラベル（例「9/15-21」「2/23-3/1」）から、その週の最終日を求める。
+ * まだ終わっていない週を「直近週」として出すと、途中経過の数字が
+ * 完了した週と並んで誤解を生むため、それを見分けるのに使う。
+ */
+function weekEndDate(label) {
+  const t = String(label).trim();
+  const m = t.match(/^(\d{1,2})\/(\d{1,2})\s*-\s*(?:(\d{1,2})\/)?(\d{1,2})$/);
+  if (!m) return null;
+  const startMonth = Number(m[1]);
+  const endMonth = m[3] ? Number(m[3]) : startMonth;
+  const endDay = Number(m[4]);
+  const base = new Date();
+  let year = base.getFullYear();
+  // 年をまたぐ週（12/29-1/4 など）は、終わりが翌年になる
+  if (endMonth < startMonth) {
+    year += base.getMonth() + 1 >= startMonth ? 1 : 0;
+  } else if (base.getMonth() + 1 < startMonth - 6) {
+    year -= 1;
+  }
+  return new Date(year, endMonth - 1, endDay, 23, 59, 59);
+}
+
+/** その週がもう終わっているか（終わっていない週は集計から外す） */
+function isWeekFinished(label) {
+  const end = weekEndDate(label);
+  return end === null ? true : end.getTime() <= Date.now();
 }
 
 /** 流入経路の分類。備考の文章から、当てはまるものを全部拾う（複数回答あり） */
@@ -395,6 +435,7 @@ function renderUtilChart() {
 
   // 各店舗の線
   const seriesGroups = [];
+  const endLabels = [];
   for (const s of STORES) {
     const dimmed = state.store !== 'all' && state.store !== s.id;
     const g = el('g', { class: dimmed ? 'dim-series' : null });
@@ -452,24 +493,59 @@ function renderUtilChart() {
       );
     }
 
-    // 線の右端に店舗名を直接ラベル（凡例だけに頼らない）
+    // 線の右端に店舗名を直接ラベル（凡例だけに頼らない）。
+    // 位置は後でまとめて調整するので、ここでは覚えておくだけ。
     const last = [...points].reverse().find(Boolean);
     if (last) {
-      g.appendChild(
-        el(
-          'text',
-          {
-            class: 'series-label',
-            x: last.x + 10,
-            y: last.y + 4,
-            fill: color,
-          },
-          `${s.name} ${last.v.toFixed(0)}%`
-        )
-      );
+      endLabels.push({
+        name: s.name,
+        value: last.v,
+        x: last.x,
+        y: last.y + 4,
+        origY: last.y,
+        color,
+        group: g,
+      });
     }
     seriesGroups.push(g);
     svg.appendChild(g);
+  }
+
+  // 店舗が増えると右端のラベルが重なって読めなくなるので、縦にずらす
+  const LINE = Math.round(15 * sc);
+  endLabels.sort((a, b) => a.y - b.y);
+  for (let i = 1; i < endLabels.length; i++) {
+    const gap = endLabels[i].y - endLabels[i - 1].y;
+    if (gap < LINE) endLabels[i].y = endLabels[i - 1].y + LINE;
+  }
+  // 下にはみ出したぶんを全体で押し戻す
+  const over = endLabels.length
+    ? endLabels[endLabels.length - 1].y - (m.top + ih)
+    : 0;
+  if (over > 0) for (const L of endLabels) L.y -= over;
+
+  for (const L of endLabels) {
+    // ずらした先が線から離れたときは、線とラベルを細い線でつなぐ
+    if (Math.abs(L.y - L.origY) > 2) {
+      L.group.appendChild(
+        el('line', {
+          x1: L.x + 3,
+          y1: L.origY,
+          x2: L.x + 8,
+          y2: L.y - 4,
+          stroke: L.color,
+          'stroke-width': 1,
+          opacity: 0.5,
+        })
+      );
+    }
+    L.group.appendChild(
+      el(
+        'text',
+        { class: 'series-label', x: L.x + 10, y: L.y, fill: L.color },
+        `${L.name} ${L.value.toFixed(0)}%`
+      )
+    );
   }
 
   // ホバー: 週ごとの縦線＋全店の値
@@ -1058,15 +1134,18 @@ function renderLegend(selector, items) {
 
 function renderKPIs() {
   // 選択中の範囲で、記録がある最後の週
+  // まだ終わっていない週は、途中経過なので直近週には使わない
   const withData = ACTIVE_WEEKS.filter((wi) => recordAt(wi) !== null);
   const latest = withData[withData.length - 1];
   const prev = withData[withData.length - 2];
+  const ongoing = ongoingWeeks();
 
-  const scopeLabel = state.store === 'all' ? '4店舗の合計' : `${storeName(state.store)}店`;
+  const scopeLabel = state.store === 'all' ? `${STORES.length}店舗の合計` : `${storeName(state.store)}店`;
   $('#summary-scope').textContent =
     latest === undefined
-      ? `${scopeLabel} — 記録された週がありません`
-      : `${scopeLabel} ／ ${WEEKS[latest]} の週`;
+      ? `${scopeLabel} — 終わった週の記録がまだありません`
+      : `${scopeLabel} ／ ${WEEKS[latest]} の週` +
+        (ongoing.length ? `　※${WEEKS[ongoing[ongoing.length - 1]]} は進行中のため含めていません` : '');
 
   const box = $('#kpi-row');
   if (latest === undefined) {
@@ -1196,7 +1275,8 @@ function lastMonthWeeklyAverage() {
 
 function renderMonthKPIs() {
   const g = lastMonthGroup();
-  const scopeLabel = state.store === 'all' ? '4店舗の合計' : `${storeName(state.store)}店`;
+  const scopeLabel =
+    state.store === 'all' ? `${STORES.length}店舗の合計` : `${storeName(state.store)}店`;
   const box = $('#kpi-month');
   const note = $('#month-scope');
 
