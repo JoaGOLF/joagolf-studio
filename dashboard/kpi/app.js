@@ -1929,7 +1929,8 @@ function buildReport(period) {
     return false;
   }
 
-  const scope = state.store === 'all' ? '全店（4店舗合計）' : `${storeName(state.store)}店`;
+  const scope =
+    state.store === 'all' ? `全店（${STORES.length}店舗合計）` : `${storeName(state.store)}店`;
   const cur = sumWeeks(spec.weeks);
 
   const parts = [];
@@ -2017,7 +2018,7 @@ function buildReport(period) {
   const trials = filteredTrials().filter((x) => inRange(x.date, range));
   const chCount = new Map();
   for (const x of trials) for (const c of channelsOf(x.note)) chCount.set(c, (chCount.get(c) ?? 0) + 1);
-  const chRows = [...chCount.entries()].sort((a, b) => b[1] - a[1]).map(([k, v]) => [k, `${v}人`]);
+  const chRows = countRows(chCount, '人');
   const colA = html('div');
   colA.appendChild(html('h2', 'report-h2', `体験に来たきっかけ（${trials.length}人）`));
   colA.appendChild(
@@ -2030,7 +2031,7 @@ function buildReport(period) {
   const churn = filteredChurn().filter((x) => inRange(x.date, range));
   const rCount = new Map();
   for (const x of churn) rCount.set(classifyReason(x), (rCount.get(classifyReason(x)) ?? 0) + 1);
-  const rRows = [...rCount.entries()].sort((a, b) => b[1] - a[1]).map(([k, v]) => [k, `${v}件`]);
+  const rRows = countRows(rCount, '件');
   const colB = html('div');
   const leave = churn.filter((x) => x.kind === '退会').length;
   const pause = churn.filter((x) => x.kind === '休会').length;
@@ -2067,8 +2068,53 @@ function buildReport(period) {
     )
   );
 
-  box.replaceChildren(...parts);
+  const sheet = html('div', 'report-sheet');
+  sheet.replaceChildren(...parts);
+  box.replaceChildren(sheet);
+  fitToOnePage(box, sheet);
   return true;
+}
+
+/**
+ * 集計した Map を「多い順の表」にする。
+ * 種類が多すぎると1枚に収まらないので、上位だけ残して残りは「その他」にまとめる。
+ */
+function countRows(map, unit, max = 7) {
+  const sorted = [...map.entries()].sort((a, b) => b[1] - a[1]);
+  if (sorted.length <= max) return sorted.map(([k, v]) => [k, `${v}${unit}`]);
+  const head = sorted.slice(0, max - 1);
+  const rest = sorted.slice(max - 1).reduce((a, [, v]) => a + v, 0);
+  return [...head.map(([k, v]) => [k, `${v}${unit}`]), [`その他（${sorted.length - max + 1}種）`, `${rest}${unit}`]];
+}
+
+/* A4 縦・余白 12mm/12mm/10mm のとき、紙に入る中身の高さ（CSS の :root と同じ値）。
+   印刷のときの組み方は画面での組み方と数ポイントずれることがあるので、
+   6mm ぶん余裕を持たせて「入る高さ」とする。 */
+const MM = 96 / 25.4;
+const SHEET_ROOM = (275 - 6) * MM;
+/* これより小さくすると読めなくなるので、ここで止める（そのときだけ2枚になる） */
+const MIN_ZOOM = 0.55;
+
+/**
+ * レポートをA4 1枚に収める。
+ * 画面の外で一度組み立てて高さを測り、はみ出していれば少しずつ縮める。
+ * 縮めても収まりきらない場合は MIN_ZOOM で止める（文字を切らないことを優先する）。
+ */
+function fitToOnePage(box, sheet) {
+  sheet.style.setProperty('--report-zoom', '1');
+  box.classList.add('is-measuring');
+
+  let zoom = 1;
+  let h = sheet.getBoundingClientRect().height;
+  // 縮めると行の折り返しが変わって高さも変わるので、収まるまで数回みる
+  for (let i = 0; i < 5 && h > SHEET_ROOM && zoom > MIN_ZOOM; i++) {
+    zoom = Math.max(MIN_ZOOM, zoom * (SHEET_ROOM / h) * 0.995);
+    sheet.style.setProperty('--report-zoom', String(zoom));
+    h = sheet.getBoundingClientRect().height;
+  }
+
+  box.classList.remove('is-measuring');
+  return { height: h, zoom };
 }
 
 /** 週の並びから、含まれる日付の範囲をざっくり求める（体験・退会の絞り込み用） */

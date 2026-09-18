@@ -871,14 +871,211 @@ body {
   transform: translateY(0);
 }
 
-/* 画面上ではレポートは隠しておく */
+/* ==========================================================================
+   レポート（PDF）— A4 縦 1枚に必ず収める
+   --------------------------------------------------------------------------
+   見た目の指定を @media print の外に置いてあるのは、
+   印刷する前に「画面の外」で同じ組み方をして高さを測り、
+   はみ出す分だけ縮めてから印刷するため。
+   print の中だけに書くと、測るときに別の見た目になってしまう。
+   ========================================================================== */
+
+/* A4 縦・余白 12mm/12mm/10mm のときに使える中身の大きさ */
+:root {
+  --sheet-w: 186mm; /* 210 - 12 - 12 */
+  --sheet-h: 275mm; /* 297 - 12 - 10 */
+}
+
+/* 画面ではレポートは出さない */
 .report {
   display: none;
 }
 
-/* ==========================================================================
-   印刷（PDF保存）— A4 縦 1枚に収める
-   ========================================================================== */
+/* 高さを測るあいだだけ、画面の外で組み立てる */
+.report.is-measuring {
+  display: block;
+  position: fixed;
+  top: 0;
+  left: -20000px;
+  width: var(--sheet-w);
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.report-sheet {
+  width: var(--sheet-w);
+  margin: 0 auto;
+  font-size: 10pt;
+  line-height: 1.5;
+  color: #1a1a1a;
+  /* はみ出すときだけ JS が 1 未満の値を入れる。
+     transform ではなく zoom を使うのは、zoom だと箱そのものが小さくなり、
+     「見た目は縮んだのに高さは元のまま」で白紙の2枚目が出たり、
+     はみ出しを隠して文字が切れたりしないため。 */
+  zoom: var(--report-zoom, 1);
+  /* 表の見出しの色を紙にも出す */
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+
+.report-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12mm;
+  border-bottom: 2px solid var(--accent);
+  padding-bottom: 3mm;
+  margin-bottom: 4mm;
+}
+
+.report-brand {
+  margin: 0;
+  font-size: 8pt;
+  letter-spacing: 0.12em;
+  color: var(--accent);
+  font-weight: 700;
+}
+
+.report-head h1 {
+  margin: 1mm 0 0;
+  font-size: 15pt;
+  font-weight: 700;
+}
+
+.report-period {
+  margin: 1mm 0 0;
+  font-size: 9.5pt;
+  color: #4a4a52;
+}
+
+.report-meta {
+  text-align: right;
+  flex: none;
+}
+
+.report-meta p {
+  margin: 0 0 0.8mm;
+  font-size: 8.5pt;
+  color: #4a4a52;
+}
+
+.report-confidential {
+  font-weight: 700;
+  color: var(--accent) !important;
+  letter-spacing: 0.1em;
+}
+
+/* KPI は6枚を2段で */
+.report-kpis {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 3mm;
+  margin-bottom: 5mm;
+}
+
+.report-kpis .kpi {
+  border: 1px solid #e6e6ea;
+  border-left: 2.5pt solid var(--accent);
+  border-radius: 2mm;
+  padding: 2.5mm 3mm;
+  break-inside: avoid;
+}
+
+.report-kpis .kpi-label {
+  font-size: 8pt;
+  margin-bottom: 0.5mm;
+}
+
+.report-kpis .kpi-value {
+  font-size: 17pt;
+}
+
+.report-kpis .kpi-unit {
+  font-size: 9pt;
+}
+
+.report-kpis .kpi-delta {
+  font-size: 8pt;
+  margin-top: 1mm;
+}
+
+.report-h2 {
+  font-size: 10pt;
+  font-weight: 700;
+  margin: 0 0 2mm;
+  padding-left: 2.5mm;
+  border-left: 2.5pt solid var(--accent);
+}
+
+.report-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 8.5pt;
+  margin-bottom: 4mm;
+  break-inside: avoid;
+}
+
+.report-table th,
+.report-table td {
+  border-bottom: 0.5pt solid #e6e6ea;
+  padding: 1.4mm 2mm;
+  text-align: left;
+}
+
+.report-table thead th {
+  background: var(--accent-soft);
+  font-size: 8pt;
+  font-weight: 700;
+}
+
+.report-table .num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+/* 合計行がある表だけ、最終行を強調する */
+.report-table.has-total tbody tr:last-child td {
+  font-weight: 700;
+  border-top: 0.8pt solid #c9c9d0;
+}
+
+.report-note {
+  margin: -3mm 0 4mm;
+  font-size: 8pt;
+  color: #6b6b76;
+}
+
+.report-two {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6mm;
+}
+
+.report-empty {
+  font-size: 8.5pt;
+  color: #6b6b76;
+  margin: 0 0 4mm;
+}
+
+.report-alerts {
+  margin: 0 0 4mm;
+  padding-left: 4mm;
+  font-size: 8.5pt;
+  line-height: 1.55;
+}
+
+.report-alerts li {
+  margin-bottom: 1mm;
+  break-inside: avoid;
+}
+
+.report-foot {
+  margin: 0;
+  padding-top: 2.5mm;
+  border-top: 0.5pt solid #e6e6ea;
+  font-size: 7.5pt;
+  color: #6b6b76;
+}
 
 @page {
   size: A4 portrait;
@@ -897,171 +1094,12 @@ body {
   }
 
   body {
+    margin: 0;
     font-size: 10pt;
   }
 
   .report {
     display: block;
-    color: #1a1a1a;
-  }
-
-  .report-head {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    gap: 12mm;
-    border-bottom: 2px solid var(--accent);
-    padding-bottom: 3mm;
-    margin-bottom: 4mm;
-  }
-
-  .report-brand {
-    margin: 0;
-    font-size: 8pt;
-    letter-spacing: 0.12em;
-    color: var(--accent);
-    font-weight: 700;
-  }
-
-  .report-head h1 {
-    margin: 1mm 0 0;
-    font-size: 15pt;
-    font-weight: 700;
-  }
-
-  .report-period {
-    margin: 1mm 0 0;
-    font-size: 9.5pt;
-    color: #4a4a52;
-  }
-
-  .report-meta {
-    text-align: right;
-    flex: none;
-  }
-
-  .report-meta p {
-    margin: 0 0 0.8mm;
-    font-size: 8.5pt;
-    color: #4a4a52;
-  }
-
-  .report-confidential {
-    font-weight: 700;
-    color: var(--accent) !important;
-    letter-spacing: 0.1em;
-  }
-
-  /* KPI は6枚を2段で */
-  .report-kpis {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 3mm;
-    margin-bottom: 5mm;
-  }
-
-  .report-kpis .kpi {
-    border: 1px solid #e6e6ea;
-    border-left: 2.5pt solid var(--accent);
-    border-radius: 2mm;
-    padding: 2.5mm 3mm;
-    break-inside: avoid;
-  }
-
-  .report-kpis .kpi-label {
-    font-size: 8pt;
-    margin-bottom: 0.5mm;
-  }
-
-  .report-kpis .kpi-value {
-    font-size: 17pt;
-  }
-
-  .report-kpis .kpi-unit {
-    font-size: 9pt;
-  }
-
-  .report-kpis .kpi-delta {
-    font-size: 8pt;
-    margin-top: 1mm;
-  }
-
-  .report-h2 {
-    font-size: 10pt;
-    font-weight: 700;
-    margin: 0 0 2mm;
-    padding-left: 2.5mm;
-    border-left: 2.5pt solid var(--accent);
-  }
-
-  .report-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 8.5pt;
-    margin-bottom: 4mm;
-    break-inside: avoid;
-  }
-
-  .report-table th,
-  .report-table td {
-    border-bottom: 0.5pt solid #e6e6ea;
-    padding: 1.4mm 2mm;
-    text-align: left;
-  }
-
-  .report-table thead th {
-    background: var(--accent-soft);
-    font-size: 8pt;
-    font-weight: 700;
-  }
-
-  .report-table .num {
-    text-align: right;
-    font-variant-numeric: tabular-nums;
-  }
-
-  /* 合計行がある表だけ、最終行を強調する */
-  .report-table.has-total tbody tr:last-child td {
-    font-weight: 700;
-    border-top: 0.8pt solid #c9c9d0;
-  }
-
-  .report-note {
-    margin: -3mm 0 4mm;
-    font-size: 8pt;
-    color: #6b6b76;
-  }
-
-  .report-two {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 6mm;
-  }
-
-  .report-empty {
-    font-size: 8.5pt;
-    color: #6b6b76;
-    margin: 0 0 4mm;
-  }
-
-  .report-alerts {
-    margin: 0 0 4mm;
-    padding-left: 4mm;
-    font-size: 8.5pt;
-    line-height: 1.55;
-  }
-
-  .report-alerts li {
-    margin-bottom: 1mm;
-    break-inside: avoid;
-  }
-
-  .report-foot {
-    margin: 0;
-    padding-top: 2.5mm;
-    border-top: 0.5pt solid #e6e6ea;
-    font-size: 7.5pt;
-    color: #6b6b76;
   }
 }
 
