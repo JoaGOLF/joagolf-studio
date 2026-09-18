@@ -349,13 +349,100 @@ function readTokyo(out) {
     return null;
   }
 
+  var heat = readTokyoHeatmap(ss, sites);
+
   return {
     sites: sites,
     months: months,
     monthly: monthly,
     monthlyTotal: monthlyTotal,
+    days: heat ? heat.days : null,
+    times: heat ? heat.times : null,
+    heatmap: heat ? heat.heatmap : null,
     spreadsheetName: ss.getName(),
   };
+}
+
+/**
+ * 曜日 × 時間帯 の表を読む。
+ * 「時間帯 / 月 / 火 …」という見出しの左上に拠点名が書かれた表が、拠点ぶん並んでいる。
+ * どの拠点にも値が無い時間帯は落として、表を詰める。
+ */
+function readTokyoHeatmap(ss, sites) {
+  var DAYS = ['月', '火', '水', '木', '金', '土', '日'];
+  var names = sites.map(function (x) { return x.name; });
+  var byTime = {}; // 時間帯 -> 拠点 -> 曜日 -> 値
+  var timeOrder = [];
+
+  ss.getSheets().forEach(function (sheet) {
+    if (sheet.isSheetHidden()) return;
+    var v = sheet.getDataRange().getValues();
+
+    for (var r = 0; r < v.length; r++) {
+      var row = v[r].map(s);
+      // 「時間帯」の見出しが出てくる位置ごとに、1つの表として読む
+      for (var c = 0; c < row.length; c++) {
+        if (row[c] !== '時間帯') continue;
+
+        // 曜日の並びを、この表の見出しから拾う
+        var dayCols = {};
+        for (var d = c + 1; d < Math.min(c + 9, row.length); d++) {
+          if (DAYS.indexOf(row[d]) >= 0) dayCols[row[d]] = d;
+        }
+        if (!Object.keys(dayCols).length) continue;
+
+        // 拠点名は、この表の左上（1つ上の行の同じ列あたり）にある
+        var site = '';
+        if (r > 0) {
+          for (var k = c; k >= 0 && k > c - 3; k--) {
+            var cand = s(v[r - 1][k]);
+            if (names.indexOf(cand) >= 0) { site = cand; break; }
+          }
+        }
+        if (!site) continue;
+
+        for (var i = r + 1; i < v.length; i++) {
+          var time = s(v[i][c]);
+          if (!/^\d{1,2}:\d{2}$/.test(time)) break; // 表の終わり
+          if (timeOrder.indexOf(time) < 0) timeOrder.push(time);
+          if (!byTime[time]) byTime[time] = {};
+          if (!byTime[time][site]) byTime[time][site] = {};
+          DAYS.forEach(function (day) {
+            if (dayCols[day] === undefined) return;
+            var val = toRate(v[i][dayCols[day]]);
+            if (val !== null) byTime[time][site][day] = val;
+          });
+        }
+      }
+    }
+  });
+
+  if (!timeOrder.length) return null;
+
+  // 時間帯を時刻順にそろえる
+  timeOrder.sort(function (a, b) {
+    return Number(a.split(':')[0]) - Number(b.split(':')[0]);
+  });
+
+  // どの拠点にも値が無い時間帯は落とす
+  var times = timeOrder.filter(function (time) {
+    return names.some(function (n) {
+      return byTime[time] && byTime[time][n] && Object.keys(byTime[time][n]).length;
+    });
+  });
+  if (!times.length) return null;
+
+  var heatmap = {};
+  names.forEach(function (n) {
+    heatmap[n] = times.map(function (time) {
+      var cell = (byTime[time] && byTime[time][n]) || {};
+      return DAYS.map(function (day) {
+        return cell[day] === undefined ? null : cell[day];
+      });
+    });
+  });
+
+  return { days: DAYS, times: times, heatmap: heatmap };
 }
 
 /** 「58.3%」や 0.583 を 58.3 という数値にする */
