@@ -1378,6 +1378,15 @@ function renderWeeklyTable() {
   }
 
   table.replaceChildren(thead, tbody);
+
+  // 2段目の見出しを1段目の真下に貼り付けるため、1段目の高さを CSS に渡す。
+  // 「週」のセルは2段ぶんの高さを持つ（rowSpan）ので、店舗名のセルで測る。
+  requestAnimationFrame(() => {
+    const cell = table.querySelector('thead tr:first-child th:not([rowspan])');
+    if (cell) {
+      table.style.setProperty('--thead-h', `${Math.round(cell.getBoundingClientRect().height)}px`);
+    }
+  });
 }
 
 /* ==========================================================================

@@ -493,6 +493,36 @@ body {
   box-shadow: inset 0 -1px 0 var(--border);
 }
 
+/*
+ * 見出しが2段ある表（週ごとの数字）では、2段目も top:0 だと1段目に重なって
+ * 店舗名が見えなくなる。2段目を1段目の高さぶん下げる。
+ */
+.data-table thead tr:nth-child(2) th {
+  top: var(--thead-h, 34px);
+}
+
+/*
+ * 横に長い表は、左端の見出し列（週・日付）を固定する。
+ * 固定しないと、右へスクロールした時点でどの行か分からなくなる。
+ */
+.data-table th:first-child,
+.data-table td:first-child {
+  position: sticky;
+  left: 0;
+  background: var(--surface-1);
+  z-index: 1;
+  box-shadow: 1px 0 0 var(--border);
+}
+
+.data-table thead th:first-child {
+  background: var(--accent-soft);
+  z-index: 3;
+}
+
+.data-table tbody tr:hover td:first-child {
+  background: var(--hover-wash);
+}
+
 .data-table td.num,
 .data-table th.num {
   text-align: right;
