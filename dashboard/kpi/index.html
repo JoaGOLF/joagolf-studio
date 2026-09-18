@@ -156,7 +156,8 @@
         <div class="section-head">
           <h2 id="h-trial">体験レッスンと、そこからの入会</h2>
           <p class="section-note">
-            週ごとに、左の棒が体験に来た人数、右の棒がそのうち入会した人数です。色は下の凡例のとおり。
+            週ごとに、左の棒が体験に来た人数、右の棒がそのうち入会した人数です。
+            全店を選んでいるときは、棒の中を店舗ごとに色分けしています。
           </p>
         </div>
         <div class="card">
@@ -170,7 +171,8 @@
         <div class="section-head">
           <h2 id="h-table">週ごとの数字（表）</h2>
           <p class="section-note">
-            グラフの元になっている数字です。「−」はスプレッドシートが空欄の週です。
+            グラフの元になっている数字です。<strong>新しい週が上</strong>に並んでいます。
+            「−」はスプレッドシートが空欄の週です。
           </p>
         </div>
         <div class="card table-card">
@@ -192,6 +194,7 @@
           <div>
             <h3 class="card-title">経路ごとの体験人数</h3>
             <div id="chart-channel" class="chart chart-bars"></div>
+            <div id="legend-channel" class="legend"></div>
           </div>
           <div>
             <h3 class="card-title">経路ごとの入会率</h3>
@@ -204,10 +207,14 @@
       <section class="section" aria-labelledby="h-plan">
         <div class="section-head">
           <h2 id="h-plan">入会したプランの内訳</h2>
-          <p class="section-note">体験から入会に至った方のプランです。未入会の方は含みません。</p>
+          <p class="section-note">
+          体験から入会に至った方のプランです。未入会の方は含みません。
+          全店を選んでいるときは、棒の中を店舗ごとに色分けしています。
+        </p>
         </div>
         <div class="card">
           <div id="chart-plan" class="chart chart-bars"></div>
+          <div id="legend-plan" class="legend"></div>
         </div>
       </section>
 

@@ -803,19 +803,26 @@ function renderTrialChart() {
     'aria-label': '週ごとの体験人数と、そこから入会した人数の棒グラフ',
   });
 
+  // 全店を見ているときは、店舗ごとに色分けして積み上げる
+  const byStore = state.store === 'all';
+  const targets = byStore ? STORES : [storeById[state.store]];
+
   const rows = ACTIVE_WEEKS.map((wi) => ({ wi, rec: recordAt(wi) }));
   const maxV = Math.max(...rows.map((r) => (r.rec ? r.rec.trials : 0)), 1);
-  // 人数なので目盛りは必ず整数にする
-  const tickStep = [1, 2, 5, 10, 20, 50].find((c) => maxV / c <= 5) ?? 100;
-  const yMax = Math.max(tickStep, Math.ceil(maxV / tickStep) * tickStep);
+  const yMax = Math.max(2, Math.ceil(maxV / 2) * 2);
   const y = (v) => m.top + ih - (v / yMax) * ih;
 
-  for (let v = 0; v <= yMax; v += tickStep) {
+  for (let k = 0; k <= 4; k++) {
+    const v = (yMax / 4) * k;
     svg.appendChild(
       el('line', { class: 'grid-line', x1: m.left, x2: m.left + iw, y1: y(v), y2: y(v) })
     );
     svg.appendChild(
-      el('text', { class: 'tick-label', x: m.left - 9, y: y(v) + 4, 'text-anchor': 'end' }, String(v))
+      el(
+        'text',
+        { class: 'tick-label', x: m.left - 9, y: y(v) + 4, 'text-anchor': 'end' },
+        Number.isInteger(v) ? String(v) : v.toFixed(1)
+      )
     );
   }
 
@@ -823,26 +830,35 @@ function renderTrialChart() {
   const step = iw / n;
   const barW = Math.min(18, step * 0.3);
 
+  /** 1本の棒を、店舗ごとに積み上げて描く */
+  function stack(cx, wi, key, dx, dim) {
+    let cursor = 0;
+    for (const s of targets) {
+      const rec = toRec(WEEKLY[s.id][wi]);
+      const v = rec ? rec[key] : 0;
+      if (!v) continue;
+      const yTop = y(cursor + v);
+      const h = Math.max(1, y(cursor) - yTop - (byStore ? 2 : 0));
+      svg.appendChild(
+        el('rect', {
+          x: cx + dx - barW / 2,
+          y: yTop,
+          width: barW,
+          height: h,
+          rx: 3,
+          fill: byStore ? seriesColor(s.slot) : dim,
+          opacity: key === 'trials' && byStore ? 0.45 : 1,
+        })
+      );
+      cursor += v;
+    }
+  }
+
   rows.forEach(({ wi, rec }, i) => {
     const cx = m.left + step * (i + 0.5);
     if (rec) {
-      const pairs = [
-        { v: rec.trials, color: 'var(--seq-250)', dx: -barW / 2 - 1 },
-        { v: rec.joins, color: 'var(--seq-550)', dx: barW / 2 + 1 },
-      ];
-      for (const p of pairs) {
-        if (p.v <= 0) continue;
-        svg.appendChild(
-          el('rect', {
-            x: cx + p.dx - barW / 2,
-            y: y(p.v),
-            width: barW,
-            height: Math.max(2, y(0) - y(p.v)),
-            rx: 3,
-            fill: p.color,
-          })
-        );
-      }
+      stack(cx, wi, 'trials', -barW / 2 - 1, 'var(--seq-250)');
+      stack(cx, wi, 'joins', barW / 2 + 1, 'var(--seq-550)');
     }
 
     svg.appendChild(
@@ -855,14 +871,22 @@ function renderTrialChart() {
         showTooltip(e, tipNode(WEEKS[wi], [{ label: '記録', value: 'なし' }]));
         return;
       }
-      showTooltip(
-        e,
-        tipNode(`${WEEKS[wi]}（${state.store === 'all' ? '全店' : storeName(state.store)}）`, [
-          { color: 'var(--seq-250)', label: '体験', value: `${rec.trials} 人` },
-          { color: 'var(--seq-550)', label: '入会', value: `${rec.joins} 人` },
-          { label: '入会率', value: fmtPct(pct(rec.joins, rec.trials), 0) },
-        ])
-      );
+      const lines = [];
+      if (byStore) {
+        for (const s of STORES) {
+          const r = toRec(WEEKLY[s.id][wi]);
+          if (!r) continue;
+          lines.push({
+            color: seriesColor(s.slot),
+            label: s.name,
+            value: `体験 ${r.trials} / 入会 ${r.joins}`,
+          });
+        }
+      }
+      lines.push({ label: '合計 体験', value: `${rec.trials} 人` });
+      lines.push({ label: '合計 入会', value: `${rec.joins} 人` });
+      lines.push({ label: '入会率', value: fmtPct(pct(rec.joins, rec.trials), 0) });
+      showTooltip(e, tipNode(`${WEEKS[wi]}（${byStore ? '全店' : storeName(state.store)}）`, lines));
     });
     hit.addEventListener('mousemove', positionTooltip);
     hit.addEventListener('mouseleave', hideTooltip);
@@ -874,10 +898,19 @@ function renderTrialChart() {
   );
 
   $('#chart-trial').replaceChildren(svg);
-  renderLegend('#legend-trial', [
-    { color: 'var(--seq-250)', label: '体験に来た人数' },
-    { color: 'var(--seq-550)', label: 'そのうち入会した人数' },
-  ]);
+
+  renderLegend(
+    '#legend-trial',
+    byStore
+      ? [
+          ...STORES.map((s) => ({ color: seriesColor(s.slot), label: s.name })),
+          { color: 'var(--dim)', label: '左の薄い棒＝体験／右の濃い棒＝入会' },
+        ]
+      : [
+          { color: 'var(--seq-250)', label: '体験に来た人数' },
+          { color: 'var(--seq-550)', label: 'そのうち入会した人数' },
+        ]
+  );
 }
 
 /* ==========================================================================
@@ -1220,7 +1253,8 @@ function renderWeeklyTable() {
   if (isAll) for (const mname of ['稼働率', '体験', '入会', '入会率']) r2.appendChild(html('th', 'num', mname));
   thead.appendChild(r2);
 
-  for (const wi of ACTIVE_WEEKS) {
+  // 表は新しい週を上に出す（グラフは時間の流れどおり左→右のまま）
+  for (const wi of [...ACTIVE_WEEKS].reverse()) {
     const tr = document.createElement('tr');
     tr.appendChild(html('td', null, WEEKS[wi]));
     for (const s of targets) {
@@ -1269,19 +1303,28 @@ function renderChannelCharts() {
   const counts = new Map();
   for (const t of rows) {
     for (const ch of channelsOf(t.note)) {
-      const c = counts.get(ch) ?? { total: 0, joined: 0 };
+      const c = counts.get(ch) ?? { total: 0, joined: 0, stores: {} };
       c.total += 1;
       if (isJoined(t)) c.joined += 1;
+      c.stores[t.store] = (c.stores[t.store] ?? 0) + 1;
       counts.set(ch, c);
     }
   }
 
+  const byStore = state.store === 'all';
   const items = CHANNEL_ORDER.filter((ch) => counts.has(ch)).map((ch) => {
     const c = counts.get(ch);
     return {
       label: ch,
       value: c.total,
       display: `${c.total}人`,
+      segments: byStore
+        ? STORES.map((s) => ({
+            name: s.name,
+            value: c.stores?.[s.id] ?? 0,
+            color: seriesColor(s.slot),
+          }))
+        : null,
       tipExtra: [
         { label: '入会', value: `${c.joined}人` },
         { label: '入会率', value: fmtPct(pct(c.joined, c.total), 0) },
@@ -1295,6 +1338,10 @@ function renderChannelCharts() {
     tipLabel: '体験',
     ariaLabel: '流入経路ごとの体験人数の横棒グラフ',
   });
+  renderLegend(
+    '#legend-channel',
+    byStore ? STORES.map((s) => ({ color: seriesColor(s.slot), label: s.name })) : []
+  );
 
   // 入会率（母数が少ない経路は数字を添えて誤読を防ぐ）
   const rateItems = items
@@ -1321,21 +1368,48 @@ function renderChannelCharts() {
 
 function renderPlanChart() {
   const rows = filteredTrials().filter(isJoined);
+  const byStore = state.store === 'all';
+
+  // プランごとの人数。全店のときは、さらに店舗ごとに分ける
   const counts = new Map();
-  for (const t of rows) counts.set(t.plan, (counts.get(t.plan) ?? 0) + 1);
+  for (const t of rows) {
+    if (!counts.has(t.plan)) counts.set(t.plan, { total: 0, byStore: {} });
+    const c = counts.get(t.plan);
+    c.total += 1;
+    c.byStore[t.store] = (c.byStore[t.store] ?? 0) + 1;
+  }
+
   const items = [...counts.entries()]
-    .map(([label, value]) => ({ label, value, display: `${value}人` }))
+    .map(([label, c]) => ({
+      label,
+      value: c.total,
+      display: `${c.total}人`,
+      segments: byStore
+        ? STORES.map((s) => ({
+            name: s.name,
+            value: c.byStore[s.id] ?? 0,
+            color: seriesColor(s.slot),
+          }))
+        : null,
+    }))
     .sort((a, b) => b.value - a.value);
 
   if (items.length === 0) {
     $('#chart-plan').replaceChildren(html('p', 'muted', '入会の記録がありません。'));
+    renderLegend('#legend-plan', []);
     return;
   }
+
   renderHBar('#chart-plan', items, {
     unit: '人',
     tipLabel: '入会',
     ariaLabel: 'プランごとの入会人数の横棒グラフ',
   });
+
+  renderLegend(
+    '#legend-plan',
+    byStore ? STORES.map((s) => ({ color: seriesColor(s.slot), label: s.name })) : []
+  );
 }
 
 function renderTrialsTable() {
