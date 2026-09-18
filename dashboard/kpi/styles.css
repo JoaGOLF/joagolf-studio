@@ -1090,6 +1090,8 @@ body {
   padding: 4px 12px;
 }
 
+/* ここから下はタブレットだけ。スマホ側の指定を上書きしないよう下限を付ける */
+/* スマホ・タブレット共通：店舗ボタンをタイトルの下に回し、横に流す */
 @media (max-width: 1024px) {
   .header-inner {
     flex-wrap: wrap;
@@ -1098,17 +1100,6 @@ body {
 
   .header-filters {
     width: 100%;
-  }
-
-  /* 枠がボタンの幅だけになるようにする（横いっぱいに伸びると間延びして見える） */
-  .header-filters .segmented {
-    width: fit-content;
-    max-width: 100%;
-  }
-
-  /* KPIは3+3で割れるようにする（4+2だと右下が空いて不格好） */
-  .kpi-row {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
   .header-filters .segmented {
@@ -1125,6 +1116,20 @@ body {
 
   .header-filters .segmented button {
     flex: none;
+  }
+}
+
+/* ここだけタブレット専用。スマホ側の指定を上書きしないよう下限を付ける */
+@media (min-width: 768px) and (max-width: 1024px) {
+  /* 枠がボタンの幅だけになるようにする（横いっぱいに伸びると間延びして見える） */
+  .header-filters .segmented {
+    width: fit-content;
+    max-width: 100%;
+  }
+
+  /* KPIは3+3で割れるようにする（4+2だと右下が空いて不格好） */
+  .kpi-row {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
 
