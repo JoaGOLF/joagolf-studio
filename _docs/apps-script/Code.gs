@@ -101,6 +101,20 @@ function weekLabel(v) {
   return String(v).replace(/　/g, ' ').trim();
 }
 
+/**
+ * 時間帯のセルを「10:00」の形にする。
+ * スプレッドシートでは「10:00」と打つと時刻データとして保存されることがあり、
+ * その場合ふつうに文字列として読むと日付（1899-12-30 など）になってしまう。
+ */
+function timeLabel(v) {
+  if (v === null || v === undefined || v === '') return '';
+  if (Object.prototype.toString.call(v) === '[object Date]') {
+    return v.getHours() + ':' + ('0' + v.getMinutes()).slice(-2);
+  }
+  var m = String(v).trim().match(/^(\d{1,2}):(\d{2})/);
+  return m ? Number(m[1]) + ':' + m[2] : '';
+}
+
 /** 日付セルを yyyy-MM-dd にする。文字列で入っていても拾う */
 function toIso(v) {
   if (v === null || v === undefined || v === '') return '';
@@ -349,7 +363,7 @@ function readTokyo(out) {
     return null;
   }
 
-  var heat = readTokyoHeatmap(ss, sites);
+  var heat = readTokyoHeatmap(ss, sites, out);
 
   return {
     sites: sites,
@@ -368,11 +382,13 @@ function readTokyo(out) {
  * 「時間帯 / 月 / 火 …」という見出しの左上に拠点名が書かれた表が、拠点ぶん並んでいる。
  * どの拠点にも値が無い時間帯は落として、表を詰める。
  */
-function readTokyoHeatmap(ss, sites) {
+function readTokyoHeatmap(ss, sites, out) {
   var DAYS = ['月', '火', '水', '木', '金', '土', '日'];
   var names = sites.map(function (x) { return x.name; });
   var byTime = {}; // 時間帯 -> 拠点 -> 曜日 -> 値
   var timeOrder = [];
+  var tablesFound = 0; // 「時間帯」の見出しを見つけた回数
+  var noSite = 0;      // 見出しはあったが拠点名が取れなかった回数
 
   ss.getSheets().forEach(function (sheet) {
     if (sheet.isSheetHidden()) return;
@@ -391,19 +407,21 @@ function readTokyoHeatmap(ss, sites) {
         }
         if (!Object.keys(dayCols).length) continue;
 
-        // 拠点名は、この表の左上（1つ上の行の同じ列あたり）にある
+        // 拠点名は、この表の左上あたりにある。
+        // 結合セルは左上にしか値が入らないので、上に数行・左に数列さかのぼって探す。
         var site = '';
-        if (r > 0) {
-          for (var k = c; k >= 0 && k > c - 3; k--) {
-            var cand = s(v[r - 1][k]);
+        for (var up = 1; up <= 3 && !site && r - up >= 0; up++) {
+          for (var k = c; k >= 0 && k > c - 4; k--) {
+            var cand = s(v[r - up][k]);
             if (names.indexOf(cand) >= 0) { site = cand; break; }
           }
         }
-        if (!site) continue;
+        if (!site) { noSite++; continue; }
 
+        tablesFound++;
         for (var i = r + 1; i < v.length; i++) {
-          var time = s(v[i][c]);
-          if (!/^\d{1,2}:\d{2}$/.test(time)) break; // 表の終わり
+          var time = timeLabel(v[i][c]);
+          if (!time) break; // 表の終わり
           if (timeOrder.indexOf(time) < 0) timeOrder.push(time);
           if (!byTime[time]) byTime[time] = {};
           if (!byTime[time][site]) byTime[time][site] = {};
@@ -417,7 +435,13 @@ function readTokyoHeatmap(ss, sites) {
     }
   });
 
-  if (!timeOrder.length) return null;
+  if (!timeOrder.length) {
+    out.warnings.push(
+      '東京店実績: 曜日×時間帯の表を読めませんでした（「時間帯」の見出し ' +
+        tablesFound + '件 / 拠点名が取れなかった表 ' + noSite + '件）'
+    );
+    return null;
+  }
 
   // 時間帯を時刻順にそろえる
   timeOrder.sort(function (a, b) {
