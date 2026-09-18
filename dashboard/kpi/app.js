@@ -2141,7 +2141,18 @@ async function loadFromSheet() {
   SNAPSHOT_DATE = body.snapshotDate || SNAPSHOT_DATE;
   SHEET_WARNINGS = Array.isArray(body.warnings) ? body.warnings : [];
   if (body.tokyo && Array.isArray(body.tokyo.sites) && body.tokyo.sites.length) {
-    TOKYO = { ...FILE_TOKYO, ...body.tokyo };
+    // シート側が読めなかった項目は null を返してくる。
+    // そのまま上書きすると予備データまで消えてしまうので、中身があるものだけ差し替える。
+    const merged = { ...FILE_TOKYO };
+    for (const [k, v] of Object.entries(body.tokyo)) {
+      const empty =
+        v === null ||
+        v === undefined ||
+        (Array.isArray(v) && v.length === 0) ||
+        (typeof v === 'object' && !Array.isArray(v) && Object.keys(v).length === 0);
+      if (!empty) merged[k] = v;
+    }
+    TOKYO = merged;
   }
   DATA_SOURCE = 'sheet';
   LOAD_ERROR = null;
