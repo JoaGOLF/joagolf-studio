@@ -13,7 +13,7 @@
       href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&family=Noto+Sans+JP:wght@400;500;700&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="./styles.css?v=b8911f71" />
+    <link rel="stylesheet" href="./styles.css?v=f8aa1347" />
     <link rel="icon" href="/favicon.svg" />
   </head>
   <body>
@@ -275,8 +275,32 @@
     <!-- レポートの中身。画面には出さず、印刷のときだけ表示する -->
     <div id="report" class="report" aria-hidden="true"></div>
 
+    <!-- AI相談。印刷には出ない（body直下にあるので @media print で隠れる） -->
+    <button id="ai-fab" class="ai-fab" type="button">💬 AIに相談</button>
+    <div id="ai-panel" class="ai-panel" hidden>
+      <div class="ai-head">
+        <span class="ai-title">数字のAI相談<small>この画面のデータをもとに回答します</small></span>
+        <button id="ai-close" class="ai-close" type="button" aria-label="閉じる">×</button>
+      </div>
+      <div id="ai-msgs" class="ai-msgs" role="log" aria-live="polite"></div>
+      <form id="ai-form" class="ai-form">
+        <input
+          id="ai-in"
+          class="ai-in"
+          type="text"
+          placeholder="数字について質問してみる…"
+          maxlength="1000"
+          autocomplete="off"
+        />
+        <button id="ai-send" class="ai-send" type="submit">送信</button>
+      </form>
+      <p class="ai-note">
+        会員の氏名は送っていません。答えは目安として、最後はご自身で数字を確かめてください。
+      </p>
+    </div>
+
     <div id="tooltip" class="tooltip" role="status" aria-live="polite"></div>
 
-    <script type="module" src="./app.js?v=317d02e9"></script>
+    <script type="module" src="./app.js?v=07fbd420"></script>
   </body>
 </html>

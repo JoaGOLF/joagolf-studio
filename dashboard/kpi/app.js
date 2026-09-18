@@ -2204,6 +2204,119 @@ function setupReportButtons() {
 }
 
 /* ==========================================================================
+   AI相談
+   --------------------------------------------------------------------------
+   質問を chat.php に送り、サーバー側でスプレッドシートの中身と一緒に
+   Gemini へ渡す。APIキーはサーバーにあり、ブラウザには出てこない。
+   ========================================================================== */
+
+const CHAT_SUGGESTIONS = [
+  '先週の結果を3行で要約して',
+  'いま一番気をつけるべき店舗はどこ？',
+  '体験から入会につながりやすい経路は？',
+  '退会を減らすために何ができる？',
+];
+
+const chatHistory = [];
+let chatBusy = false;
+
+/** いま画面で選んでいる範囲を、AIへの補足として渡す */
+function chatScope() {
+  const where = state.store === 'all' ? `全店（${STORES.length}店舗）` : `${storeName(state.store)}店`;
+  const last = ACTIVE_WEEKS.length ? WEEKS[ACTIVE_WEEKS[ACTIVE_WEEKS.length - 1]] : null;
+  return last ? `${where} / 記録がある直近の週は ${last}` : where;
+}
+
+function chatAdd(kind, text) {
+  const node = html('div', `ai-m ${kind}`, text);
+  const box = $('#ai-msgs');
+  box.appendChild(node);
+  box.scrollTop = box.scrollHeight;
+  return node;
+}
+
+function chatShowSuggestions() {
+  const box = $('#ai-msgs');
+  for (const q of CHAT_SUGGESTIONS) {
+    const b = html('button', 'ai-sug', q);
+    b.type = 'button';
+    b.addEventListener('click', () => chatSend(q));
+    box.appendChild(b);
+  }
+  box.scrollTop = box.scrollHeight;
+}
+
+async function chatSend(question) {
+  const q = String(question || '').trim();
+  if (chatBusy || !q) return;
+  chatBusy = true;
+  $('#ai-send').disabled = true;
+  for (const el of document.querySelectorAll('.ai-sug')) el.remove();
+  chatAdd('user', q);
+
+  const waiting = chatAdd('model', '考え中');
+  const dots = html('span', 'ai-typing');
+  dots.innerHTML = '<i></i><i></i><i></i>';
+  waiting.appendChild(dots);
+
+  try {
+    const res = await fetch('./chat.php', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ question: q, history: chatHistory, scope: chatScope() }),
+    });
+    const body = await res.json();
+    waiting.remove();
+    if (body.answer) {
+      chatAdd('model', body.answer);
+      chatHistory.push({ role: 'user', text: q }, { role: 'model', text: body.answer });
+      while (chatHistory.length > 8) chatHistory.shift();
+    } else {
+      chatAdd('err', body.error || 'エラーが起きました。少し待ってからもう一度お試しください。');
+    }
+  } catch {
+    waiting.remove();
+    chatAdd('err', 'AIに接続できませんでした。通信の状態を確かめて、もう一度お試しください。');
+  }
+
+  chatBusy = false;
+  $('#ai-send').disabled = false;
+}
+
+function setupChat() {
+  const fab = $('#ai-fab');
+  const panel = $('#ai-panel');
+  if (!fab || !panel) return;
+
+  const open = () => {
+    panel.hidden = false;
+    fab.hidden = true;
+    if (!$('#ai-msgs').children.length) {
+      chatAdd('model', 'このダッシュボードの数字について、なんでも聞いてください。');
+      chatShowSuggestions();
+    }
+    if (!window.matchMedia('(max-width: 767px)').matches) $('#ai-in').focus();
+  };
+  const close = () => {
+    panel.hidden = true;
+    fab.hidden = false;
+  };
+
+  fab.addEventListener('click', open);
+  $('#ai-close').addEventListener('click', close);
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && !panel.hidden) close();
+  });
+  $('#ai-form').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const input = $('#ai-in');
+    const q = input.value;
+    input.value = '';
+    chatSend(q);
+  });
+}
+
+/* ==========================================================================
    フィルタ・テーマ
    ========================================================================== */
 
@@ -2376,6 +2489,7 @@ function init() {
   }
 
   setupReportButtons();
+  setupChat();
   renderAll();
   window.addEventListener('scroll', hideTooltip, { passive: true });
 
@@ -2393,12 +2507,16 @@ function init() {
   // 画面幅が変わると文字の拡大率も変わるので、余白を取り直すために描き直す
   let resizeTimer = null;
   let lastScale = chartScale();
+  let lastWidth = window.innerWidth;
   window.addEventListener('resize', () => {
     clearTimeout(resizeTimer);
     resizeTimer = setTimeout(() => {
       const now = chartScale();
-      if (now !== lastScale) {
+      // 横棒グラフは枠の幅に合わせて組んでいるので、幅が変わったら組み直す
+      const moved = Math.abs(window.innerWidth - lastWidth) > 40;
+      if (now !== lastScale || moved) {
         lastScale = now;
+        lastWidth = window.innerWidth;
         renderAll();
       }
     }, 200);
