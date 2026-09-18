@@ -1010,7 +1010,7 @@ function renderTrialChart() {
           height: h,
           rx: 3,
           fill: byStore ? seriesColor(s.slot) : dim,
-          opacity: key === 'trials' && byStore ? 0.45 : 1,
+          opacity: key === 'trials' ? 0.45 : 1,
         })
       );
       cursor += v;
@@ -1020,8 +1020,9 @@ function renderTrialChart() {
   rows.forEach(({ wi, rec }, i) => {
     const cx = m.left + step * (i + 0.5);
     if (rec) {
-      stack(cx, wi, 'trials', -barW / 2 - 1, 'var(--seq-250)');
-      stack(cx, wi, 'joins', barW / 2 + 1, 'var(--seq-550)');
+      // 1店舗のときは、その店舗の色の 薄い（体験）／濃い（入会）で描く
+      stack(cx, wi, 'trials', -barW / 2 - 1, currentBarColor());
+      stack(cx, wi, 'joins', barW / 2 + 1, currentBarColor());
     }
 
     svg.appendChild(
@@ -1070,8 +1071,12 @@ function renderTrialChart() {
           { color: 'var(--dim)', label: '左の薄い棒＝体験／右の濃い棒＝入会' },
         ]
       : [
-          { color: 'var(--seq-250)', label: '体験に来た人数' },
-          { color: 'var(--seq-550)', label: 'そのうち入会した人数' },
+          // 棒は不透明度45%で描いているので、凡例も白と45%混ぜた色にする
+          {
+            color: `color-mix(in srgb, ${currentBarColor()} 45%, #fff)`,
+            label: '体験に来た人数',
+          },
+          { color: currentBarColor(), label: 'そのうち入会した人数' },
         ]
   );
 }

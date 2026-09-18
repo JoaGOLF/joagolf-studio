@@ -515,8 +515,15 @@ body {
  * 横に長い表は、左端の見出し列（週・日付）を固定する。
  * 固定しないと、右へスクロールした時点でどの行か分からなくなる。
  */
-.data-table th:first-child,
-.data-table td:first-child {
+/*
+ * 固定するのは「週」の列だけ。
+ * 見出しが2段ある表では、2段目の左端は「週」ではなく最初の店舗の「枠」なので、
+ * ここを固定してしまうと「週」の上に重なって読めなくなる（スマホで発生した）。
+ * そのため thead は1段目だけを対象にする。
+ */
+.data-table tbody th:first-child,
+.data-table tbody td:first-child,
+.data-table thead tr:first-child th:first-child {
   position: sticky;
   left: 0;
   background: var(--surface-1);
@@ -524,7 +531,7 @@ body {
   box-shadow: 1px 0 0 var(--border);
 }
 
-.data-table thead th:first-child {
+.data-table thead tr:first-child th:first-child {
   background: var(--accent-soft);
   z-index: 3;
 }
