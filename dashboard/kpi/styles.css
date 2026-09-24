@@ -882,6 +882,103 @@ body {
 }
 
 /* ==========================================================================
+   期間の送り（前の週／次の週）
+   ========================================================================== */
+
+.period-nav {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0 0 14px;
+}
+
+.period-btn,
+.period-latest {
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  border-radius: 999px;
+  padding: 7px 14px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.period-btn {
+  background: var(--surface-1);
+  color: var(--accent-deep);
+  border: 1px solid var(--border);
+}
+
+.period-btn:hover:not(:disabled) {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+
+.period-btn:disabled {
+  color: var(--text-muted);
+  cursor: default;
+  opacity: 0.5;
+}
+
+.period-now {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-primary);
+  padding: 0 4px;
+  min-width: 6em;
+  text-align: center;
+}
+
+.period-latest {
+  background: none;
+  border: 0;
+  color: var(--text-secondary);
+  text-decoration: underline;
+  padding: 7px 4px;
+}
+
+.period-latest:hover {
+  color: var(--accent-deep);
+}
+
+.period-latest[hidden] {
+  display: none;
+}
+
+@media (max-width: 767px) {
+  .period-nav {
+    gap: 6px;
+  }
+
+  .period-btn,
+  .period-latest {
+    font-size: 12px;
+    padding: 6px 11px;
+  }
+
+  .period-now {
+    font-size: 14px;
+    min-width: 0;
+    flex: 1 1 auto;
+  }
+
+  /* 「最新の週へ」は折り返して1行使う */
+  .period-latest {
+    flex: 1 0 100%;
+    text-align: left;
+  }
+}
+
+/* 印刷には出さない */
+@media print {
+  .period-nav {
+    display: none;
+  }
+}
+
+/* ==========================================================================
    レポート出力
    ========================================================================== */
 

@@ -230,27 +230,6 @@ function lastMonthNumber() {
   return d.getMonth() === 0 ? 12 : d.getMonth(); // getMonth() は 0=1月なので、そのまま前月になる
 }
 
-/**
- * 「先月」のまとまりを返す。まだ先月のデータが無ければ、記録のある最後の月を返す。
- * 返り値の isLastMonth で、本当に先月なのかどうかが分かる。
- */
-function lastMonthGroup() {
-  const groups = monthGroups().filter((g) => sumWeeks(g.weeks) !== null);
-  if (!groups.length) return null;
-  const target = lastMonthNumber();
-  const hit = groups.find((g) => g.month === target);
-  if (hit) {
-    const idx = groups.indexOf(hit);
-    return { ...hit, prev: idx > 0 ? groups[idx - 1] : null, isLastMonth: true };
-  }
-  const fallback = groups[groups.length - 1];
-  return {
-    ...fallback,
-    prev: groups.length > 1 ? groups[groups.length - 2] : null,
-    isLastMonth: false,
-  };
-}
-
 /** 記録のある週を月ごとにまとめる。古い順 */
 function monthGroups() {
   const order = [];
@@ -265,6 +244,48 @@ function monthGroups() {
     byMonth.get(mo).push(wi);
   }
   return order.map((mo) => ({ month: mo, weeks: byMonth.get(mo) }));
+}
+
+/* --------------------------------------------------------------------------
+   どの週・どの月を見ているか
+   既定は「記録のある最新の週」と「先月」。前後のボタンで過去にさかのぼれる。
+   -------------------------------------------------------------------------- */
+
+/** サマリーに出せる週（記録があり、かつ終わっている週）。古い順 */
+function summaryWeeks() {
+  return ACTIVE_WEEKS.filter((wi) => recordAt(wi) !== null);
+}
+
+/** いま見ている週。選ばれていない（または選んだ週に記録が無い）なら最新 */
+function pickedWeek() {
+  const list = summaryWeeks();
+  if (!list.length) return null;
+  if (state.week !== null && list.includes(state.week)) return state.week;
+  return list[list.length - 1];
+}
+
+/** 記録のある月のまとまり。古い順 */
+function monthGroupsWithData() {
+  return monthGroups().filter((g) => sumWeeks(g.weeks) !== null);
+}
+
+/** いま見ている月。選ばれていなければ先月（無ければ記録のある最後の月） */
+function pickedMonthGroup() {
+  const gs = monthGroupsWithData();
+  if (!gs.length) return null;
+  let idx = state.month === null ? -1 : gs.findIndex((g) => g.month === state.month);
+  if (idx < 0) {
+    idx = gs.findIndex((g) => g.month === lastMonthNumber());
+    if (idx < 0) idx = gs.length - 1;
+  }
+  return {
+    ...gs[idx],
+    prev: idx > 0 ? gs[idx - 1] : null,
+    index: idx,
+    total: gs.length,
+    // 「先月を出すつもりが、先月の記録がまだ無かった」ときだけ断り書きを出す
+    fellBack: state.month === null && gs[idx].month !== lastMonthNumber(),
+  };
 }
 
 /** その週が、その月の何週目かを返す */
@@ -315,6 +336,8 @@ function sumWeeks(weekIdxs, storeId = state.store) {
 
 const state = {
   store: 'all', // 'all' | store id
+  week: null, // 見ている週（WEEKS の番号）。null なら記録のある最新の週
+  month: null, // 見ている月（1〜12）。null なら先月
 };
 
 let storeById = Object.fromEntries(STORES.map((s) => [s.id, s]));
@@ -1261,35 +1284,56 @@ function renderLegend(selector, items) {
    ========================================================================== */
 
 function renderKPIs() {
-  // 選択中の範囲で、記録がある最後の週
-  // まだ終わっていない週は、途中経過なので直近週には使わない
-  const withData = ACTIVE_WEEKS.filter((wi) => recordAt(wi) !== null);
-  const latest = withData[withData.length - 1];
-  const prev = withData[withData.length - 2];
+  const list = summaryWeeks();
+  const cur_wi = pickedWeek();
+  const i = cur_wi === null ? -1 : list.indexOf(cur_wi);
+  const prev = i > 0 ? list[i - 1] : undefined;
   const ongoing = ongoingWeeks();
 
   const scopeLabel = state.store === 'all' ? `${STORES.length}店舗の合計` : `${storeName(state.store)}店`;
+
+  /*
+   * 全店を見ているとき、その週にまだ一部の店舗しか入力されていないと、
+   * 合計が極端に小さく出て「急に落ちた」ように見えてしまう。
+   * 何店舗ぶん入っているかを添えて、誤読を防ぐ。
+   */
+  let partial = '';
+  if (cur_wi !== null && state.store === 'all') {
+    const filled = STORES.filter((st) => toRec(WEEKLY[st.id][cur_wi])).length;
+    if (filled > 0 && filled < STORES.length) {
+      partial = `　※この週はまだ ${filled}/${STORES.length} 店舗ぶんしか入力されていません`;
+    }
+  }
+
   $('#summary-scope').textContent =
-    latest === undefined
+    cur_wi === null
       ? `${scopeLabel} — 終わった週の記録がまだありません`
-      : `${scopeLabel} ／ ${WEEKS[latest]} の週` +
+      : scopeLabel +
+        partial +
         (ongoing.length ? `　※${WEEKS[ongoing[ongoing.length - 1]]} は進行中のため含めていません` : '');
 
+  updatePeriodNav('week', {
+    label: cur_wi === null ? '—' : `${WEEKS[cur_wi]} の週`,
+    index: i,
+    total: list.length,
+    isDefault: state.week === null,
+  });
+
   const box = $('#kpi-row');
-  if (latest === undefined) {
+  if (cur_wi === null) {
     box.replaceChildren(html('p', 'muted', 'この店舗の週次データはまだ入っていません。'));
     return;
   }
 
-  const cur = recordAt(latest);
+  const cur = recordAt(cur_wi);
   const old = prev === undefined ? null : recordAt(prev);
-  const avg = lastMonthWeeklyAverage();
-  const same = sameWeekLastMonth(latest);
+  const avg = weeklyAverageBefore(cur_wi);
+  const same = sameWeekLastMonth(cur_wi);
   box.replaceChildren(
     ...kpiCards(cur, [
       { rec: old, label: '前週比' },
-      avg ? { rec: avg.rec, label: '先月の週平均比' } : null,
-      same ? { rec: same.rec, label: `先月の第${same.nth}週比` } : null,
+      avg ? { rec: avg.rec, label: `${avg.month}月の週平均比` } : null,
+      same ? { rec: same.rec, label: `${same.month}月の第${same.nth}週比` } : null,
     ]).map(kpiCardNode)
   );
 
@@ -1298,9 +1342,58 @@ function renderKPIs() {
   if (detail) {
     const bits = [];
     if (prev !== undefined) bits.push(`前週＝${WEEKS[prev]}`);
-    if (avg) bits.push(`先月(${avg.month}月)の週平均＝${avg.weeks}週の平均`);
-    if (same) bits.push(`先月の第${same.nth}週＝${same.weekLabel}`);
+    if (avg) bits.push(`${avg.month}月の週平均＝${avg.weeks}週の平均`);
+    if (same) bits.push(`${same.month}月の第${same.nth}週＝${same.weekLabel}`);
     detail.textContent = bits.length ? `比べている相手：${bits.join(' ／ ')}` : '';
+  }
+}
+
+/* --------------------------------------------------------------------------
+   期間の送り（← 前の週 / 次の週 → など）
+   -------------------------------------------------------------------------- */
+
+/** ボタンの状態と、いま見ている期間の文字を更新する */
+function updatePeriodNav(kind, { label, index, total, isDefault }) {
+  const now = $(`#${kind}-now`);
+  if (!now) return;
+  now.textContent = label;
+  const prev = $(`#${kind}-prev`);
+  const next = $(`#${kind}-next`);
+  const latest = $(`#${kind}-latest`);
+  if (prev) prev.disabled = index <= 0;
+  if (next) next.disabled = index < 0 || index >= total - 1;
+  // 既定の位置（最新の週・先月）にいるときは、戻るボタンを出さない
+  if (latest) latest.hidden = isDefault !== false;
+}
+
+/** 前後に送る。d は -1（前）か 1（次） */
+function stepPeriod(kind, d) {
+  if (kind === 'week') {
+    const list = summaryWeeks();
+    const i = list.indexOf(pickedWeek());
+    const n = i + d;
+    if (i < 0 || n < 0 || n >= list.length) return;
+    state.week = list[n];
+  } else {
+    const gs = monthGroupsWithData();
+    const g = pickedMonthGroup();
+    if (!g) return;
+    const n = g.index + d;
+    if (n < 0 || n >= gs.length) return;
+    state.month = gs[n].month;
+  }
+  renderAll();
+}
+
+function setupPeriodNav() {
+  for (const kind of ['week', 'month']) {
+    $(`#${kind}-prev`)?.addEventListener('click', () => stepPeriod(kind, -1));
+    $(`#${kind}-next`)?.addEventListener('click', () => stepPeriod(kind, 1));
+    $(`#${kind}-latest`)?.addEventListener('click', () => {
+      if (kind === 'week') state.week = null;
+      else state.month = null;
+      renderAll();
+    });
   }
 }
 
@@ -1379,9 +1472,14 @@ function kpiCardNode(c) {
 }
 
 /** 先月の「1週あたり平均」。週の数字と比べられるようにするため */
-function lastMonthWeeklyAverage() {
-  const g = lastMonthGroup();
-  if (!g) return null;
+/**
+ * その週から見て「1つ前の月」の週平均。
+ * 過去の週を見ているときも、その週の前月と比べられるようにしている。
+ */
+function weeklyAverageBefore(weekIndex) {
+  const pos = weekPositionInMonth(weekIndex);
+  if (!pos || pos.groupIndex === 0) return null;
+  const g = monthGroups()[pos.groupIndex - 1];
   const sum = sumWeeks(g.weeks);
   if (!sum) return null;
   const n = g.weeks.length || 1;
@@ -1402,7 +1500,7 @@ function lastMonthWeeklyAverage() {
    ========================================================================== */
 
 function renderMonthKPIs() {
-  const g = lastMonthGroup();
+  const g = pickedMonthGroup();
   const scopeLabel =
     state.store === 'all' ? `${STORES.length}店舗の合計` : `${storeName(state.store)}店`;
   const box = $('#kpi-month');
@@ -1410,16 +1508,26 @@ function renderMonthKPIs() {
 
   if (!g) {
     note.textContent = `${scopeLabel} — 記録された月がありません`;
+    updatePeriodNav('month', { label: '—', index: -1, total: 0, isDefault: true });
     box.replaceChildren(html('p', 'muted', 'この店舗の月次データはまだ入っていません。'));
     return;
   }
 
+  updatePeriodNav('month', {
+    label: `${g.month}月`,
+    index: g.index,
+    total: g.total,
+    isDefault: state.month === null,
+  });
+
   const first = WEEKS[g.weeks[0]];
   const last = WEEKS[g.weeks[g.weeks.length - 1]];
   const span = g.weeks.length === 1 ? first : `${first} 〜 ${last}`;
+  const thisMonth = new Date().getMonth() + 1;
   note.textContent =
-    `${scopeLabel} ／ ${g.month}月（${g.weeks.length}週分：${span}）` +
-    (g.isLastMonth ? '' : '　※先月の記録がまだ無いため、記録のある最後の月を表示しています');
+    `${scopeLabel} ／ ${g.weeks.length}週分：${span}` +
+    (g.month === thisMonth ? '　※今月はまだ途中です' : '') +
+    (g.fellBack ? '　※先月の記録がまだ無いため、記録のある最後の月を表示しています' : '');
 
   const cur = sumWeeks(g.weeks);
   const fair = g.prev ? g.prev.weeks.slice(0, g.weeks.length) : null;
@@ -2010,24 +2118,24 @@ function reportTable(headers, rows, aligns = []) {
 /** レポートの対象期間を決める。period は 'week' | 'month' */
 function reportPeriod(period) {
   if (period === 'week') {
-    const withData = ACTIVE_WEEKS.filter((wi) => recordAt(wi) !== null);
-    const latest = withData[withData.length - 1];
-    const prev = withData[withData.length - 2];
-    if (latest === undefined) return null;
-    const avg = lastMonthWeeklyAverage();
-    const same = sameWeekLastMonth(latest);
+    const list = summaryWeeks();
+    const cur = pickedWeek();
+    if (cur === null) return null;
+    const prev = list[list.indexOf(cur) - 1];
+    const avg = weeklyAverageBefore(cur);
+    const same = sameWeekLastMonth(cur);
     return {
       title: '週次レポート',
-      label: `${WEEKS[latest]} の週`,
-      weeks: [latest],
+      label: `${WEEKS[cur]} の週`,
+      weeks: [cur],
       comparisons: [
         { rec: prev === undefined ? null : recordAt(prev), label: '前週比' },
-        avg ? { rec: avg.rec, label: '先月の週平均比' } : null,
-        same ? { rec: same.rec, label: `先月の第${same.nth}週比` } : null,
+        avg ? { rec: avg.rec, label: `${avg.month}月の週平均比` } : null,
+        same ? { rec: same.rec, label: `${same.month}月の第${same.nth}週比` } : null,
       ],
     };
   }
-  const g = lastMonthGroup();
+  const g = pickedMonthGroup();
   if (!g) return null;
   const fair = g.prev ? g.prev.weeks.slice(0, g.weeks.length) : null;
   const sameLength = !g.prev || fair.length === g.prev.weeks.length;
@@ -2045,7 +2153,7 @@ function reportPeriod(period) {
       },
     ],
     note: [
-      g.isLastMonth ? null : '先月の記録がまだ無いため、記録のある最後の月を出しています。',
+      g.fellBack ? '先月の記録がまだ無いため、記録のある最後の月を出しています。' : null,
       sameLength
         ? null
         : `${g.month}月は${g.weeks.length}週分のため、${g.prev.month}月の最初の${g.weeks.length}週と比べています。`,
@@ -2589,6 +2697,7 @@ function init() {
   }
 
   setupReportButtons();
+  setupPeriodNav();
   setupChat();
   renderAll();
   window.addEventListener('scroll', hideTooltip, { passive: true });
