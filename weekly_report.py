@@ -33,7 +33,8 @@ LP_PATH = "/campaign/tokyo-a-3months/"
 # 予約リンク → 店舗名
 # 東京4店舗は公式LINEが予約導線(2026-08-23〜)。ボタンのid(linkId)で店舗を判別する
 LINE_STORE = {"line-kojimachi": "麹町店", "line-nishi-shinjuku": "西新宿店",
-              "line-sendagaya": "千駄ヶ谷店", "line-akasaka": "赤坂店"}
+              "line-sendagaya": "千駄ヶ谷店", "line-akasaka": "赤坂店",
+              "line-kobetorroad": "神戸トアロード店"}
 
 
 def line_store(link_id):
@@ -184,7 +185,7 @@ def build(start, end, pstart, pend):
                   limit=200, order_by_metric="eventCount")
     reserve, line_clicks, share_clicks = {}, 0, 0
     for url, lid, n in out:
-        if "page.line.me" in url:          # LINE友だち追加(LP + 東京4店の予約ボタン)
+        if "page.line.me" in url or "lin.ee/" in url:  # LINE友だち追加(LP + LINE予約店舗のボタン)
             line_clicks += n
             st = line_store(lid)           # 東京店舗ページのLINE予約ボタンは店舗別予約としても集計
             if st:
@@ -198,8 +199,9 @@ def build(start, end, pstart, pend):
     prev_out = ga4_run(ga, pstart, pend, ["linkUrl", "linkId"], ["eventCount"],
                        dim_filter=contains_filter("eventName", "click"), limit=200)
     prev_reserve = sum(n for u, l, n in prev_out
-                       if label_for(u, RESERVE_MAP) or ("page.line.me" in u and line_store(l)))
-    prev_line = sum(n for u, l, n in prev_out if "page.line.me" in u)
+                       if label_for(u, RESERVE_MAP)
+                       or (("page.line.me" in u or "lin.ee/" in u) and line_store(l)))
+    prev_line = sum(n for u, l, n in prev_out if "page.line.me" in u or "lin.ee/" in u)
 
     # ④ LP
     lp = ga4_run(ga, start, end, ["pagePath"], ["screenPageViews", "activeUsers"],
