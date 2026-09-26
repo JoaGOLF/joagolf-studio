@@ -1,20 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url><loc>https://joagolfstudio.jp/</loc><lastmod>2026-08-27</lastmod><changefreq>weekly</changefreq><priority>1.0</priority></url>
+  <url><loc>https://joagolfstudio.jp/</loc><lastmod>2026-09-26</lastmod><changefreq>weekly</changefreq><priority>1.0</priority></url>
   <url><loc>https://joagolfstudio.jp/concept/</loc><lastmod>2026-08-18</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
   <url><loc>https://joagolfstudio.jp/campaign/tokyo-a-3months/</loc><lastmod>2026-08-17</lastmod><changefreq>weekly</changefreq><priority>0.9</priority></url>
-  <url><loc>https://joagolfstudio.jp/store/</loc><lastmod>2026-08-23</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://joagolfstudio.jp/store/kobe/</loc><lastmod>2026-08-23</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://joagolfstudio.jp/store/kobetorroad/</loc><lastmod>2026-08-23</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://joagolfstudio.jp/store/minoh/</loc><lastmod>2026-08-23</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://joagolfstudio.jp/store/kojimachi/</loc><lastmod>2026-08-28</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://joagolfstudio.jp/store/nishi-shinjuku/</loc><lastmod>2026-08-28</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://joagolfstudio.jp/store/sendagaya/</loc><lastmod>2026-08-28</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://joagolfstudio.jp/store/akasaka/</loc><lastmod>2026-08-28</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://joagolfstudio.jp/store/</loc><lastmod>2026-09-24</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://joagolfstudio.jp/store/kobe/</loc><lastmod>2026-09-26</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://joagolfstudio.jp/store/kobetorroad/</loc><lastmod>2026-09-26</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://joagolfstudio.jp/store/minoh/</loc><lastmod>2026-09-26</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://joagolfstudio.jp/store/kojimachi/</loc><lastmod>2026-09-26</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://joagolfstudio.jp/store/nishi-shinjuku/</loc><lastmod>2026-09-26</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://joagolfstudio.jp/store/sendagaya/</loc><lastmod>2026-09-26</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://joagolfstudio.jp/store/akasaka/</loc><lastmod>2026-09-26</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
   <url><loc>https://joagolfstudio.jp/swing-type/</loc><lastmod>2026-08-18</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
   <url><loc>https://joagolfstudio.jp/voice/</loc><lastmod>2026-08-18</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
   <url><loc>https://joagolfstudio.jp/faq/</loc><lastmod>2026-08-27</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
-  <url><loc>https://joagolfstudio.jp/news/</loc><lastmod>2026-08-23</lastmod><changefreq>weekly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://joagolfstudio.jp/news/</loc><lastmod>2026-09-26</lastmod><changefreq>weekly</changefreq><priority>0.6</priority></url>
   <url><loc>https://joagolfstudio.jp/news/01/</loc><lastmod>2026-08-18</lastmod><changefreq>yearly</changefreq><priority>0.4</priority></url>
   <url><loc>https://joagolfstudio.jp/news/02/</loc><lastmod>2026-08-18</lastmod><changefreq>yearly</changefreq><priority>0.4</priority></url>
   <url><loc>https://joagolfstudio.jp/news/03/</loc><lastmod>2026-08-18</lastmod><changefreq>yearly</changefreq><priority>0.4</priority></url>
@@ -26,6 +26,10 @@
   <url><loc>https://joagolfstudio.jp/news/09/</loc><lastmod>2026-08-23</lastmod><changefreq>yearly</changefreq><priority>0.4</priority></url>
   <url><loc>https://joagolfstudio.jp/news/10/</loc><lastmod>2026-08-23</lastmod><changefreq>yearly</changefreq><priority>0.4</priority></url>
   <url><loc>https://joagolfstudio.jp/news/11/</loc><lastmod>2026-08-23</lastmod><changefreq>yearly</changefreq><priority>0.4</priority></url>
+  <url><loc>https://joagolfstudio.jp/news/12/</loc><lastmod>2026-09-26</lastmod><changefreq>yearly</changefreq><priority>0.4</priority></url>
+  <url><loc>https://joagolfstudio.jp/news/13/</loc><lastmod>2026-09-26</lastmod><changefreq>yearly</changefreq><priority>0.4</priority></url>
+  <url><loc>https://joagolfstudio.jp/news/14/</loc><lastmod>2026-09-26</lastmod><changefreq>yearly</changefreq><priority>0.4</priority></url>
+  <url><loc>https://joagolfstudio.jp/news/15/</loc><lastmod>2026-09-26</lastmod><changefreq>yearly</changefreq><priority>0.4</priority></url>
   <url><loc>https://joagolfstudio.jp/message/</loc><lastmod>2026-08-18</lastmod><changefreq>yearly</changefreq><priority>0.5</priority></url>
   <url><loc>https://joagolfstudio.jp/contact/</loc><lastmod>2026-08-18</lastmod><changefreq>yearly</changefreq><priority>0.5</priority></url>
 </urlset>
