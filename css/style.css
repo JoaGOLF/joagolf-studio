@@ -2133,19 +2133,27 @@ button {
   box-shadow: var(--shadow-md);
 }
 
+.instructor__locations {
+  margin: 18px 0 20px;
+  text-align: left;
+}
+
+.instructor__stores-label {
+  margin: 0 0 8px;
+  color: #6b5260;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.5;
+}
+
 .instructor__stores {
-  position: absolute;
-  top: 60px;
-  right: 80px;
   display: flex;
   flex-wrap: wrap;
-  justify-content: flex-end;
-  gap: 6px;
-  max-width: 230px;
+  align-items: center;
+  gap: 8px;
   list-style: none;
   padding: 0;
   margin: 0;
-  z-index: 2;
 }
 
 .instructor__store-tag {
@@ -2153,16 +2161,17 @@ button {
   align-items: center;
   justify-content: center;
   box-sizing: border-box;
+  min-height: 34px;
   font-family: "Outfit", "Noto Sans JP", sans-serif;
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 600;
-  padding: 4px 12px;
-  border-radius: 999px;
-  border: 1.5px solid var(--color-primary);
-  background: #fff;
-  color: var(--color-primary);
+  padding: 6px 12px;
+  border-radius: 7px;
+  border: 1px solid #e7bfd5;
+  background: #fff0f7;
+  color: #8d1b59;
   white-space: nowrap;
-  line-height: 1;
+  line-height: 1.5;
 }
 
 .instructor__store-tag.is-active {
@@ -4518,38 +4527,18 @@ body:not(.is-result) .sticky-cta--result-only.is-visible {
   }
 
 
-  .instructor__stores {
-    position: static;
-    display: flex;
-    flex-wrap: nowrap;
-    align-items: center;
-    justify-content: flex-start;
-    max-width: none;
-    margin: 0 -16px 0;
-    padding: 0 16px 4px;
-    gap: 6px;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;
-    grid-column: 1 / -1;
-    grid-row: 1;
+  .instructor__locations {
+    margin: 16px 0;
   }
 
-  .instructor__stores::-webkit-scrollbar {
-    display: none;
+  .instructor__stores {
+    gap: 8px;
   }
 
   .instructor__store-tag {
-    flex: 0 0 auto;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    height: 26px;
-    padding: 0 12px;
-    font-size: 12px;
-    border-radius: 999px;
-    white-space: nowrap;
-    line-height: 1;
+    min-height: 34px;
+    padding: 6px 11px;
+    font-size: 13px;
   }
 
   .instructor__profile {
